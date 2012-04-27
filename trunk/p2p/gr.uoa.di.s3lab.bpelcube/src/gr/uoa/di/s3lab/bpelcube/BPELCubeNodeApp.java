@@ -124,7 +124,7 @@ public class BPELCubeNodeApp extends BPELCubeNode {
 	protected void prepareGUI() {
 		
 		mainFrame = new JFrame();
-		mainFrame.setTitle("P2PEngine:node " + this.getName());
+		mainFrame.setTitle("BPELCube:node " + this.getName());
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		JPanel mainPanel = new JPanel();

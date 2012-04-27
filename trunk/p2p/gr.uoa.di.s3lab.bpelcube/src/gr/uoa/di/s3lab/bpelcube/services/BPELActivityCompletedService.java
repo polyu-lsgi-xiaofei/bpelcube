@@ -15,9 +15,15 @@
  */
 package gr.uoa.di.s3lab.bpelcube.services;
 
+import gr.uoa.di.s3lab.bpelcube.BPELActivityListener;
+import gr.uoa.di.s3lab.bpelcube.BPELActivityNotifier;
 import gr.uoa.di.s3lab.bpelcube.BPELCubeService;
+import gr.uoa.di.s3lab.p2p.P2PEndpoint;
 import gr.uoa.di.s3lab.p2p.P2PRequest;
 import gr.uoa.di.s3lab.p2p.P2PResponse;
+
+import java.util.Hashtable;
+import java.util.Set;
 
 /**
  * 
@@ -42,7 +48,37 @@ public class BPELActivityCompletedService extends BPELCubeService {
 
 	@Override
 	public void execute() {
-		// TODO Implement this method
+		
+		// persist all new variables
+		Hashtable<String, P2PEndpoint> newVariableHolders = request.getNewVariableHolders();
+		Set<String> variableIds = newVariableHolders.keySet();
+		for (String vid : variableIds) {
+			P2PEndpoint holderEndpoint = newVariableHolders.get(vid);
+			// the variable value is set to null because the variable is held remotely
+			db.addVariable(request.getP2PSessionId(), vid, holderEndpoint.toString(), null);
+		}
+		
+		// notify the respective activity listener
+		BPELActivityListener<P2PRequest> activityListener = null;
+		while (true) {
+			activityListener = me.getActivityListener(
+					request.getP2PSessionId(), request.getActivityId());
+			if (activityListener != null) {
+				break;
+			}
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		BPELActivityNotifier<P2PRequest> activityNotifier = new BPELActivityNotifier<P2PRequest>(activityListener.getQueue());
+		try {
+			activityNotifier.notify(request);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override

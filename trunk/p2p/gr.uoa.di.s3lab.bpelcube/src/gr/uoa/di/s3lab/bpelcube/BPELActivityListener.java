@@ -34,6 +34,10 @@ public class BPELActivityListener<E> {
 		this.queue = queue;
 	}
 	
+	public SynchronousQueue<E> getQueue() {
+		return queue;
+	}
+
 	/**
 	 * Listens for a notification from the activity notifier.
 	 * 
