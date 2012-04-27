@@ -38,7 +38,7 @@ public class BPELCubeUtils {
 	public static String newP2PSessionID() {
 		StringBuilder sb = new StringBuilder();
 		
-		sb.append("p2p").append("-");
+		sb.append("urn:bpelcube").append(":");
 		sb.append(System.currentTimeMillis()).append("-");
 		sb.append(processInstanceCounter++);
 		

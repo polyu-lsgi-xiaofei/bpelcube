@@ -72,12 +72,27 @@ public class BPELCubeNodeDB extends P2PNodeDB {
 		
 		return this.executeDDL(SQL);
 	}
-
+	
+	private boolean createTable_P2P_SESSION_VARIABLES() {
+		
+		String SQL = "CREATE CACHED TABLE P2P_SESSION_VARIABLES (" +
+				"P2P_SESSION_ID VARCHAR(100) NOT NULL," +
+				"VARIABLE_ID VARCHAR(100) NOT NULL," +
+				"HOLDER_ENDPOINT VARCHAR(255) NOT NULL," +
+				"VARIABLE_VALUE OBJECT," +
+				"PRIMARY KEY (P2P_SESSION_ID,VARIABLE_ID)," +
+				"FOREIGN KEY (P2P_SESSION_ID) REFERENCES P2P_SESSION (P2P_SESSION_ID) ON DELETE CASCADE" +
+				");";
+		
+		return this.executeDDL(SQL);
+	}
+	
 	@Override
 	protected void createTables() {
 		createTable_P2P_SESSION();
 		createTable_P2P_SESSION_ACTIVITIES();
 		createTable_P2P_SESSION_NEIGHBORS();
+		createTable_P2P_SESSION_VARIABLES();
 	}
 
 	@Override
@@ -352,6 +367,215 @@ public class BPELCubeNodeDB extends P2PNodeDB {
 		List<String> result = new ArrayList<String>();
 		try {
 			String SQL = "SELECT NEIGHBOR_ENDPOINT FROM P2P_SESSION_NEIGHBORS WHERE P2P_SESSION_ID=?";
+			stmt = this.connection.prepareStatement(SQL);
+			stmt.setString(1, p2pSessionId);
+			rset = stmt.executeQuery();
+			while (rset.next()) {
+				result.add(rset.getString(1));
+			}
+			return result;
+		} catch (SQLException e) {
+			log.debug(e.getMessage());
+			return result;
+		} finally {
+			try {
+				if (rset != null) {
+					rset.close();
+					rset = null;
+				}
+				if (stmt != null) {
+					stmt.close();
+					stmt = null;
+				}
+			} catch (SQLException e) {}
+		}
+	}
+	
+	/**
+	 * Returns true if the specified variable exists in the database.
+	 * 
+	 * @param p2pSessionId
+	 * @param variableId
+	 * @return
+	 */
+	public boolean variableExists(String p2pSessionId, String variableId) {
+		PreparedStatement stmt = null;
+		ResultSet rset = null;
+		try {
+			String SQL = "SELECT 1 FROM P2P_SESSION_VARIABLES WHERE P2P_SESSION_ID=? AND VARIABLE_ID=?";
+			stmt = this.connection.prepareStatement(SQL);
+			stmt.setString(1, p2pSessionId);
+			stmt.setString(2, variableId);
+			rset = stmt.executeQuery();
+			return rset.next();
+		} catch (SQLException e) {
+			log.debug(e.getMessage());
+			return false;
+		} finally {
+			try {
+				if (rset != null) {
+					rset.close();
+					rset = null;
+				}
+				if (stmt != null) {
+					stmt.close();
+					stmt = null;
+				}
+			} catch (SQLException e) {}
+		}
+	}
+	
+	/**
+	 * Adds a new P2P_SESSION_VARIABLES row.
+	 * 
+	 * @param p2pSessionId
+	 * @param holderEndpoint
+	 */
+	public void addVariable(String p2pSessionId, String variableId, String holderEndpoint, String value) {
+		PreparedStatement stmt = null;
+		try {
+			String SQL = "INSERT INTO P2P_SESSION_VARIABLES " +
+					"(P2P_SESSION_ID, VARIABLE_ID, HOLDER_ENDPOINT, VARIABLE_VALUE) VALUES (?,?,?,?)";
+			stmt = this.connection.prepareStatement(SQL);
+			stmt.setString(1, p2pSessionId);
+			stmt.setString(2, variableId);
+			stmt.setString(3, holderEndpoint);
+			if (value == null) {
+				stmt.setNull(4, Types.JAVA_OBJECT);
+			} else {
+				stmt.setObject(4, value);
+			}
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			log.debug(e.getMessage());
+		} finally {
+			try {
+				if (stmt != null) {
+					stmt.close();
+					stmt = null;
+				}
+			} catch (SQLException e) {}
+		}
+	}
+	
+	/**
+	 * Updates the value of the specified variable in the specified P2P session.
+	 * 
+	 * @param p2pSessionId
+	 * @param variableId
+	 * @param value
+	 */
+	public void updateVariableValue(String p2pSessionId, String variableId, String value) {
+		PreparedStatement stmt = null;
+		try {
+			String SQL = "UPDATE P2P_SESSION_VARIABLES SET VARIABLE_VALUE=? " +
+					"WHERE P2P_SESSION_ID=? AND VARIABLE_ID=?";
+			stmt = this.connection.prepareStatement(SQL);
+			stmt.setObject(1, value);
+			stmt.setString(2, p2pSessionId);
+			stmt.setString(3, variableId);
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			log.debug(e.getMessage());
+		} finally {
+			try {
+				if (stmt != null) {
+					stmt.close();
+					stmt = null;
+				}
+			} catch (SQLException e) {}
+		}
+	}
+	
+	/**
+	 * Gets the value of the specified variable.
+	 * 
+	 * @param p2pSessionId
+	 * @param variableId
+	 * @return
+	 */
+	public String getVariableValue(String p2pSessionId, String variableId) {
+		PreparedStatement stmt = null;
+		ResultSet rset = null;
+		try {
+			String SQL = "SELECT VARIABLE_VALUE FROM P2P_SESSION_VARIABLES WHERE P2P_SESSION_ID=? AND VARIABLE_ID=?";
+			stmt = this.connection.prepareStatement(SQL);
+			stmt.setString(1, p2pSessionId);
+			stmt.setString(2, variableId);
+			rset = stmt.executeQuery();
+			if (rset.next()) {
+				return (String)rset.getObject(1);
+			}
+			return null;
+		} catch (SQLException e) {
+			log.debug(e.getMessage());
+			return null;
+		} finally {
+			try {
+				if (rset != null) {
+					rset.close();
+					rset = null;
+				}
+				if (stmt != null) {
+					stmt.close();
+					stmt = null;
+				}
+			} catch (SQLException e) {}
+		}
+	}
+	
+	/**
+	 * Gets the P2P endpoint address of the holder of the specified variable
+	 * in the specified P2P session.
+	 * 
+	 * @param p2pSessionId
+	 * @param variableId
+	 * @return
+	 */
+	public String getVariableHolder(String p2pSessionId, String variableId) {
+		PreparedStatement stmt = null;
+		ResultSet rset = null;
+		try {
+			String SQL = "SELECT HOLDER_ENDPOINT FROM P2P_SESSION_VARIABLES " +
+					"WHERE P2P_SESSION_ID=? AND VARIABLE_ID=?";
+			stmt = this.connection.prepareStatement(SQL);
+			stmt.setString(1, p2pSessionId);
+			stmt.setString(2, variableId);
+			rset = stmt.executeQuery();
+			if (rset.next()) {
+				return rset.getString(1);
+			}
+			return null;
+		} catch (SQLException e) {
+			log.debug(e.getMessage());
+			return null;
+		} finally {
+			try {
+				if (rset != null) {
+					rset.close();
+					rset = null;
+				}
+				if (stmt != null) {
+					stmt.close();
+					stmt = null;
+				}
+			} catch (SQLException e) {}
+		}
+	}
+	
+	/**
+	 * Returns the P2P endpoint addresses of the variable holders involved in the 
+	 * specified P2P session.
+	 * 
+	 * @param p2pSessionId
+	 * @return
+	 */
+	public List<String> getVariableHolders(String p2pSessionId) {
+		PreparedStatement stmt = null;
+		ResultSet rset = null;
+		List<String> result = new ArrayList<String>();
+		try {
+			String SQL = "SELECT HOLDER_ENDPOINT FROM P2P_SESSION_VARIABLE_HOLDERS WHERE P2P_SESSION_ID=?";
 			stmt = this.connection.prepareStatement(SQL);
 			stmt.setString(1, p2pSessionId);
 			rset = stmt.executeQuery();

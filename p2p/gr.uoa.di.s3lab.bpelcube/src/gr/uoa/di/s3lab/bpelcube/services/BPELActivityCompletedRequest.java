@@ -15,8 +15,11 @@
  */
 package gr.uoa.di.s3lab.bpelcube.services;
 
+import gr.uoa.di.s3lab.p2p.P2PEndpoint;
 import gr.uoa.di.s3lab.p2p.P2PRequest;
 import gr.uoa.di.s3lab.p2p.P2PService;
+
+import java.util.Hashtable;
 
 /**
  * 
@@ -35,13 +38,17 @@ public class BPELActivityCompletedRequest extends P2PRequest {
 	 */
 	private String activityId;
 	
-	// TODO Add a hashtable attribute for the new variable holders
+	/**
+	 * The new variable holders.
+	 */
+	private Hashtable<String, P2PEndpoint> newVariableHolders;
 	
 	/**
 	 * Constructor.
 	 */
 	public BPELActivityCompletedRequest() {
 		super();
+		newVariableHolders = new Hashtable<String, P2PEndpoint>();
 	}
 
 	@Override
@@ -63,6 +70,14 @@ public class BPELActivityCompletedRequest extends P2PRequest {
 
 	public void setActivityId(String activityId) {
 		this.activityId = activityId;
+	}
+
+	public Hashtable<String, P2PEndpoint> getNewVariableHolders() {
+		return newVariableHolders;
+	}
+
+	public void setNewVariableHolders(Hashtable<String, P2PEndpoint> newVariableHolders) {
+		this.newVariableHolders = newVariableHolders;
 	}
 
 }
