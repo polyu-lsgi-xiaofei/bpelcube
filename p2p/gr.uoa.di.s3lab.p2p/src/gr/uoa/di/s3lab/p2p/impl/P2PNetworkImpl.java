@@ -58,7 +58,7 @@ public class P2PNetworkImpl extends P2PNetwork {
 
 	@Override
 	public void shutdown() throws Exception {
-		
+		connectionListener.stop();
 	}
 
 }
