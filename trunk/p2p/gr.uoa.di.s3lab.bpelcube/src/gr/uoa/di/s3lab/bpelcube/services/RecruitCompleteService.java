@@ -16,6 +16,8 @@
 package gr.uoa.di.s3lab.bpelcube.services;
 
 import gr.uoa.di.s3lab.bpelcube.BPELCubeService;
+import gr.uoa.di.s3lab.bpelcube.BPELProcessExecutionListener;
+import gr.uoa.di.s3lab.bpelcube.BPELProcessExecutionNotifier;
 import gr.uoa.di.s3lab.p2p.P2PRequest;
 import gr.uoa.di.s3lab.p2p.P2PResponse;
 
@@ -45,7 +47,36 @@ public class RecruitCompleteService extends BPELCubeService {
 	@Override
 	public void execute() {
 		
-		// TODO Invoke the process of the P2P session
+		// Notify the BPEL process execution listener that the recruitment is 
+		// complete.
+		String p2pSessionId = request.getP2PSessionId();
+		me.getLog().debug("Notifying the process execution listener of P2P session: " + p2pSessionId);
+		
+		BPELProcessExecutionListener<P2PRequest> processExecutionListener = null;
+		
+		while (true) {
+			
+			processExecutionListener = me.removeProcessExecutionListener(p2pSessionId);
+			if (processExecutionListener == null) {
+				try {
+					Thread.sleep(30);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			} else {
+				break;
+			}
+		}
+				
+		BPELProcessExecutionNotifier<P2PRequest> processExecutionNotifier = 
+				new BPELProcessExecutionNotifier<P2PRequest>(
+						processExecutionListener.getQueue());
+		
+		try {
+			processExecutionNotifier.notify(request);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
