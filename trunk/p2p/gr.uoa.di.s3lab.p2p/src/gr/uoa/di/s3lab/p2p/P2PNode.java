@@ -342,7 +342,7 @@ public abstract class P2PNode {
 			return;
 		}
 		leave();
-		Thread.sleep(3000);
+//		Thread.sleep(3000);
 		stopConnectionListener();
 		network.shutdown();
 		P2PNodeDB db = getNodeDB();
