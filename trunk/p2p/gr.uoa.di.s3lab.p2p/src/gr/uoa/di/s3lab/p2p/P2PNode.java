@@ -20,6 +20,7 @@ import gr.uoa.di.s3lab.p2p.Log.Level;
 import java.net.SocketException;
 import java.net.URI;
 import java.util.List;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
@@ -74,6 +75,8 @@ public abstract class P2PNode {
 	 * Schedules the execution of this node's connection listener.
 	 */
 	private ScheduledExecutorService connectionListenerExecutor;
+	
+	private Future<?> connectionListenerFuture;
 	
 	/**
 	 * The logger of this node.
@@ -265,14 +268,16 @@ public abstract class P2PNode {
 						return;
 					} catch (SocketException e) {
 	
+					} catch (NullPointerException e) {
+						return;
 					} catch (Exception e) {
 						e.printStackTrace();
-					}
+					} 
 				}
 			}
 		};
 		connectionListenerExecutor = new ScheduledThreadPoolExecutor(1);
-		connectionListenerExecutor.execute(runnable);
+		connectionListenerFuture = connectionListenerExecutor.submit(runnable);
 	}
 
 	/**
@@ -282,6 +287,11 @@ public abstract class P2PNode {
 	 */
 	private void stopConnectionListener() throws Exception {
 		log.info("Stopping the p2p connection listener");
+		
+		connectionListenerFuture.cancel(true);
+		connectionListenerFuture = null;
+		
+		connectionListenerExecutor.shutdown();
 		connectionListenerExecutor.shutdownNow();
 		connectionListenerExecutor = null;
 	}
