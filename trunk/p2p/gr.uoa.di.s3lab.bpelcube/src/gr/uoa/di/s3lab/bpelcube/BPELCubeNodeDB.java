@@ -199,6 +199,41 @@ public class BPELCubeNodeDB extends P2PNodeDB {
 	}
 	
 	/**
+	 * Gets the node's role in the specified P2P session.
+	 * 
+	 * @param p2pSessionId
+	 * @return
+	 */
+	public String getNodeRole(String p2pSessionId) {
+		PreparedStatement stmt = null;
+		ResultSet rset = null;
+		try {
+			String SQL = "SELECT NODE_ROLE FROM P2P_SESSION WHERE P2P_SESSION_ID=?";
+			stmt = this.connection.prepareStatement(SQL);
+			stmt.setString(1, p2pSessionId);
+			rset = stmt.executeQuery();
+			if (rset.next()) {
+				return rset.getString(1);
+			}
+			return null;
+		} catch (SQLException e) {
+			log.debug(e.getMessage());
+			return null;
+		} finally {
+			try {
+				if (rset != null) {
+					rset.close();
+					rset = null;
+				}
+				if (stmt != null) {
+					stmt.close();
+					stmt = null;
+				}
+			} catch (SQLException e) {}
+		}
+	}
+	
+	/**
 	 * Sets the completion time of the specified P2P session.
 	 * 
 	 * @param p2pSessionId

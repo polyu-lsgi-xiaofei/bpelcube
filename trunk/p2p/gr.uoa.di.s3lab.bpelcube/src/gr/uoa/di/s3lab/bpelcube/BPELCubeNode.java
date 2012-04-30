@@ -141,7 +141,7 @@ public class BPELCubeNode extends HypercubeNode {
 	 * @param p2pSessionId
 	 * @param completionTime
 	 */
-	public void finalizeP2PExecution(String p2pSessionId, Long completionTime) {
+	public void finalizeP2PSession(String p2pSessionId, Long completionTime) {
 		
 		db.setCompletionTime(p2pSessionId, completionTime);
 	}
