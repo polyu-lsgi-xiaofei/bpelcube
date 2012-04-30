@@ -26,6 +26,7 @@ import gr.uoa.di.s3lab.p2p.hypercube.Neighbor;
 import java.net.URI;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.concurrent.SynchronousQueue;
 
 /**
  * Hypercube-based implementation of the P2P engine node.
@@ -47,6 +48,9 @@ public class BPELCubeNode extends HypercubeNode {
 	
 	private Hashtable<String, BPELActivityListener<P2PRequest>> activityListeners = 
 			new Hashtable<String, BPELActivityListener<P2PRequest>>();
+	
+	private Hashtable<String, BPELProcessExecutionListener<P2PRequest>> processExecutionListeners = 
+			new Hashtable<String, BPELProcessExecutionListener<P2PRequest>>();
 	
 	/**
 	 * Constructor.
@@ -86,13 +90,13 @@ public class BPELCubeNode extends HypercubeNode {
 	
 	/**
 	 * Initializes the distributed execution of the specified activities by 
-	 * assigning them to a series of selected P2P engine nodes.
+	 * assigning them to a series of selected worker nodes.
 	 * 
+	 * @param p2pSessionId
 	 * @param activityIds ids of the activities to be distributed
 	 */
-	public void initP2PExecution(List<String> activityIds) {
+	public void recruitWorkers(String p2pSessionId, List<String> activityIds) {
 		
-		String p2pSessionId = BPELCubeUtils.newP2PSessionID();
 		Long p2pSessionCreationTime = System.currentTimeMillis();
 		db.addP2PSession(p2pSessionId, Role.MANAGER.toString(), p2pSessionCreationTime, null);
 		
@@ -117,6 +121,14 @@ public class BPELCubeNode extends HypercubeNode {
 			db.addP2PSessionNeighor(p2pSessionId, LRU.asP2PEndpoint().toString());
 			try {
 				invokeOneWayService(LRU.asP2PEndpoint(), recruitRequest);
+				
+				// Now wait until the recruitment process is complete
+				SynchronousQueue<P2PRequest> queue = new SynchronousQueue<P2PRequest>();
+				BPELProcessExecutionListener<P2PRequest> processExecutionListener = 
+						new BPELProcessExecutionListener<P2PRequest>(queue);
+				processExecutionListener.setP2PSessionId(p2pSessionId);
+				this.addProcessExecutionListener(processExecutionListener);
+				processExecutionListener.listen();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -177,6 +189,41 @@ public class BPELCubeNode extends HypercubeNode {
 		String key = keyBuilder.toString();
 		
 		return activityListeners.remove(key);
+	}
+	
+	/**
+	 * Adds the specified BPEL process execution listener.
+	 * 
+	 * @param processExecutionListener
+	 */
+	public void addProcessExecutionListener(
+			BPELProcessExecutionListener<P2PRequest> processExecutionListener) {
+		processExecutionListeners.put(processExecutionListener.getP2PSessionId(), 
+				processExecutionListener);
+	}
+	
+	/**
+	 * Gets the BPEL process execution listener that corresponds to the 
+	 * specified P2P session.
+	 * 
+	 * @param p2pSessionId
+	 * @return
+	 */
+	public BPELProcessExecutionListener<P2PRequest> getProcessExecutionListener(
+			String p2pSessionId) {
+		return processExecutionListeners.get(p2pSessionId);
+	}
+	
+	/**
+	 * Removes the BPEL process execution listener that corresponds to the 
+	 * specified P2P session.
+	 * 
+	 * @param p2pSessionId
+	 * @return
+	 */
+	public BPELProcessExecutionListener<P2PRequest> removeProcessExecutionListener(
+			String p2pSessionId) {
+		return processExecutionListeners.remove(p2pSessionId);
 	}
 
 }

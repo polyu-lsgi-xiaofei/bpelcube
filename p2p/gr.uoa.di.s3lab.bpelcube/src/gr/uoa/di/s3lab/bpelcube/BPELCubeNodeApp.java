@@ -197,7 +197,7 @@ public class BPELCubeNodeApp extends BPELCubeNode {
 				activityIds.add("Assign3");
 				activityIds.add("Invoke3");
 				activityIds.add("Assign4");
-				initP2PExecution(activityIds);
+				recruitWorkers("1234", activityIds);
 			}
 		});
 		gbc = new GridBagConstraints();
