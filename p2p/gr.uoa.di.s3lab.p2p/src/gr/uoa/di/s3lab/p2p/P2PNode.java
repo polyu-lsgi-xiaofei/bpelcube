@@ -257,6 +257,7 @@ public abstract class P2PNode {
 						}
 					} catch (InterruptedException e) {
 						try {
+							log.info("P2P connection listener interrupted");
 							listener.stop();
 						} catch (Exception e1) {
 							e1.printStackTrace();
