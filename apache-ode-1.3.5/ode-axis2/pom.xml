@@ -34,6 +34,21 @@
     </properties>
      
     <dependencies>
+    	<!-- ****************************************** -->
+    	<!-- Michael Pantazoglou: BPELCube dependencies -->
+    	<dependency>
+            <groupId>gr.uoa.di.s3lab</groupId>
+            <artifactId>p2p</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>gr.uoa.di.s3lab</groupId>
+            <artifactId>p2p.hypercube</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>gr.uoa.di.s3lab</groupId>
+            <artifactId>bpelcube</artifactId>
+        </dependency>
+        <!-- ****************************************** -->
         <dependency>
             <groupId>org.apache.ode</groupId>
             <artifactId>ode-bpel-compiler</artifactId>

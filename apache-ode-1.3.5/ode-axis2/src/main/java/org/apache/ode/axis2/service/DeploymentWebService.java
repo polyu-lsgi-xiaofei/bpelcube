@@ -198,6 +198,10 @@ public class DeploymentWebService {
                             response.addChild(d);
                         }
                         sendResponse(factory, messageContext, "deployResponse", response);
+                    
+                        /******************************************************/
+                        // Michael Pantazoglou:
+                        /******************************************************/
                     } finally {
                         _poller.release();
                     }

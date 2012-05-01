@@ -137,5 +137,8 @@
 	<classpathentry kind="var" path="M2_REPO/bouncycastle/bcprov-jdk13/132/bcprov-jdk13-132.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/rampart/rampart-trust/1.3/rampart-trust-1.3.jar"/>
 	<classpathentry kind="var" path="JDK_LIB/tools.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/gr.uoa.di.s3lab.bpelcube"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/gr.uoa.di.s3lab.p2p"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/gr.uoa.di.s3lab.p2p.hypercube"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
