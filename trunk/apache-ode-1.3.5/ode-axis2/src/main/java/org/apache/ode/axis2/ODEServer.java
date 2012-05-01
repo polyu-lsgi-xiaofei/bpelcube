@@ -19,10 +19,16 @@
 
 package org.apache.ode.axis2;
 
+import gr.uoa.di.s3lab.bpelcube.BPELCubeNode;
+import gr.uoa.di.s3lab.p2p.Log.Level;
+
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -49,8 +55,8 @@ import javax.transaction.xa.XAResource;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
-import org.apache.commons.httpclient.util.IdleConnectionTimeoutThread;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
+import org.apache.commons.httpclient.util.IdleConnectionTimeoutThread;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ode.axis2.deploy.DeploymentPoller;
@@ -129,8 +135,75 @@ public class ODEServer {
     protected MultiThreadedHttpConnectionManager httpConnectionManager;
     protected IdleConnectionTimeoutThread idleConnectionTimeoutThread;
     
+    /**************************************************************************/
+    // Michael Pantazoglou: The following method is used to initialize the 
+    // local p2p node.
+    
+    /**
+     * Initializes the local p2p node.
+     */
+    private void initBPELCubeNode() {
+    	
+    	File classesDir = new File(_workRoot, "classes");
+    	File p2pDir = new File(classesDir, "p2p");
+    	if (!p2pDir.exists()) {
+    		p2pDir.mkdir();
+    	}
+    	
+    	File p2pPropertiesFile = new File(classesDir, "p2p.properties");
+    	if (!p2pPropertiesFile.exists()) {
+    		__log.info("File " + p2pPropertiesFile.getAbsolutePath() + " does not exist.");
+    		__log.info("P2P will not be started.");
+    		return;
+    	}
+    	
+    	try {
+			
+    		// Load p2p properties file
+			FileInputStream in = new FileInputStream(p2pPropertiesFile);
+			Properties props = new Properties();
+			props.load(in);
+			in.close();
+			
+			// Read properties
+			URI home = p2pDir.toURI();
+			String name = props.getProperty("node.name");
+			String domain = props.getProperty("node.domain");
+			String addressAsString = props.getProperty("node.address");
+			URI address = new URI(addressAsString);
+			int port = Integer.valueOf(props.getProperty("node.port"));
+			String logLevelAsString = props.getProperty("node.log.level");
+			Level logLevel = Level.valueOf(logLevelAsString);
+			String bootstrapURIAsString = props.getProperty("node.bootstrap.uri");
+			URI bootstrapURI = null;
+			if (bootstrapURIAsString.length() > 0) {
+				bootstrapURI = new URI(bootstrapURIAsString);
+			}
+			
+			// Construct and start the p2p node
+			BPELCubeNode node = new BPELCubeNode(home, name, domain, address, port, logLevel);
+			node.setBootstrapURI(bootstrapURI);
+			node.start();
+			
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    }
+    /**************************************************************************/
+    
     public void init(ServletConfig config, AxisConfiguration axisConf) throws ServletException {
         init(config.getServletContext().getRealPath("/WEB-INF"), axisConf);
+        
+        /**********************************************************************/
+        // Michael Pantazoglou: initialize the local p2p node
+        this.initBPELCubeNode();
+        /**********************************************************************/
     }
 
     public void init(String contextPath, AxisConfiguration axisConf) throws ServletException {
