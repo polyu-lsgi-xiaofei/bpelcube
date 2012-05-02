@@ -200,7 +200,9 @@ public class DeploymentWebService {
                         sendResponse(factory, messageContext, "deployResponse", response);
                     
                         /******************************************************/
-                        // Michael Pantazoglou:
+                        // Michael Pantazoglou: Broadcast the deployed bundle
+                        
+                        
                         /******************************************************/
                     } finally {
                         _poller.release();
