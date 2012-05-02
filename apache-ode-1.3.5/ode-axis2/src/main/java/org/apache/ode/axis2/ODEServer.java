@@ -136,11 +136,10 @@ public class ODEServer {
     protected IdleConnectionTimeoutThread idleConnectionTimeoutThread;
     
     /**************************************************************************/
-    // Michael Pantazoglou: The following method is used to initialize the 
-    // local p2p node.
+    // Michael Pantazoglou: The following method is used to start the local p2p node
     
     /**
-     * Initializes the local p2p node.
+     * Initializes and starts the local p2p node.
      */
     private void initBPELCubeNode() {
     	
@@ -186,15 +185,35 @@ public class ODEServer {
 			node.start();
 			
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			__log.debug(null, e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			__log.debug(null, e);
 		} catch (URISyntaxException e) {
-			e.printStackTrace();
+			__log.debug(null, e);
 		} catch (Exception e) {
-			e.printStackTrace();
+			__log.debug(null, e);
 		}
     }
+    
+    // Michael Pantazoglou: The following method is used to stop the local p2p node
+    
+    /**
+     * Shuts down the local p2p node.
+     */
+    private void shutDownBPELCubeNode() {
+    	
+    	BPELCubeNode node = (BPELCubeNode) BPELCubeNode.sharedInstance;
+    	if (node != null) {
+    		if (node.isStarted()) {
+    			try {
+					node.stop();
+				} catch (Exception e) {
+					__log.debug(null, e);
+				}
+    		}
+    	}
+    }
+    
     /**************************************************************************/
     
     public void init(ServletConfig config, AxisConfiguration axisConf) throws ServletException {
@@ -353,6 +372,11 @@ public class ODEServer {
      * @throws AxisFault if the engine is unable to shut down.
      */
     public void shutDown() throws AxisFault {
+    	
+    	/**********************************************************************/
+    	// Michael Pantazoglou: Shut down the local p2p node
+    	this.shutDownBPELCubeNode();
+    	/**********************************************************************/
 
         ClassLoader old = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
