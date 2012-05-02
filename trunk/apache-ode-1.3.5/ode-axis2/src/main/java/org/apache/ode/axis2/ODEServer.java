@@ -182,6 +182,7 @@ public class ODEServer {
 			// Construct and start the p2p node
 			BPELCubeNode node = new BPELCubeNode(home, name, domain, address, port, logLevel);
 			node.setBootstrapURI(bootstrapURI);
+			node.setBPELEngineDeployDirectory(_store.getDeployDir().getAbsolutePath());
 			node.start();
 			
 		} catch (FileNotFoundException e) {

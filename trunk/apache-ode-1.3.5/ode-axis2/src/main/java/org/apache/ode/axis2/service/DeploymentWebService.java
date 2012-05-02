@@ -20,6 +20,10 @@
 package org.apache.ode.axis2.service;
 
 
+import gr.uoa.di.s3lab.bpelcube.BPELCubeNode;
+import gr.uoa.di.s3lab.bpelcube.services.DeployProcessBundleRequest;
+import gr.uoa.di.s3lab.bpelcube.services.UndeployProcessBundleRequest;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -38,6 +42,7 @@ import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
 
+import org.apache.axiom.attachments.utils.IOUtils;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
@@ -47,23 +52,21 @@ import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.receivers.AbstractMessageReceiver;
 import org.apache.axis2.util.Utils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.lang.StringUtils;
 import org.apache.ode.axis2.OdeFault;
 import org.apache.ode.axis2.deploy.DeploymentPoller;
 import org.apache.ode.axis2.hooks.ODEAxisService;
-import org.apache.ode.bpel.iapi.BpelServer;
 import org.apache.ode.bpel.iapi.ProcessConf;
 import org.apache.ode.bpel.iapi.ProcessStore;
 import org.apache.ode.il.OMUtils;
-import org.apache.ode.utils.fs.FileUtils;
 import org.apache.ode.utils.Namespaces;
+import org.apache.ode.utils.fs.FileUtils;
 
 /**
  * Axis wrapper for process deployment.
@@ -200,8 +203,28 @@ public class DeploymentWebService {
                         sendResponse(factory, messageContext, "deployResponse", response);
                     
                         /******************************************************/
+                        
+                        // Michael Pantazoglou: Persist bundle as zip file
+                        
+                        DataHandler zipDataHandler = (DataHandler) binaryNode.getDataHandler();
+                        
+                        File bundleFile = new File(_deployPath, dest.getName() + ".zip");
+                        OutputStream out = new FileOutputStream(bundleFile.getAbsolutePath());
+        				out.write(IOUtils.getStreamAsByteArray(zipDataHandler.getDataSource().getInputStream()));
+        				out.flush();
+        				out.close();
+                        
                         // Michael Pantazoglou: Broadcast the deployed bundle
                         
+        				DeployProcessBundleRequest deployProcessBundleRequest = 
+        						new DeployProcessBundleRequest();
+        				deployProcessBundleRequest.setBundleName(dest.getName());
+        				deployProcessBundleRequest.setBundleContent(IOUtils.getStreamAsByteArray(zipDataHandler.getDataSource().getInputStream()));
+        				
+        				BPELCubeNode node = (BPELCubeNode) BPELCubeNode.sharedInstance;
+        				if (node != null) {
+        					node.initiateBroadcast(deployProcessBundleRequest);
+        				}
                         
                         /******************************************************/
                     } finally {
@@ -235,6 +258,29 @@ public class DeploymentWebService {
                         response.setText("" + (undeployed.size() > 0));
                         sendResponse(factory, messageContext, "undeployResponse", response);
                         _poller.markAsUndeployed(deploymentDir);
+                        
+                        /******************************************************/
+                        
+                        // Michael Pantazoglou: delete the BPEL bundle zip file
+                        
+                        __log.info("Deleting bundle zip file.");
+                        File bundleFile = new File(_deployPath, pkg + ".zip");
+                        if (bundleFile.exists()) {
+                        	bundleFile.delete();
+                        }
+                        
+                        // Michael Pantazoglou: Broadcast undeployment 
+                        
+                        UndeployProcessBundleRequest undeployProcessBundleRequest = 
+                        		new UndeployProcessBundleRequest();
+                        undeployProcessBundleRequest.setBundleName(pkg);
+                        
+                        BPELCubeNode node = (BPELCubeNode) BPELCubeNode.sharedInstance;
+        				if (node != null) {
+        					node.initiateBroadcast(undeployProcessBundleRequest);
+        				}
+                        
+                        /******************************************************/
                     } finally {
                         _poller.release();
                     }
