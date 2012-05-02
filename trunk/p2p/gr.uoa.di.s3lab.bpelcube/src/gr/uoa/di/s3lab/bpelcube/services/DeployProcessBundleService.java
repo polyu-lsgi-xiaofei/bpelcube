@@ -20,9 +20,11 @@ import gr.uoa.di.s3lab.p2p.P2PRequest;
 import gr.uoa.di.s3lab.p2p.P2PResponse;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -106,6 +108,28 @@ public class DeployProcessBundleService extends BPELCubeService {
 	public void execute() {
 		
 		me.getLog().info("Deploying bundle with name: " + request.getBundleName());
+		
+		try {
+			File bundleFile = new File(me.getBPELEngineDeployDirectory(), request.getBundleName()+".zip");
+			if (!bundleFile.exists()) {
+				OutputStream out = new FileOutputStream(bundleFile.getAbsolutePath());
+				out.write(request.getBundleContent());
+				out.flush();
+				out.close();
+			}
+			
+			// Open zip file for reading and unzip its contents
+			ZipFile zipFile = new ZipFile(bundleFile);
+			File bundleDir = new File(me.getBPELEngineDeployDirectory(), request.getBundleName());
+			if (!bundleDir.exists()) {
+				bundleDir.mkdir();
+				this.unzipFileIntoDirectory(zipFile, bundleDir);
+			} 
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override

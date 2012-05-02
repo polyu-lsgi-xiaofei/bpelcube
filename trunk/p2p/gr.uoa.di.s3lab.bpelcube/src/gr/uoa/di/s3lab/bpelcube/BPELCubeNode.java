@@ -23,7 +23,9 @@ import gr.uoa.di.s3lab.p2p.hypercube.Hypercube;
 import gr.uoa.di.s3lab.p2p.hypercube.HypercubeNode;
 import gr.uoa.di.s3lab.p2p.hypercube.Neighbor;
 
+import java.io.File;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.SynchronousQueue;
@@ -45,6 +47,12 @@ public class BPELCubeNode extends HypercubeNode {
 	 * The embedded database of this node.
 	 */
 	private BPELCubeNodeDB db;
+	
+	/**
+	 * The absolute path of the directory that is used by the BPEL engine in 
+	 * order to store the deployed BPEL bundles.
+	 */
+	private String bpelEngineDeployDirectory; 
 	
 	private Hashtable<String, BPELActivityListener<P2PRequest>> activityListeners = 
 			new Hashtable<String, BPELActivityListener<P2PRequest>>();
@@ -86,6 +94,24 @@ public class BPELCubeNode extends HypercubeNode {
 	@Override
 	public P2PNodeDB getNodeDB() {
 		return db;
+	}
+	
+	/**
+	 * Gets the BPEL engine deploy directory's absolute path.
+	 * 
+	 * @return
+	 */
+	public String getBPELEngineDeployDirectory() {
+		return this.bpelEngineDeployDirectory;
+	}
+	
+	/**
+	 * Sets the BPEL engine deploy directory's absolute path.
+	 * 
+	 * @param directoryPath
+	 */
+	public void setBPELEngineDeployDirectory(String directoryPath) {
+		this.bpelEngineDeployDirectory = directoryPath;
 	}
 	
 	/**
@@ -224,6 +250,30 @@ public class BPELCubeNode extends HypercubeNode {
 	public BPELProcessExecutionListener<P2PRequest> removeProcessExecutionListener(
 			String p2pSessionId) {
 		return processExecutionListeners.remove(p2pSessionId);
+	}
+	
+	/**
+	 * Gets a list with the file names of the currently deployed BPEL process 
+	 * bundles.
+	 * 
+	 * @return
+	 */
+	public List<String> getCurrentlyDeployedProcessBundles() {
+		this.getLog().debug("Getting bundle folders from deploy dir: " + this.bpelEngineDeployDirectory);
+		List<String> deployedBundles = new ArrayList<String>();
+		File dir = new File(this.bpelEngineDeployDirectory);
+		String[] dirContents = dir.list();
+		if (dirContents.length == 0) {
+			this.getLog().debug("No bundles were found.");
+		}
+		for (String s : dirContents) {
+			File f = new File(dir, s);
+			if (f.isDirectory()) {
+				this.getLog().debug("Found deployed bundle: " + s);
+				deployedBundles.add(s);
+			}
+		}
+		return deployedBundles;
 	}
 
 }
