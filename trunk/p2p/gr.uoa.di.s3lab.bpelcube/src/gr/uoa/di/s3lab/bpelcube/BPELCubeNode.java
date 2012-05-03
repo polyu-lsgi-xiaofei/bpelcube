@@ -15,8 +15,10 @@
  */
 package gr.uoa.di.s3lab.bpelcube;
 
+import gr.uoa.di.s3lab.bpelcube.services.GetDeployedProcessBundlesUpdateRequest;
 import gr.uoa.di.s3lab.bpelcube.services.RecruitRequest;
 import gr.uoa.di.s3lab.p2p.Log.Level;
+import gr.uoa.di.s3lab.p2p.P2PEndpoint;
 import gr.uoa.di.s3lab.p2p.P2PNodeDB;
 import gr.uoa.di.s3lab.p2p.P2PRequest;
 import gr.uoa.di.s3lab.p2p.hypercube.Hypercube;
@@ -89,6 +91,26 @@ public class BPELCubeNode extends HypercubeNode {
 			int port, Level logLevel) {
 		super(home, name, domain, address, port, logLevel);
 		db = new BPELCubeNodeDB(home.toString());
+	}
+	
+	@Override
+	protected void join() throws Exception {
+		
+		super.join();
+		
+		if (getBootstrapURI() == null) {
+			return;
+		}
+		
+		// get updates wrt the currently deployed processes
+		GetDeployedProcessBundlesUpdateRequest getDeployedProcessBundlesUpdateRequest = 
+				new GetDeployedProcessBundlesUpdateRequest();
+		getDeployedProcessBundlesUpdateRequest.setRequester(getEndpoint());
+		getDeployedProcessBundlesUpdateRequest.setDeployedProcessBundles(getCurrentlyDeployedProcessBundles());
+		
+		P2PEndpoint bootstrapEndpoint = new P2PEndpoint();
+		bootstrapEndpoint.setAddress(getBootstrapURI());
+		invokeOneWayService(bootstrapEndpoint, getDeployedProcessBundlesUpdateRequest);
 	}
 	
 	@Override
@@ -259,7 +281,7 @@ public class BPELCubeNode extends HypercubeNode {
 	 * @return
 	 */
 	public List<String> getCurrentlyDeployedProcessBundles() {
-		this.getLog().debug("Getting bundle folders from deploy dir: " + this.bpelEngineDeployDirectory);
+		this.getLog().debug("Getting bundle folders from deploy directory: " + this.bpelEngineDeployDirectory);
 		List<String> deployedBundles = new ArrayList<String>();
 		File dir = new File(this.bpelEngineDeployDirectory);
 		String[] dirContents = dir.list();
