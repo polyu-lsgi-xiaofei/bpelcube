@@ -15,6 +15,8 @@
  */
 package gr.uoa.di.s3lab.bpelcube;
 
+import javax.xml.namespace.QName;
+
 /**
  * This class provides a number of P2P engine-related utilities.
  * 
@@ -27,6 +29,11 @@ public class BPELCubeUtils {
 	 * Counts the number of created process instances.
 	 */
 	private static long processInstanceCounter = 0L;
+	
+	/**
+	 * The qualified name of the p2p session id soap header extension.
+	 */
+	public static final QName SOAP_HEADER_P2P_SESSION_ID = new QName("urn:bpelcube", "P2PSessionId");
 	
 	/**
 	 * Creates and returns a new P2P session ID. Uniqueness is attempted to be 
