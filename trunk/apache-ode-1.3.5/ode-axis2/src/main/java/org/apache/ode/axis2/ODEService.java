@@ -23,10 +23,15 @@ import gr.uoa.di.s3lab.bpelcube.BPELCubeNode;
 import gr.uoa.di.s3lab.bpelcube.BPELCubeNode.Role;
 import gr.uoa.di.s3lab.bpelcube.BPELCubeNodeDB;
 import gr.uoa.di.s3lab.bpelcube.BPELCubeUtils;
+import gr.uoa.di.s3lab.bpelcube.BPELProcessExecutionListener;
+import gr.uoa.di.s3lab.bpelcube.services.RecruitRequest;
+import gr.uoa.di.s3lab.p2p.P2PRequest;
+import gr.uoa.di.s3lab.p2p.hypercube.Neighbor;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
+import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
 
 import javax.transaction.TransactionManager;
@@ -64,7 +69,9 @@ import org.apache.ode.bpel.iapi.MessageExchange;
 import org.apache.ode.bpel.iapi.MyRoleMessageExchange;
 import org.apache.ode.bpel.iapi.ProcessConf;
 import org.apache.ode.bpel.o.OActivity;
+import org.apache.ode.bpel.o.OAssign;
 import org.apache.ode.bpel.o.OBase;
+import org.apache.ode.bpel.o.OInvoke;
 import org.apache.ode.utils.DOMUtils;
 import org.apache.ode.utils.GUID;
 import org.apache.ode.utils.Namespaces;
@@ -145,11 +152,13 @@ public class ODEService {
     	
     	if (p2pSessionId == null) {
     		
-    		// I will assume the MANAGER role so I have to recruit workers
+    		// the SOAP request was not sent by another p2p node
+    		
     		p2pSessionId = BPELCubeUtils.newP2PSessionID();
+    		Long p2pSessionCreationTime = System.currentTimeMillis();
     		
     		// persist p2p session
-    		db.addP2PSession(p2pSessionId, Role.MANAGER.toString(), System.currentTimeMillis(), null);
+    		db.addP2PSession(p2pSessionId, Role.MANAGER.toString(), p2pSessionCreationTime, null);
     		
     		// find out which activities will be executed by worker nodes
     		List<String> toBeDistributed = new ArrayList<String>();
@@ -159,7 +168,58 @@ public class ODEService {
     			if (!(oBase instanceof OActivity)) {
     				continue;
     			}
+    			OActivity oActivity = (OActivity) oBase;
+    			String aId = oActivity.getType() + oActivity.getId();
+    			if ((oActivity instanceof OAssign)|| (oActivity instanceof OInvoke)) {
+    				
+    				__log.info("Activity " + aId + " will be distributed");
+    				toBeDistributed.add(aId);
+    			} else {
+    				
+    				// the activity will be locally executed
+    				__log.info("Activity " + aId + " will be locally executed");
+    				db.addP2PSessionActivity(p2pSessionId, aId);
+    			}
+    		}
+    		
+    		// find LRU neighbor
+    		Neighbor LRU = me.getLRUNeighbor();
+    		if (LRU == null) {
     			
+    			__log.info("I have no neighbors, so I will execute all activities locally");
+    			for (String aId : toBeDistributed) {
+    				db.addP2PSessionActivity(p2pSessionId, aId);
+    			}
+    		} else {
+    			// Start the recruitment of worker nodes
+        		RecruitRequest recruitRequest = new RecruitRequest();
+        		recruitRequest.setActivityIds(toBeDistributed);
+        		recruitRequest.setManagerEndpoint(me.getEndpoint());
+        		recruitRequest.setP2PSessionCreationTime(p2pSessionCreationTime);
+        		recruitRequest.setP2PSessionId(p2pSessionId);
+        		recruitRequest.setRequesterEndpoint(me.getEndpoint());
+        		recruitRequest.setMessageContext(originalMessageContext);
+        		
+        		try {
+					me.invokeOneWayService(LRU.asP2PEndpoint(), recruitRequest);
+				} catch (Exception e) {
+					__log.debug(null, e);
+				}
+        		
+        		// wait until the recruitment is finished before moving on with
+        		// the execution of the BPEL process
+        		__log.info("Waiting for the recruitment to finish");
+        		SynchronousQueue<P2PRequest> q = new SynchronousQueue<P2PRequest>();
+        		BPELProcessExecutionListener<P2PRequest> processExecutionListener = 
+        				new BPELProcessExecutionListener<P2PRequest>(q);
+        		processExecutionListener.setP2PSessionId(p2pSessionId);
+        		me.addProcessExecutionListener(processExecutionListener);
+        		try {
+					processExecutionListener.listen();
+					__log.info("Recruitment finished for p2p session: " + p2pSessionId);
+				} catch (InterruptedException e) {
+					__log.debug(null, e);
+				}
     		}
     	}
     	
@@ -182,6 +242,12 @@ public class ODEService {
             __log.debug("ODE routed to operation " + odeMex.getOperation() + " from service " + _serviceName);
             odeMex.setProperty("isTwoWay", Boolean.toString(msgContext.getAxisOperation() instanceof TwoChannelAxisOperation));
             if (odeMex.getOperation() != null) {
+            	
+            	/**************************************************************/
+            	// Michael Pantazoglou: Initialize the P2P session
+            	this.initP2PSession(msgContext, odeMex);
+            	/**************************************************************/
+            	
                 // Preparing message to send to ODE
                 Message odeRequest = odeMex.createMessage(odeMex.getOperation().getInput().getMessage().getQName());
                 _converter.parseSoapRequest(odeRequest, msgContext.getEnvelope(), odeMex.getOperation());
