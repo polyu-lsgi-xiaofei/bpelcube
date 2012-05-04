@@ -63,6 +63,14 @@ public class MyRoleMessageExchangeImpl extends MessageExchangeImpl implements My
         super(engine, mexdao);
         _process = process;
     }
+    
+    /**************************************************************************/
+    // Michael Pantazoglou: Added getter for the BpelProcess  
+    
+    public BpelProcess getBpelProcess() {
+    	return _process;
+    }
+    /**************************************************************************/
 
     public CorrelationStatus getCorrelationStatus() {
         return CorrelationStatus.valueOf(getDAO().getCorrelationStatus());
