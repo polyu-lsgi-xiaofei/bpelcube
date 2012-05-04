@@ -19,9 +19,15 @@
 
 package org.apache.ode.axis2;
 
+import gr.uoa.di.s3lab.bpelcube.BPELCubeNode;
+import gr.uoa.di.s3lab.bpelcube.BPELCubeNode.Role;
+import gr.uoa.di.s3lab.bpelcube.BPELCubeNodeDB;
+import gr.uoa.di.s3lab.bpelcube.BPELCubeUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.Map;
 
 import javax.transaction.TransactionManager;
 import javax.wsdl.Definition;
@@ -35,6 +41,8 @@ import javax.xml.namespace.QName;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPFault;
+import org.apache.axiom.soap.SOAPHeader;
+import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.context.MessageContext;
@@ -44,6 +52,8 @@ import org.apache.axis2.transport.jms.JMSConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ode.axis2.util.SoapMessageConverter;
+import org.apache.ode.bpel.engine.BpelProcess;
+import org.apache.ode.bpel.engine.MyRoleMessageExchangeImpl;
 import org.apache.ode.bpel.epr.EndpointFactory;
 import org.apache.ode.bpel.epr.MutableEndpoint;
 import org.apache.ode.bpel.epr.WSAEndpoint;
@@ -53,6 +63,8 @@ import org.apache.ode.bpel.iapi.Message;
 import org.apache.ode.bpel.iapi.MessageExchange;
 import org.apache.ode.bpel.iapi.MyRoleMessageExchange;
 import org.apache.ode.bpel.iapi.ProcessConf;
+import org.apache.ode.bpel.o.OActivity;
+import org.apache.ode.bpel.o.OBase;
 import org.apache.ode.utils.DOMUtils;
 import org.apache.ode.utils.GUID;
 import org.apache.ode.utils.Namespaces;
@@ -95,6 +107,64 @@ public class ODEService {
     public String getName() {
     	return _axisService.getName();
     }
+    
+    /**************************************************************************/
+    // Michael Pantazoglou: Initializes the p2p session for this process execution
+    
+    @SuppressWarnings("rawtypes")
+	private void initP2PSession(MessageContext originalMessageContext, MyRoleMessageExchange odeMex) {
+    	
+    	BPELCubeNode me = (BPELCubeNode) BPELCubeNode.sharedInstance;
+    	BPELCubeNodeDB db = (BPELCubeNodeDB) me.getNodeDB();
+    	
+    	// check if the message contains a SOAP header part with the p2p session id
+    	String p2pSessionId = null;
+    	
+    	SOAPEnvelope soapEnvelope = originalMessageContext.getEnvelope();
+    	SOAPHeader soapHeader = soapEnvelope.getHeader();
+    	
+    	if (soapHeader != null) {
+    		
+    		ArrayList soapHeaderBlocks = soapHeader.getHeaderBlocksWithNSURI(
+    				BPELCubeUtils.SOAP_HEADER_P2P_SESSION_ID.getNamespaceURI());
+    		if (soapHeaderBlocks != null) {
+    			
+    			for (int i=0; i<soapHeaderBlocks.size(); i++) {
+    				
+    				SOAPHeaderBlock soapHeaderBlock = (SOAPHeaderBlock) soapHeaderBlocks.get(i);
+    				if (soapHeaderBlock.getLocalName().equals(BPELCubeUtils.SOAP_HEADER_P2P_SESSION_ID.getLocalPart())) {
+    					
+    					// p2p session id is already here; this means that I will 
+    					// have to assume the WORKER role in this p2p session
+    					p2pSessionId = soapHeaderBlock.getText();
+    					break;
+    				}
+    			}
+    		}
+    	}
+    	
+    	if (p2pSessionId == null) {
+    		
+    		// I will assume the MANAGER role so I have to recruit workers
+    		p2pSessionId = BPELCubeUtils.newP2PSessionID();
+    		
+    		// persist p2p session
+    		db.addP2PSession(p2pSessionId, Role.MANAGER.toString(), System.currentTimeMillis(), null);
+    		
+    		// find out which activities will be executed by worker nodes
+    		List<String> toBeDistributed = new ArrayList<String>();
+    		BpelProcess bpelProcess = ((MyRoleMessageExchangeImpl) odeMex).getBpelProcess();
+    		List<OBase> children = bpelProcess.getOProcess().getChildren();
+    		for (OBase oBase : children) {
+    			if (!(oBase instanceof OActivity)) {
+    				continue;
+    			}
+    			
+    		}
+    	}
+    	
+    }
+    /**************************************************************************/
     
     public void onAxisMessageExchange(MessageContext msgContext, MessageContext outMsgContext, SOAPFactory soapFactory)
             throws AxisFault {
