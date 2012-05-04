@@ -15,8 +15,9 @@
  */
 package gr.uoa.di.s3lab.bpelcube.services;
 
-import gr.uoa.di.s3lab.bpelcube.BPELCubeService;
 import gr.uoa.di.s3lab.bpelcube.BPELCubeNode.Role;
+import gr.uoa.di.s3lab.bpelcube.BPELCubeService;
+import gr.uoa.di.s3lab.bpelcube.util.GenericWebServiceClient;
 import gr.uoa.di.s3lab.p2p.P2PRequest;
 import gr.uoa.di.s3lab.p2p.P2PResponse;
 import gr.uoa.di.s3lab.p2p.hypercube.Hypercube;
@@ -50,9 +51,13 @@ public class RecruitService extends BPELCubeService {
 	public void execute() {
 		
 		if (!db.p2pSessionExists(request.getP2PSessionId())) {
+			
 			db.addP2PSession(request.getP2PSessionId(), Role.WORKER.toString(),
 					request.getP2PSessionCreationTime(), null);
-			// TODO invoke the BPEL process locally
+			
+			// invoke the BPEL process locally
+			GenericWebServiceClient wsClient = new GenericWebServiceClient();
+			wsClient.invoke(request.getMessageContext(), request.getP2PSessionId());
 		}
 		
 		String activityId = request.getActivityIds().remove(0);
