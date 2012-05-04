@@ -78,5 +78,16 @@
 			<fileset dir="${ode.axis2}/target" includes="*.jar" />
 		</copy>		
 	</target>
+	
+	<target name="install-ode-bpel-runtime">
+		<exec executable="${maven.command}" dir="${ode.bpel.runtime}">
+			<arg value="-o"/>
+			<arg value="-Dmaven.test.skip=true"/>
+			<arg value="install"/>
+		</exec>
+		<copy todir="${ode.webapp.lib}" overwrite="true">
+			<fileset dir="${ode.bpel.runtime}/target" includes="*.jar" />
+		</copy>		
+	</target>
 
 </project>
