@@ -73,7 +73,8 @@ public class BPELActivityCompletedService extends BPELCubeService {
 			}
 		}
 		
-		BPELActivityNotifier<P2PRequest> activityNotifier = new BPELActivityNotifier<P2PRequest>(activityListener.getQueue());
+		BPELActivityNotifier<P2PRequest> activityNotifier = 
+				new BPELActivityNotifier<P2PRequest>(activityListener.getQueue());
 		try {
 			activityNotifier.notify(request);
 		} catch (InterruptedException e) {
