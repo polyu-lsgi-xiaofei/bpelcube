@@ -53,7 +53,7 @@ public class BPELActivityCompletedRequest extends P2PRequest {
 
 	@Override
 	public P2PService createService() {
-		return null;
+		return new BPELActivityCompletedService();
 	}
 
 	public String getP2PSessionId() {
