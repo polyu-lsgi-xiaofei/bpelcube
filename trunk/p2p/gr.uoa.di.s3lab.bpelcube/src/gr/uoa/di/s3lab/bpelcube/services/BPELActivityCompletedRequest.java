@@ -21,6 +21,8 @@ import gr.uoa.di.s3lab.p2p.P2PService;
 
 import java.util.Hashtable;
 
+import org.apache.ode.bpel.runtime.channels.FaultData;
+
 /**
  * 
  * @author Michael Pantazoglou
@@ -42,6 +44,11 @@ public class BPELActivityCompletedRequest extends P2PRequest {
 	 * The new variable holders.
 	 */
 	private Hashtable<String, P2PEndpoint> newVariableHolders;
+	
+	/**
+	 * The fault data related to the execution of the activity.
+	 */
+	private FaultData faultData;
 	
 	/**
 	 * Constructor.
@@ -78,6 +85,14 @@ public class BPELActivityCompletedRequest extends P2PRequest {
 
 	public void setNewVariableHolders(Hashtable<String, P2PEndpoint> newVariableHolders) {
 		this.newVariableHolders = newVariableHolders;
+	}
+
+	public FaultData getFaultData() {
+		return faultData;
+	}
+
+	public void setFaultData(FaultData faultData) {
+		this.faultData = faultData;
 	}
 
 }
