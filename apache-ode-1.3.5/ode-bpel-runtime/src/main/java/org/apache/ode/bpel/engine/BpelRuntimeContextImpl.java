@@ -18,16 +18,23 @@
  */
 package org.apache.ode.bpel.engine;
 
+import gr.uoa.di.s3lab.bpelcube.BPELCubeNode;
+import gr.uoa.di.s3lab.bpelcube.BPELCubeNodeDB;
+import gr.uoa.di.s3lab.bpelcube.services.ReadBPELVariableRequest;
+import gr.uoa.di.s3lab.bpelcube.services.ReadBPELVariableResponse;
+import gr.uoa.di.s3lab.bpelcube.services.WriteBPELVariableRequest;
+import gr.uoa.di.s3lab.p2p.P2PEndpoint;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.wsdl.Fault;
 import javax.wsdl.Operation;
@@ -50,8 +57,8 @@ import org.apache.ode.bpel.dao.ProcessInstanceDAO;
 import org.apache.ode.bpel.dao.ScopeDAO;
 import org.apache.ode.bpel.dao.ScopeStateEnum;
 import org.apache.ode.bpel.dao.XmlDataDAO;
-import org.apache.ode.bpel.evar.ExternalVariableModuleException;
 import org.apache.ode.bpel.evar.ExternalVariableModule.Value;
+import org.apache.ode.bpel.evar.ExternalVariableModuleException;
 import org.apache.ode.bpel.evt.CorrelationSetWriteEvent;
 import org.apache.ode.bpel.evt.ProcessCompletionEvent;
 import org.apache.ode.bpel.evt.ProcessInstanceEvent;
@@ -68,19 +75,17 @@ import org.apache.ode.bpel.iapi.Endpoint;
 import org.apache.ode.bpel.iapi.EndpointReference;
 import org.apache.ode.bpel.iapi.Message;
 import org.apache.ode.bpel.iapi.MessageExchange;
-import org.apache.ode.bpel.iapi.MyRoleMessageExchange;
-import org.apache.ode.bpel.iapi.PartnerRoleMessageExchange;
-import org.apache.ode.bpel.iapi.Scheduler;
 import org.apache.ode.bpel.iapi.MessageExchange.FailureType;
 import org.apache.ode.bpel.iapi.MessageExchange.MessageExchangePattern;
 import org.apache.ode.bpel.iapi.MessageExchange.Status;
+import org.apache.ode.bpel.iapi.MyRoleMessageExchange;
+import org.apache.ode.bpel.iapi.PartnerRoleMessageExchange;
 import org.apache.ode.bpel.iapi.ProcessConf.CLEANUP_CATEGORY;
 import org.apache.ode.bpel.iapi.ProcessConf.PartnerRoleConfig;
+import org.apache.ode.bpel.iapi.Scheduler;
 import org.apache.ode.bpel.iapi.Scheduler.JobDetails;
 import org.apache.ode.bpel.iapi.Scheduler.JobType;
-import org.apache.ode.bpel.intercept.InterceptorInvoker;
 import org.apache.ode.bpel.memdao.ProcessInstanceDaoImpl;
-import org.apache.ode.bpel.o.OFailureHandling;
 import org.apache.ode.bpel.o.OMessageVarType;
 import org.apache.ode.bpel.o.OPartnerLink;
 import org.apache.ode.bpel.o.OProcess;
@@ -106,12 +111,11 @@ import org.apache.ode.utils.DOMUtils;
 import org.apache.ode.utils.GUID;
 import org.apache.ode.utils.Namespaces;
 import org.apache.ode.utils.ObjectPrinter;
-import org.apache.ode.bpel.evar.ExternalVariableModuleException;
-import org.apache.ode.bpel.evar.ExternalVariableModule.Value;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 public class BpelRuntimeContextImpl implements BpelRuntimeContext {
 
@@ -503,12 +507,120 @@ public class BpelRuntimeContextImpl implements BpelRuntimeContext {
 
     public Node readVariable(Long scopeInstanceId, String varname, boolean forWriting) throws FaultException {
         ScopeDAO scopedao = _dao.getScope(scopeInstanceId);
+        
+        /**********************************************************************/
+        // Michael Pantazoglou: P2P-based variable reading
+        
+        BPELCubeNode me = (BPELCubeNode) BPELCubeNode.sharedInstance;
+        BPELCubeNodeDB db = (BPELCubeNodeDB) me.getNodeDB();
+        
+        String p2pSessionId = this._instantiatingMessageExchange.getP2PSessionId();
+        String variableId = scopedao.getName() + ":" + varname;
+        
+        String variableHolder = db.getVariableHolder(p2pSessionId, variableId);
+        
+        if (variableHolder.equals(me.getEndpoint().toString())) {
+        	
+        	// I am the holder of this variable
+        	__log.info("I am the holder of variable: " + variableId);
+        	String variableValue = db.getVariableValue(p2pSessionId, variableId);
+        	try {
+				return DOMUtils.stringToDOM(variableValue);
+			} catch (SAXException e) {
+				__log.debug(null, e);
+			} catch (IOException e) {
+				__log.debug(null, e);
+			}
+        } else {
+        	
+        	try {
+				// send read variable request to variable holder
+        		__log.info("Sending ReadBPELVariableRequest to: " + variableHolder);
+				ReadBPELVariableRequest readBPELVariableRequest = 
+						new ReadBPELVariableRequest();
+				readBPELVariableRequest.setP2PSessionId(p2pSessionId);
+				readBPELVariableRequest.setVariableId(variableId);
+				
+				P2PEndpoint holderEndpoint = new P2PEndpoint();
+				holderEndpoint.setAddress(new URI(variableHolder));
+				
+				ReadBPELVariableResponse readBPELVariableResponse = 
+						(ReadBPELVariableResponse) me.invokeTwoWayService(
+								holderEndpoint, readBPELVariableRequest);
+				
+				return DOMUtils.stringToDOM(
+						readBPELVariableResponse.getVariableValue());
+			} catch (URISyntaxException e) {
+				__log.debug(null, e);
+			} catch (SAXException e) {
+				__log.debug(null, e);
+			} catch (IOException e) {
+				__log.debug(null, e);
+			} catch (Exception e) {
+				__log.debug(null, e);
+			}
+        }
+        
+        /**********************************************************************/
+        
         XmlDataDAO var = scopedao.getVariable(varname);
         return (var == null || var.isNull()) ? null : var.get();
     }
     
     public Node writeVariable(VariableInstance variable, Node changes) {
         ScopeDAO scopeDAO = _dao.getScope(variable.scopeInstance);
+        
+        /**********************************************************************/
+        // Michael Pantazoglou: P2P-based variable writing
+        
+        BPELCubeNode me = (BPELCubeNode) BPELCubeNode.sharedInstance;
+        BPELCubeNodeDB db = (BPELCubeNodeDB) me.getNodeDB();
+        
+        String p2pSessionId = this._instantiatingMessageExchange.getP2PSessionId();
+        String variableId = scopeDAO.getName() + ":" + variable.declaration.name;
+        
+        String variableHolder = db.getVariableHolder(p2pSessionId, variableId);
+        
+        if (variableHolder == null) {
+        	
+        	// I will become the holder of this variable
+        	__log.info("I will become the holder of variable: " + variableId);
+        	db.addVariable(p2pSessionId, variableId, me.getEndpoint().toString(), null);
+        	db.updateVariableValue(p2pSessionId, variableId, DOMUtils.domToString(changes));
+        	return changes;
+        } else {
+        	
+        	if (variableHolder.equals(me.getEndpoint().toString())) {
+        		
+        		// I am the holder of this variable
+        		__log.info("I am the holder of variable: " + variableId);
+        		db.updateVariableValue(p2pSessionId, variableId, DOMUtils.domToString(changes));
+        		return changes;
+        	} else {
+        		
+        		try {
+					// Send Write variable request to variable holder node
+        			__log.info("Sending WriteBPELVariableRequest to: " + variableHolder);
+					WriteBPELVariableRequest writeBPELVariableRequest = 
+							new WriteBPELVariableRequest();
+					writeBPELVariableRequest.setP2PSessionId(p2pSessionId);
+					writeBPELVariableRequest.setVariableId(variableId);
+					writeBPELVariableRequest.setVariableValue(DOMUtils.domToString(changes));
+					
+					P2PEndpoint holderEndpoint = new P2PEndpoint();
+					holderEndpoint.setAddress(new URI(variableHolder));
+					me.invokeTwoWayService(holderEndpoint, writeBPELVariableRequest);
+					return changes;
+				} catch (URISyntaxException e) {
+					__log.debug(null, e);
+				} catch (Exception e) {
+					__log.debug(null, e);
+				}
+        	}
+        }
+        
+        /**********************************************************************/
+        
         XmlDataDAO dataDAO = scopeDAO.getVariable(variable.declaration.name);
         dataDAO.set(changes);
 
@@ -1569,5 +1681,14 @@ public class BpelRuntimeContextImpl implements BpelRuntimeContext {
             return c;
         }
     }
+    
+    /**************************************************************************/
+    // Michael Pantazoglou: Added getter method 
+    
+    public MyRoleMessageExchangeImpl getInstantiatingMessageExchange() {
+    	return _instantiatingMessageExchange;
+    }
+    
+    /**************************************************************************/
 
 }
