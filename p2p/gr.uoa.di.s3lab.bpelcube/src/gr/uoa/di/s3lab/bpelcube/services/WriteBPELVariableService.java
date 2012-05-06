@@ -55,7 +55,7 @@ public class WriteBPELVariableService extends BPELCubeService {
 	public void execute() {
 		response = new WriteBPELVariableResponse();
 		
-		String p2pSessionId = request.getP2pSessionId();
+		String p2pSessionId = request.getP2PSessionId();
 		String variableId = request.getVariableId();
 		String variableValue = request.getVariableValue();
 		

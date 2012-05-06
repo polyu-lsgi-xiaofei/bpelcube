@@ -55,11 +55,11 @@ public class WriteBPELVariableRequest extends P2PRequest {
 		return new WriteBPELVariableService();
 	}
 
-	public String getP2pSessionId() {
+	public String getP2PSessionId() {
 		return p2pSessionId;
 	}
 
-	public void setP2pSessionId(String p2pSessionId) {
+	public void setP2PSessionId(String p2pSessionId) {
 		this.p2pSessionId = p2pSessionId;
 	}
 
