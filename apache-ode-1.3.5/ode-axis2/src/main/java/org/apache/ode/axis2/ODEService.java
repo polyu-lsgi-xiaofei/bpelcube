@@ -152,7 +152,7 @@ public class ODEService {
     	
     	if (p2pSessionId == null) {
     		
-    		// the SOAP request was not sent by another p2p node
+    		// the SOAP request was not sent by me
     		
     		p2pSessionId = BPELCubeUtils.newP2PSessionID();
     		Long p2pSessionCreationTime = System.currentTimeMillis();
@@ -169,7 +169,7 @@ public class ODEService {
     				continue;
     			}
     			OActivity oActivity = (OActivity) oBase;
-    			String aId = oActivity.getType() + oActivity.getId();
+    			String aId = oActivity.getType() + "::"+ oActivity.getId();
     			if ((oActivity instanceof OAssign)|| (oActivity instanceof OInvoke)) {
     				
     				__log.info("Activity " + aId + " will be distributed");
@@ -222,6 +222,8 @@ public class ODEService {
 				}
     		}
     	}
+    	
+    	((MyRoleMessageExchangeImpl)odeMex).setP2PSessionId(p2pSessionId);
     	
     }
     /**************************************************************************/
