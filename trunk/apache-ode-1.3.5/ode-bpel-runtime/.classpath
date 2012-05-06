@@ -120,5 +120,8 @@
 	<classpathentry kind="src" path="/ode-agents"/>
 	<classpathentry kind="var" path="M2_REPO/tranql/tranql-connector-derby-common/1.1/tranql-connector-derby-common-1.1.jar"/>
 	<classpathentry kind="var" path="JDK_LIB/tools.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/gr.uoa.di.s3lab.bpelcube"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/gr.uoa.di.s3lab.p2p"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/gr.uoa.di.s3lab.p2p.hypercube"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

@@ -70,6 +70,18 @@ public class MyRoleMessageExchangeImpl extends MessageExchangeImpl implements My
     public BpelProcess getBpelProcess() {
     	return _process;
     }
+    
+    //Michael Pantazoglou: Added p2p session id attribute + getter/setter
+    
+    private String p2pSessionId;
+    
+    public void setP2PSessionId(String p2pSessionId) {
+    	this.p2pSessionId = p2pSessionId;
+    }
+    
+    public String getP2PSessionId() {
+    	return p2pSessionId;
+    }
     /**************************************************************************/
 
     public CorrelationStatus getCorrelationStatus() {
