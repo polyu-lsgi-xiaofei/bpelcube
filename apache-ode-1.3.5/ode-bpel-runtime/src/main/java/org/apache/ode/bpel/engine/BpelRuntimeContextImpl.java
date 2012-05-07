@@ -39,6 +39,9 @@ import java.util.List;
 import javax.wsdl.Fault;
 import javax.wsdl.Operation;
 import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -111,6 +114,7 @@ import org.apache.ode.utils.DOMUtils;
 import org.apache.ode.utils.GUID;
 import org.apache.ode.utils.Namespaces;
 import org.apache.ode.utils.ObjectPrinter;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -504,6 +508,16 @@ public class BpelRuntimeContextImpl implements BpelRuntimeContext {
         return _bpelProcess._engine._contexts.eprContext.convertEndpoint(nodeQName, sourceNode).toXML();
     }
 
+    /**************************************************************************/
+    // Michael Pantazoglou: Utility methods for variable reading
+    
+    private Document bytesToXML(byte[] xml) throws SAXException, ParserConfigurationException, IOException {
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		return builder.parse(new ByteArrayInputStream(xml));
+	}
+	
+    /**************************************************************************/
 
     public Node readVariable(Long scopeInstanceId, String varname, boolean forWriting) throws FaultException {
         ScopeDAO scopedao = _dao.getScope(scopeInstanceId);
@@ -514,52 +528,110 @@ public class BpelRuntimeContextImpl implements BpelRuntimeContext {
         BPELCubeNode me = (BPELCubeNode) BPELCubeNode.sharedInstance;
         BPELCubeNodeDB db = (BPELCubeNodeDB) me.getNodeDB();
         
-        String p2pSessionId = this._instantiatingMessageExchange.getP2PSessionId();
+        String p2pSessionId = _bpelProcess.getP2PSessionId();
         String variableId = scopedao.getName() + ":" + varname;
         
-        String variableHolder = db.getVariableHolder(p2pSessionId, variableId);
+        __log.info("Reading variable: " + variableId);
         
-        if (variableHolder.equals(me.getEndpoint().toString())) {
-        	
-        	// I am the holder of this variable
-        	__log.info("I am the holder of variable: " + variableId);
-        	String variableValue = db.getVariableValue(p2pSessionId, variableId);
-        	try {
-				return DOMUtils.stringToDOM(variableValue);
-			} catch (SAXException e) {
-				__log.debug(null, e);
-			} catch (IOException e) {
-				__log.debug(null, e);
-			}
-        } else {
-        	
-        	try {
-				// send read variable request to variable holder
-        		__log.info("Sending ReadBPELVariableRequest to: " + variableHolder);
-				ReadBPELVariableRequest readBPELVariableRequest = 
-						new ReadBPELVariableRequest();
-				readBPELVariableRequest.setP2PSessionId(p2pSessionId);
-				readBPELVariableRequest.setVariableId(variableId);
-				
-				P2PEndpoint holderEndpoint = new P2PEndpoint();
-				holderEndpoint.setAddress(new URI(variableHolder));
-				
-				ReadBPELVariableResponse readBPELVariableResponse = 
-						(ReadBPELVariableResponse) me.invokeTwoWayService(
-								holderEndpoint, readBPELVariableRequest);
-				
-				return DOMUtils.stringToDOM(
-						readBPELVariableResponse.getVariableValue());
-			} catch (URISyntaxException e) {
-				__log.debug(null, e);
-			} catch (SAXException e) {
-				__log.debug(null, e);
-			} catch (IOException e) {
-				__log.debug(null, e);
-			} catch (Exception e) {
-				__log.debug(null, e);
-			}
+        String variableHolder = db.getVariableHolder(p2pSessionId, variableId);
+        if (variableHolder != null) {
+        	if (variableHolder.equals(me.getEndpoint().toString())) {
+            	
+            	// I am the holder of this variable
+            	__log.info("I am the holder of variable: " + variableId);
+            	String variableValue = db.getVariableValue(p2pSessionId, variableId);
+            	
+            	try {
+					Node data = (Node)bytesToXML(variableValue.getBytes());
+					if (data == null) {
+						return null;
+					}
+					Document doc = DOMUtils.newDocument();
+					Node copy = doc.importNode(data.getFirstChild(), true);
+					if (data instanceof Element) {
+						doc.appendChild(copy);
+					} else {
+					    Element wrapper = doc.createElement("wrapper");
+					    wrapper.appendChild(copy);
+					}
+					return copy;
+				} catch (DOMException e) {
+					__log.debug(null, e);
+				} catch (SAXException e) {
+					__log.debug(null, e);
+				} catch (ParserConfigurationException e) {
+					__log.debug(null, e);
+				} catch (IOException e) {
+					__log.debug(null, e);
+				}
+            	
+//            	__log.info("Variable value: " + variableValue);
+//            	try {
+//    				return DOMUtils.stringToDOM(variableValue);
+//    			} catch (SAXException e) {
+//    				__log.debug(null, e);
+//    			} catch (IOException e) {
+//    				__log.debug(null, e);
+//    			}
+            } else {
+            	
+            	try {
+    				// send read variable request to variable holder
+            		__log.info("Sending ReadBPELVariableRequest to: " + variableHolder);
+    				ReadBPELVariableRequest readBPELVariableRequest = 
+    						new ReadBPELVariableRequest();
+    				readBPELVariableRequest.setP2PSessionId(p2pSessionId);
+    				readBPELVariableRequest.setVariableId(variableId);
+    				
+    				P2PEndpoint holderEndpoint = new P2PEndpoint();
+    				holderEndpoint.setAddress(new URI(variableHolder));
+    				
+    				ReadBPELVariableResponse readBPELVariableResponse = 
+    						(ReadBPELVariableResponse) me.invokeTwoWayService(
+    								holderEndpoint, readBPELVariableRequest);
+    				
+//    				if (readBPELVariableResponse.getVariableValue() == null) {
+//    					return null;
+//    				}
+//    				return DOMUtils.stringToDOM(
+//    						readBPELVariableResponse.getVariableValue());
+    				
+    				String variableValue = readBPELVariableResponse.getVariableValue();
+    				try {
+    					Node data = (Node)bytesToXML(variableValue.getBytes());
+    					if (data == null) {
+    						return null;
+    					}
+    					Document doc = DOMUtils.newDocument();
+    					Node copy = doc.importNode(data.getFirstChild(), true);
+    					if (data instanceof Element) {
+    						doc.appendChild(copy);
+    					} else {
+    					    Element wrapper = doc.createElement("wrapper");
+    					    wrapper.appendChild(copy);
+    					}
+    					return copy;
+    				} catch (DOMException e) {
+    					__log.debug(null, e);
+    				} catch (SAXException e) {
+    					__log.debug(null, e);
+    				} catch (ParserConfigurationException e) {
+    					__log.debug(null, e);
+    				} catch (IOException e) {
+    					__log.debug(null, e);
+    				}
+    			} catch (URISyntaxException e) {
+    				__log.debug(null, e);
+    			} catch (SAXException e) {
+    				__log.debug(null, e);
+    			} catch (IOException e) {
+    				__log.debug(null, e);
+    			} catch (Exception e) {
+    				__log.debug(null, e);
+    			}
+            }
         }
+        
         
         /**********************************************************************/
         
@@ -576,8 +648,10 @@ public class BpelRuntimeContextImpl implements BpelRuntimeContext {
         BPELCubeNode me = (BPELCubeNode) BPELCubeNode.sharedInstance;
         BPELCubeNodeDB db = (BPELCubeNodeDB) me.getNodeDB();
         
-        String p2pSessionId = this._instantiatingMessageExchange.getP2PSessionId();
+        String p2pSessionId = _bpelProcess.getP2PSessionId();
         String variableId = scopeDAO.getName() + ":" + variable.declaration.name;
+        
+        __log.info("Writing variable: " + variableId);
         
         String variableHolder = db.getVariableHolder(p2pSessionId, variableId);
         
@@ -1029,9 +1103,12 @@ public class BpelRuntimeContextImpl implements BpelRuntimeContext {
                 getBpelProcess().getPartnerRoleChannel(partnerLink.partnerLink));
     }
     
-    protected BpelProcess getBpelProcess() {
+    /**************************************************************************/
+    // Michael Pantazoglou: Changed visibility from 'protected' to 'public'
+    public BpelProcess getBpelProcess() {
         return _bpelProcess;
     }
+    /**************************************************************************/
 
     private void scheduleInvokeCheck(PartnerRoleMessageExchangeImpl mex, OPartnerLink partnerLink, boolean p2p) {
         boolean isTwoWay = mex.getMessageExchangePattern() ==
