@@ -22,7 +22,11 @@ import gr.uoa.di.s3lab.p2p.P2PEndpoint;
 import gr.uoa.di.s3lab.p2p.P2PRequest;
 import gr.uoa.di.s3lab.p2p.P2PResponse;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -78,6 +82,32 @@ public class BPELActivityCompletedService extends BPELCubeService {
 		try {
 			activityNotifier.notify(request);
 		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		// forward this request to all neighbors involved in the p2p session, 
+		// except from the ones that have been already notified.
+		List<String> notifiedNodes = request.getNotifiedNodes();
+		List<String> toBeNotified = new ArrayList<String>();
+		List<String> p2pSessionNeighbors = db.getP2PSessionNeighbors(request.getP2PSessionId());
+    	for (String neighbor : p2pSessionNeighbors) {
+    		if (notifiedNodes.contains(neighbor)) {
+    			continue;
+    		}
+    		notifiedNodes.add(neighbor);
+    		toBeNotified.add(neighbor);
+    	}
+    	
+    	request.setNotifiedNodes(notifiedNodes);
+    	try {
+			for (String nodeAddress : toBeNotified) {
+				P2PEndpoint p2pEndpoint = new P2PEndpoint();
+				p2pEndpoint.setAddress(new URI(nodeAddress));
+				me.invokeOneWayService(p2pEndpoint, request);
+			}
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

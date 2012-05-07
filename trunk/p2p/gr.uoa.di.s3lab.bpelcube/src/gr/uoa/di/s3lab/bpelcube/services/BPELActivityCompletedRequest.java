@@ -19,7 +19,9 @@ import gr.uoa.di.s3lab.p2p.P2PEndpoint;
 import gr.uoa.di.s3lab.p2p.P2PRequest;
 import gr.uoa.di.s3lab.p2p.P2PService;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 
 import org.apache.ode.bpel.runtime.channels.FaultData;
 
@@ -51,11 +53,28 @@ public class BPELActivityCompletedRequest extends P2PRequest {
 	private FaultData faultData;
 	
 	/**
+	 * If set to true, this flag indicates failed execution of the activity.
+	 */
+	private boolean executionFailed;
+	
+	/**
+	 * The message explaining the cause of failure.
+	 */
+	private String failureMessage;
+	
+	/**
+	 * The list of nodes involved in the p2p session which have been already 
+	 * notified about the completion of the activity.
+	 */
+	private List<String> notifiedNodes;
+	
+	/**
 	 * Constructor.
 	 */
 	public BPELActivityCompletedRequest() {
 		super();
 		newVariableHolders = new Hashtable<String, P2PEndpoint>();
+		setNotifiedNodes(new ArrayList<String>());
 	}
 
 	@Override
@@ -93,6 +112,30 @@ public class BPELActivityCompletedRequest extends P2PRequest {
 
 	public void setFaultData(FaultData faultData) {
 		this.faultData = faultData;
+	}
+
+	public boolean isExecutionFailed() {
+		return executionFailed;
+	}
+
+	public void setExecutionFailed(boolean executionFailed) {
+		this.executionFailed = executionFailed;
+	}
+
+	public String getFailureMessage() {
+		return failureMessage;
+	}
+
+	public void setFailureMessage(String failureMessage) {
+		this.failureMessage = failureMessage;
+	}
+
+	public List<String> getNotifiedNodes() {
+		return notifiedNodes;
+	}
+
+	public void setNotifiedNodes(List<String> notifiedNodes) {
+		this.notifiedNodes = notifiedNodes;
 	}
 
 }
