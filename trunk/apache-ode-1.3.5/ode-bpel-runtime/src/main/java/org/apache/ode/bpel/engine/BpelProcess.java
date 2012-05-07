@@ -141,6 +141,21 @@ public class BpelProcess {
     // The ratio of in-memory vs serialized size of compiled bpel object.
     private static final int PROCESS_MEMORY_TO_SERIALIZED_SIZE_RATIO = 5;
     
+    /**************************************************************************/
+    // Michael Pantazoglou: Added p2p session id attribute and getter/setter
+    
+    private String p2pSessionId;
+    
+    public void setP2PSessionId(String p2pSessionId) {
+    	this.p2pSessionId = p2pSessionId;
+    }
+    
+    public String getP2PSessionId() {
+    	return p2pSessionId;
+    }
+    
+    /**************************************************************************/
+    
     public BpelProcess(ProcessConf conf) {
         _pid = conf.getProcessId();
         _pconf = conf;
