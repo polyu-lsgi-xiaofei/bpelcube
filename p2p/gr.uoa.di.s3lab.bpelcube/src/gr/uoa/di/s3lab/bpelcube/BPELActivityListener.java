@@ -30,6 +30,16 @@ public class BPELActivityListener<E> {
 	
 	private String activityId;
 	
+	public BPELActivityListener() {
+		this.queue = new SynchronousQueue<E>();
+	}
+	
+	public BPELActivityListener(String p2pSessionId, String activityId) {
+		this.queue = new SynchronousQueue<E>();
+		this.p2pSessionId = p2pSessionId;
+		this.activityId = activityId;
+	}
+	
 	public BPELActivityListener(SynchronousQueue<E> queue) {
 		this.queue = queue;
 	}

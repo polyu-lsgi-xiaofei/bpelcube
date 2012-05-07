@@ -15,13 +15,17 @@
  */
 package gr.uoa.di.s3lab.bpelcube;
 
+import gr.uoa.di.s3lab.p2p.P2PEndpoint;
 import gr.uoa.di.s3lab.p2p.P2PNodeDB;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 
 /**
@@ -101,6 +105,15 @@ public class BPELCubeNodeDB extends P2PNodeDB {
 		String SQL;
 		
 		SQL = "DELETE FROM P2P_SESSION";
+		this.executeDDL(SQL);
+		
+		SQL = "DROP TABLE P2P_SESSION_VARIABLES";
+		this.executeDDL(SQL);
+		SQL = "DROP TABLE P2P_SESSION_NEIGHBORS";
+		this.executeDDL(SQL);
+		SQL = "DROP TABLE P2P_SESSION_ACTIVITIES";
+		this.executeDDL(SQL);
+		SQL = "DROP TABLE P2P_SESSION";
 		this.executeDDL(SQL);
 	}
 	
@@ -468,6 +481,12 @@ public class BPELCubeNodeDB extends P2PNodeDB {
 	 */
 	public void addVariable(String p2pSessionId, String variableId, String holderEndpoint, String value) {
 		PreparedStatement stmt = null;
+		
+		log.debug("Adding variable:");
+		log.debug("\tp2pSessionId = " + p2pSessionId);
+		log.debug("\tvariableId = " + variableId);
+		log.debug("\tholderEndpoint = " + holderEndpoint);
+		
 		try {
 			String SQL = "INSERT INTO P2P_SESSION_VARIABLES " +
 					"(P2P_SESSION_ID, VARIABLE_ID, HOLDER_ENDPOINT, VARIABLE_VALUE) VALUES (?,?,?,?)";
@@ -502,6 +521,10 @@ public class BPELCubeNodeDB extends P2PNodeDB {
 	 */
 	public void updateVariableValue(String p2pSessionId, String variableId, String value) {
 		PreparedStatement stmt = null;
+		
+		log.debug("Updating variable " + variableId);
+		log.debug("New value: " + value);
+		
 		try {
 			String SQL = "UPDATE P2P_SESSION_VARIABLES SET VARIABLE_VALUE=? " +
 					"WHERE P2P_SESSION_ID=? AND VARIABLE_ID=?";
@@ -605,20 +628,25 @@ public class BPELCubeNodeDB extends P2PNodeDB {
 	 * @param p2pSessionId
 	 * @return
 	 */
-	public List<String> getVariableHolders(String p2pSessionId) {
+	public Hashtable<String, P2PEndpoint> getVariableHolders(String p2pSessionId) {
 		PreparedStatement stmt = null;
 		ResultSet rset = null;
-		List<String> result = new ArrayList<String>();
+		Hashtable<String, P2PEndpoint> result = new Hashtable<String, P2PEndpoint>();
 		try {
-			String SQL = "SELECT HOLDER_ENDPOINT FROM P2P_SESSION_VARIABLE_HOLDERS WHERE P2P_SESSION_ID=?";
+			String SQL = "SELECT VARIABLE_ID, HOLDER_ENDPOINT FROM P2P_SESSION_VARIABLES WHERE P2P_SESSION_ID=?";
 			stmt = this.connection.prepareStatement(SQL);
 			stmt.setString(1, p2pSessionId);
 			rset = stmt.executeQuery();
 			while (rset.next()) {
-				result.add(rset.getString(1));
+				P2PEndpoint holderEndpoint = new P2PEndpoint();
+				holderEndpoint.setAddress(new URI(rset.getString(2)));
+				result.put(rset.getString(1), holderEndpoint);
 			}
 			return result;
 		} catch (SQLException e) {
+			log.debug(e.getMessage());
+			return result;
+		} catch (URISyntaxException e) {
 			log.debug(e.getMessage());
 			return result;
 		} finally {
