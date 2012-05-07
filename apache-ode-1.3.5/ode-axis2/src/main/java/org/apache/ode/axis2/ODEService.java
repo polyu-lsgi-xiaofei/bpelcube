@@ -119,7 +119,7 @@ public class ODEService {
     // Michael Pantazoglou: Initializes the p2p session for this process execution
     
     @SuppressWarnings("rawtypes")
-	private void initP2PSession(MessageContext originalMessageContext, MyRoleMessageExchange odeMex) {
+	private String initP2PSession(MessageContext originalMessageContext, MyRoleMessageExchange odeMex) {
     	
     	BPELCubeNode me = (BPELCubeNode) BPELCubeNode.sharedInstance;
     	BPELCubeNodeDB db = (BPELCubeNodeDB) me.getNodeDB();
@@ -223,7 +223,7 @@ public class ODEService {
     		}
     	}
     	
-    	((MyRoleMessageExchangeImpl)odeMex).setP2PSessionId(p2pSessionId);
+    	return p2pSessionId;
     	
     }
     /**************************************************************************/
@@ -247,7 +247,8 @@ public class ODEService {
             	
             	/**************************************************************/
             	// Michael Pantazoglou: Initialize the P2P session
-            	this.initP2PSession(msgContext, odeMex);
+            	String p2pSessionId = this.initP2PSession(msgContext, odeMex);
+            	((MyRoleMessageExchangeImpl)odeMex).getBpelProcess().setP2PSessionId(p2pSessionId);
             	/**************************************************************/
             	
                 // Preparing message to send to ODE
