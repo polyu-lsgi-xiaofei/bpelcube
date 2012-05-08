@@ -1,5 +1,5 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
++ * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
  * regarding copyright ownership.  The ASF licenses this file
@@ -176,9 +176,9 @@ public class ODEService {
     				toBeDistributed.add(aId);
     			} else {
     				
-    				// the activity will be locally executed
-    				__log.info("Activity " + aId + " will be locally executed");
-    				db.addP2PSessionActivity(p2pSessionId, aId);
+//    				// the activity will be locally executed
+//    				__log.info("Activity " + aId + " will be locally executed");
+//    				db.addP2PSessionActivity(p2pSessionId, aId);
     			}
     		}
     		
