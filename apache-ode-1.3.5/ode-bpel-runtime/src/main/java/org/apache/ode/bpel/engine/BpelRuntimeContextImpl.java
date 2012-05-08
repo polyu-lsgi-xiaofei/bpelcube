@@ -39,9 +39,6 @@ import java.util.List;
 import javax.wsdl.Fault;
 import javax.wsdl.Operation;
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -114,7 +111,6 @@ import org.apache.ode.utils.DOMUtils;
 import org.apache.ode.utils.GUID;
 import org.apache.ode.utils.Namespaces;
 import org.apache.ode.utils.ObjectPrinter;
-import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -508,16 +504,16 @@ public class BpelRuntimeContextImpl implements BpelRuntimeContext {
         return _bpelProcess._engine._contexts.eprContext.convertEndpoint(nodeQName, sourceNode).toXML();
     }
 
-    /**************************************************************************/
-    // Michael Pantazoglou: Utility methods for variable reading
-    
-    private Document bytesToXML(byte[] xml) throws SAXException, ParserConfigurationException, IOException {
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder = factory.newDocumentBuilder();
-		return builder.parse(new ByteArrayInputStream(xml));
-	}
-	
-    /**************************************************************************/
+//    /**************************************************************************/
+//    // Michael Pantazoglou: Utility methods for variable reading
+//    
+//    private Document bytesToXML(byte[] xml) throws SAXException, ParserConfigurationException, IOException {
+//		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+//		DocumentBuilder builder = factory.newDocumentBuilder();
+//		return builder.parse(new ByteArrayInputStream(xml));
+//	}
+//	
+//    /**************************************************************************/
 
     public Node readVariable(Long scopeInstanceId, String varname, boolean forWriting) throws FaultException {
         ScopeDAO scopedao = _dao.getScope(scopeInstanceId);
@@ -541,38 +537,38 @@ public class BpelRuntimeContextImpl implements BpelRuntimeContext {
             	__log.info("I am the holder of variable: " + variableId);
             	String variableValue = db.getVariableValue(p2pSessionId, variableId);
             	
-            	try {
-					Node data = (Node)bytesToXML(variableValue.getBytes());
-					if (data == null) {
-						return null;
-					}
-					Document doc = DOMUtils.newDocument();
-					Node copy = doc.importNode(data.getFirstChild(), true);
-					if (data instanceof Element) {
-						doc.appendChild(copy);
-					} else {
-					    Element wrapper = doc.createElement("wrapper");
-					    wrapper.appendChild(copy);
-					}
-					return copy;
-				} catch (DOMException e) {
-					__log.debug(null, e);
-				} catch (SAXException e) {
-					__log.debug(null, e);
-				} catch (ParserConfigurationException e) {
-					__log.debug(null, e);
-				} catch (IOException e) {
-					__log.debug(null, e);
-				}
-            	
-//            	__log.info("Variable value: " + variableValue);
 //            	try {
-//    				return DOMUtils.stringToDOM(variableValue);
-//    			} catch (SAXException e) {
-//    				__log.debug(null, e);
-//    			} catch (IOException e) {
-//    				__log.debug(null, e);
-//    			}
+//					Node data = (Node)bytesToXML(variableValue.getBytes());
+//					if (data == null) {
+//						return null;
+//					}
+//					Document doc = DOMUtils.newDocument();
+//					Node copy = doc.importNode(data.getFirstChild(), true);
+//					if (data instanceof Element) {
+//						doc.appendChild(copy);
+//					} else {
+//					    Element wrapper = doc.createElement("wrapper");
+//					    wrapper.appendChild(copy);
+//					}
+//					return copy;
+//				} catch (DOMException e) {
+//					__log.debug(null, e);
+//				} catch (SAXException e) {
+//					__log.debug(null, e);
+//				} catch (ParserConfigurationException e) {
+//					__log.debug(null, e);
+//				} catch (IOException e) {
+//					__log.debug(null, e);
+//				}
+            	
+            	__log.info("Variable value: " + variableValue);
+            	try {
+    				return DOMUtils.stringToDOM(variableValue);
+    			} catch (SAXException e) {
+    				__log.debug(null, e);
+    			} catch (IOException e) {
+    				__log.debug(null, e);
+    			}
             } else {
             	
             	try {
@@ -590,36 +586,36 @@ public class BpelRuntimeContextImpl implements BpelRuntimeContext {
     						(ReadBPELVariableResponse) me.invokeTwoWayService(
     								holderEndpoint, readBPELVariableRequest);
     				
-//    				if (readBPELVariableResponse.getVariableValue() == null) {
-//    					return null;
-//    				}
-//    				return DOMUtils.stringToDOM(
-//    						readBPELVariableResponse.getVariableValue());
-    				
-    				String variableValue = readBPELVariableResponse.getVariableValue();
-    				try {
-    					Node data = (Node)bytesToXML(variableValue.getBytes());
-    					if (data == null) {
-    						return null;
-    					}
-    					Document doc = DOMUtils.newDocument();
-    					Node copy = doc.importNode(data.getFirstChild(), true);
-    					if (data instanceof Element) {
-    						doc.appendChild(copy);
-    					} else {
-    					    Element wrapper = doc.createElement("wrapper");
-    					    wrapper.appendChild(copy);
-    					}
-    					return copy;
-    				} catch (DOMException e) {
-    					__log.debug(null, e);
-    				} catch (SAXException e) {
-    					__log.debug(null, e);
-    				} catch (ParserConfigurationException e) {
-    					__log.debug(null, e);
-    				} catch (IOException e) {
-    					__log.debug(null, e);
+    				if (readBPELVariableResponse.getVariableValue() == null) {
+    					return null;
     				}
+    				return DOMUtils.stringToDOM(
+    						readBPELVariableResponse.getVariableValue());
+    				
+//    				String variableValue = readBPELVariableResponse.getVariableValue();
+//    				try {
+//    					Node data = (Node)bytesToXML(variableValue.getBytes());
+//    					if (data == null) {
+//    						return null;
+//    					}
+//    					Document doc = DOMUtils.newDocument();
+//    					Node copy = doc.importNode(data.getFirstChild(), true);
+//    					if (data instanceof Element) {
+//    						doc.appendChild(copy);
+//    					} else {
+//    					    Element wrapper = doc.createElement("wrapper");
+//    					    wrapper.appendChild(copy);
+//    					}
+//    					return copy;
+//    				} catch (DOMException e) {
+//    					__log.debug(null, e);
+//    				} catch (SAXException e) {
+//    					__log.debug(null, e);
+//    				} catch (ParserConfigurationException e) {
+//    					__log.debug(null, e);
+//    				} catch (IOException e) {
+//    					__log.debug(null, e);
+//    				}
     			} catch (URISyntaxException e) {
     				__log.debug(null, e);
     			} catch (SAXException e) {

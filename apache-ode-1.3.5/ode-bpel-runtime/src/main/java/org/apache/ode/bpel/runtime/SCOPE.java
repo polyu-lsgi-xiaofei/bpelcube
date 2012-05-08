@@ -75,6 +75,17 @@ class SCOPE extends ACTIVITY {
     }
 
     public void run() {
+    	
+    	/**********************************************************************/
+    	// Michael Pantazoglou: Attempt to execute this activity remotely
+    	try {
+			if (this.executeRemotely()) {
+				return;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    	/**********************************************************************/
         
         // Start the child activity.
         _child = new ActivityInfo(genMonotonic(),

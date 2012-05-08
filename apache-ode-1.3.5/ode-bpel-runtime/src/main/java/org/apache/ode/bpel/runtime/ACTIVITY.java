@@ -309,6 +309,24 @@ abstract class ACTIVITY extends BpelJacobRunnable implements IndexedObject {
 		}
     }
     
+    // Michael Pantazoglou: This method must be overriden by concrete activity classes
+    
+    public void localRun() {
+    	
+    }
+    
+    @Override
+    public void run() {
+    	
+    	try {
+			if (!executeRemotely()) {
+				localRun();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    }
+    
     /**************************************************************************/
     
 }
