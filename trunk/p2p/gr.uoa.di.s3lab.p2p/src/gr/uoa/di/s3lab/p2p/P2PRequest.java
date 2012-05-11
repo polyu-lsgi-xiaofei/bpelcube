@@ -24,10 +24,28 @@ package gr.uoa.di.s3lab.p2p;
 public abstract class P2PRequest extends P2PMessage {
 
 	private static final long serialVersionUID = 3863562841558745016L;
+	
+	private static int CORRELATION_ID_COUNTER = 0;
 
+	/**
+	 * Constructor.
+	 */
 	protected P2PRequest() {
 		super();
+		addHeaderElement(CORRELATION_ID, newCorrelationId());
 	}
+	
+	/**
+     * Creates and returns a new correlation id.
+     * 
+     * @return
+     */
+    private static String newCorrelationId() {
+    	StringBuilder sb = new StringBuilder();
+    	sb.append("p2p::").append(System.currentTimeMillis()).append("::");
+    	sb.append(CORRELATION_ID_COUNTER++);
+    	return sb.toString();
+    }
 	
 	/**
      * Creates and returns the appropriate p2p service that will handle this p2p request.

@@ -24,9 +24,26 @@ package gr.uoa.di.s3lab.p2p;
 public abstract class P2PResponse extends P2PMessage {
 
 	private static final long serialVersionUID = -2979715171809798380L;
+	
+	private static final String RESPONDER = "Responder";
 
 	protected P2PResponse() {
 		super();
+		addHeaderElement(RESPONDER, P2PNode.sharedInstance.getEndpoint());
+	}
+	
+	/**
+	 * Correlates this p2p response with the specified p2p request. This should
+	 * be used in cases of asynchronous, two-way communication between two nodes.
+	 * 
+	 * @param p2pRequest the correlated p2p request
+	 */
+	public void correlateWith(P2PRequest p2pRequest) {
+		addHeaderElement(CORRELATION_ID, p2pRequest.getHeader().get(CORRELATION_ID));
+	}
+	
+	public P2PEndpoint getResponder() {
+		return (P2PEndpoint) header.get(RESPONDER);
 	}
 
 }

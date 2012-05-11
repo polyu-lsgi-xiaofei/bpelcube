@@ -19,10 +19,12 @@ import gr.uoa.di.s3lab.p2p.Log.Level;
 
 import java.net.SocketException;
 import java.net.URI;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.SynchronousQueue;
 
 /**
  * This class defines an abstract P2P node.
@@ -87,6 +89,8 @@ public abstract class P2PNode {
 	 * The P2P network where this node belongs.
 	 */
 	private P2PNetwork network;
+	
+	private Hashtable<String, SynchronousQueue<P2PResponse>> correlators;
 
 	/**
 	 * This constructor should be used in case the node obtains its address 
@@ -107,7 +111,8 @@ public abstract class P2PNode {
 		this.domain = domain;
 		this.port = port;
 		this.log = new Log(getClass(), logLevel);
-		this.log.debug("P2P node constructor completed");
+		
+		this.correlators = new Hashtable<String, SynchronousQueue<P2PResponse>>();
 	}
 	
 	/**
@@ -130,6 +135,8 @@ public abstract class P2PNode {
 		this.address = address;
 		this.port = port;
 		this.log = new Log(getClass(), logLevel);
+		
+		this.correlators = new Hashtable<String, SynchronousQueue<P2PResponse>>();
 	}
 	
 	/**
@@ -173,6 +180,17 @@ public abstract class P2PNode {
 		return this.port;
 	}
 	
+	public SynchronousQueue<P2PResponse> removeCorrelator(String correlationId) {
+		return correlators.remove(correlationId);
+	}
+	
+	public SynchronousQueue<P2PResponse> getCorrelator(String correlationId) {
+		return correlators.get(correlationId);
+	}
+	
+	public void addCorrelator(String correlationId, SynchronousQueue<P2PResponse> queue) {
+		correlators.put(correlationId, queue);
+	}
 	
 	/**
 	 * Gets the data store of this node.
@@ -388,6 +406,24 @@ public abstract class P2PNode {
 		P2PConnection p2pConnection = this.getNetwork().connect(p2pEndpoint);
 		p2pConnection.send(request);
 		return (P2PResponse)p2pConnection.receive();
+	}
+	
+	/**
+	 * Invokes an asynchronous request-response p2p service.
+	 * 
+	 * @param p2pEndpoint the node hosting the p2p service.
+	 * @param request the service request
+	 * @return the service response
+	 * @throws Exception
+	 */
+	public final P2PResponse invokeAsyncTwoWayService(P2PEndpoint p2pEndpoint, 
+			P2PRequest request) throws Exception {
+		P2PConnection p2pConnection = this.getNetwork().connect(p2pEndpoint);
+		p2pConnection.send(request);
+		SynchronousQueue<P2PResponse> queue = new SynchronousQueue<P2PResponse>();
+		addCorrelator(request.getCorrelationId(), queue);
+		log.debug("Waiting for response...");
+		return queue.take();
 	}
 	
 	/**
