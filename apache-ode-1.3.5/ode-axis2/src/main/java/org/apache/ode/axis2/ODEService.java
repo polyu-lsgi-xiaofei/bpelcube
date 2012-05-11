@@ -69,9 +69,7 @@ import org.apache.ode.bpel.iapi.MessageExchange;
 import org.apache.ode.bpel.iapi.MyRoleMessageExchange;
 import org.apache.ode.bpel.iapi.ProcessConf;
 import org.apache.ode.bpel.o.OActivity;
-import org.apache.ode.bpel.o.OAssign;
 import org.apache.ode.bpel.o.OBase;
-import org.apache.ode.bpel.o.OInvoke;
 import org.apache.ode.utils.DOMUtils;
 import org.apache.ode.utils.GUID;
 import org.apache.ode.utils.Namespaces;
@@ -170,16 +168,11 @@ public class ODEService {
     			}
     			OActivity oActivity = (OActivity) oBase;
     			String aId = oActivity.getType() + "::"+ oActivity.getId();
-    			if ((oActivity instanceof OAssign)|| (oActivity instanceof OInvoke)) {
+    			if (BPELCubeUtils.isRemotelyExecutable(oActivity)) {
     				
     				__log.info("Activity " + aId + " will be distributed");
     				toBeDistributed.add(aId);
-    			} else {
-    				
-//    				// the activity will be locally executed
-//    				__log.info("Activity " + aId + " will be locally executed");
-//    				db.addP2PSessionActivity(p2pSessionId, aId);
-    			}
+    			} 
     		}
     		
     		// find LRU neighbor
@@ -191,6 +184,9 @@ public class ODEService {
     				db.addP2PSessionActivity(p2pSessionId, aId);
     			}
     		} else {
+    			
+    			db.addP2PSessionNeighor(p2pSessionId, LRU.asP2PEndpoint().toString());
+    			
     			// Start the recruitment of worker nodes
         		RecruitRequest recruitRequest = new RecruitRequest();
         		recruitRequest.setActivityIds(toBeDistributed);
