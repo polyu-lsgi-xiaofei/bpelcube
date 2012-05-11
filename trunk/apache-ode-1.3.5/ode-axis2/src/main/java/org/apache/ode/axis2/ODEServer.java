@@ -178,11 +178,13 @@ public class ODEServer {
 			if (bootstrapURIAsString.length() > 0) {
 				bootstrapURI = new URI(bootstrapURIAsString);
 			}
+			int bpelEnginePort = Integer.valueOf(props.getProperty("node.bpel.engine.port"));
 			
 			// Construct and start the p2p node
 			BPELCubeNode node = new BPELCubeNode(home, name, domain, address, port, logLevel);
 			node.setBootstrapURI(bootstrapURI);
 			node.setBPELEngineDeployDirectory(_store.getDeployDir().getAbsolutePath());
+			node.setBPELEnginePort(bpelEnginePort);
 			node.start();
 			
 		} catch (FileNotFoundException e) {
