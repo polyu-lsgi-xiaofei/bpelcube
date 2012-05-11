@@ -16,6 +16,7 @@
 package gr.uoa.di.s3lab.p2p;
 
 import java.io.EOFException;
+import java.util.concurrent.SynchronousQueue;
 
 
 /**
@@ -41,25 +42,41 @@ public class P2PConnectionHandler implements Runnable {
 	}
 
 	/**
-	 * Handles the connection in the following way: First, the request is
-	 * received, and is used to create an instance of the corresponding service.
-	 * Next, the service is executed based on the request, and, if a response
-	 * is required, it is sent back through the connection. 
+	 * Handles the connection in the following way: First, the p2p message is
+	 * received. If it is a p2p response, the correlation id is extracted and 
+	 * the response is pushed to the appropriate correlator. Otherwise, it is used 
+	 * to create an instance of the corresponding service. Next, the service is 
+	 * executed based on the request, and, if a response is required, it is sent 
+	 * back through the connection. 
 	 */
 	protected void handle() {
 		try {
-			P2PMessage request = connection.receive();
-			if (!(request instanceof P2PRequest)) {
+			P2PMessage message = connection.receive();
+			
+			if (message instanceof P2PResponse) {
+				P2PResponse response = (P2PResponse) message;
+				String correlationId = response.getCorrelationId();
+				if (correlationId != null) {
+					SynchronousQueue<P2PResponse> correlator = 
+							P2PNode.sharedInstance.removeCorrelator(correlationId);
+					if (correlator != null) {
+						correlator.put(response);
+					}
+				}
+				return;
+			}
+			
+			if (!(message instanceof P2PRequest)) {
 				log.error("Invalid request");
 				return;
 			}
-			P2PService service = ((P2PRequest)request).createService();
+			P2PService service = ((P2PRequest)message).createService();
 			if (service == null) {
 				log.error("Unknown request");
 				return;
 			}
 			log.debug("Executing service " + service.getClass().getSimpleName());
-			service.setRequest((P2PRequest)request);
+			service.setRequest((P2PRequest)message);
 			service.execute();
 			if (service.isRequestResponse()) {
 				P2PResponse response = service.getResponse();

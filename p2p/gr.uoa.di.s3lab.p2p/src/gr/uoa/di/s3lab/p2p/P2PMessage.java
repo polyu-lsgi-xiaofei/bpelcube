@@ -26,11 +26,14 @@ import java.util.HashMap;
 public class P2PMessage implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    public static final String CORRELATION_ID = "CorrelationId";
+    
     /**
      * The message's header may contain an arbitrary number of serializable 
      * objects distinguished by their name.
      */
-    private HashMap<String,Serializable> header;
+    protected HashMap<String,Serializable> header;
     
     public P2PMessage() {
     	header = new HashMap<String,Serializable>();
@@ -46,6 +49,15 @@ public class P2PMessage implements Serializable {
 	
 	public void addHeaderElement(String name, Serializable headerElement) {
 		this.header.put(name, headerElement);
+	}
+	
+	/**
+	 * Gets the correlation id of this p2p message.
+	 * 
+	 * @return
+	 */
+	public String getCorrelationId() {
+		return (String) header.get(CORRELATION_ID);
 	}
 
 }
