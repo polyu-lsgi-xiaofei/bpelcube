@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="bpelcube">
-	
+	<!--
 	<property name="eclipse.workspace" 
 		value="C:/Eclipse/Workspaces/bpelcube"/>
 	<property name="tomcat.home" 
@@ -9,6 +9,15 @@
 		value="C:/Apache/Maven/2.2.1/bin/mvn.bat"/>
 	<property name="local.libs" 
 		value="C:/Java/Libraries"/>
+	-->
+	<property name="eclipse.workspace" 
+		value="/Users/michael/eclipses/workspaces/bpelcube"/>
+	<property name="tomcat.home" 
+		value="/Users/michael/Desktop/bpelcube/apache-tomcat-7.0.23"/>
+	<property name="maven.command" 
+		value="/usr/bin/mvn"/>
+	<property name="local.libs" 
+		value="/Users/michael/Java/Libraries"/>
 	
 	<property name="ode.webapp" 
 		value="${tomcat.home}/webapps/ode"/>

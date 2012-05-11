@@ -17,6 +17,10 @@ package gr.uoa.di.s3lab.bpelcube;
 
 import javax.xml.namespace.QName;
 
+import org.apache.ode.bpel.o.OActivity;
+import org.apache.ode.bpel.o.OAssign;
+import org.apache.ode.bpel.o.OInvoke;
+
 /**
  * This class provides a number of P2P engine-related utilities.
  * 
@@ -50,6 +54,23 @@ public class BPELCubeUtils {
 		sb.append(processInstanceCounter++);
 		
 		return sb.toString();
+	}
+	
+	/**
+	 * Checks whether the specified BPEL activity can be executed remotely.
+	 * 
+	 * @param activity
+	 * @return
+	 */
+	public static boolean isRemotelyExecutable(OActivity activity) {
+		
+		if (activity instanceof OAssign) {
+			return true;
+		} else if (activity instanceof OInvoke) {
+			return true;
+		}
+		
+		return false;
 	}
 
 }

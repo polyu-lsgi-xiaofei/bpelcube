@@ -63,6 +63,11 @@ public class BPELCubeNode extends HypercubeNode {
 			new Hashtable<String, BPELProcessExecutionListener<P2PRequest>>();
 	
 	/**
+	 * The port of the underlying BPEL engine.
+	 */
+	private int bpelEnginePort;
+	
+	/**
 	 * Constructor.
 	 * 
 	 * @param home
@@ -296,6 +301,14 @@ public class BPELCubeNode extends HypercubeNode {
 			}
 		}
 		return deployedBundles;
+	}
+
+	public int getBPELEnginePort() {
+		return bpelEnginePort;
+	}
+
+	public void setBPELEnginePort(int bpelEnginePort) {
+		this.bpelEnginePort = bpelEnginePort;
 	}
 
 }
