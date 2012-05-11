@@ -59,7 +59,9 @@ public class BPELActivityCompletedService extends BPELCubeService {
 		for (String vid : variableIds) {
 			P2PEndpoint holderEndpoint = newVariableHolders.get(vid);
 			// the variable value is set to null because the variable is held remotely
-			db.addVariable(request.getP2PSessionId(), vid, holderEndpoint.toString(), null);
+			if (!db.variableExists(request.getP2PSessionId(), vid)) {
+				db.addVariable(request.getP2PSessionId(), vid, holderEndpoint.toString(), null);
+			}
 		}
 		
 		// notify the respective activity listener

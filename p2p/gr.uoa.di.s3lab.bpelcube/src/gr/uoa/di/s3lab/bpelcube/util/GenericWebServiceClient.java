@@ -58,7 +58,7 @@ public class GenericWebServiceClient {
 	 * @param msgContext
 	 * @param p2pSessionId
 	 */
-	public void invoke(MessageContext msgContext, String p2pSessionId)  {
+	public void invoke(MessageContext msgContext, String p2pSessionId, int bpelEnginePort)  {
 		
 		try {
 			String toAddressAsString = msgContext.getTo().getAddress();
@@ -67,7 +67,7 @@ public class GenericWebServiceClient {
 			StringBuilder sb = new StringBuilder();
 			sb.append(toAddress.getProtocol()).append("://");
 			sb.append("localhost").append(":");
-			sb.append(toAddress.getPort()).append(toAddress.getPath());
+			sb.append(bpelEnginePort).append(toAddress.getPath());
 			
 			String newToAddressAsString = sb.toString();
 			
