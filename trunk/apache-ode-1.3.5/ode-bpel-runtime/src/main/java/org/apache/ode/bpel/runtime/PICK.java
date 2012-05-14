@@ -18,11 +18,15 @@
  */
 package org.apache.ode.bpel.runtime;
 
+import gr.uoa.di.s3lab.bpelcube.BPELCubeNode;
+import gr.uoa.di.s3lab.bpelcube.BPELCubeNodeDB;
+
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.SynchronousQueue;
 
 import javax.xml.namespace.QName;
 
@@ -31,21 +35,21 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ode.bpel.common.CorrelationKey;
 import org.apache.ode.bpel.common.CorrelationKeySet;
 import org.apache.ode.bpel.common.FaultException;
+import org.apache.ode.bpel.evar.ExternalVariableModuleException;
 import org.apache.ode.bpel.evt.VariableModificationEvent;
 import org.apache.ode.bpel.explang.EvaluationException;
+import org.apache.ode.bpel.iapi.BpelEngineException;
 import org.apache.ode.bpel.o.OElementVarType;
 import org.apache.ode.bpel.o.OMessageVarType;
+import org.apache.ode.bpel.o.OMessageVarType.Part;
 import org.apache.ode.bpel.o.OPickReceive;
 import org.apache.ode.bpel.o.OScope;
-import org.apache.ode.bpel.o.OMessageVarType.Part;
 import org.apache.ode.bpel.runtime.channels.FaultData;
 import org.apache.ode.bpel.runtime.channels.PickResponseChannel;
 import org.apache.ode.bpel.runtime.channels.PickResponseChannelListener;
 import org.apache.ode.bpel.runtime.channels.TerminationChannelListener;
 import org.apache.ode.utils.DOMUtils;
 import org.apache.ode.utils.xsd.Duration;
-import org.apache.ode.bpel.evar.ExternalVariableModuleException;
-import org.apache.ode.bpel.iapi.BpelEngineException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -62,16 +66,20 @@ class PICK extends ACTIVITY {
     // if multiple alarms are set, this is the alarm the evaluates to
     // the shortest absolute time until firing.
     private OPickReceive.OnAlarm _alarm = null;
+    
+//    /**************************************************************************/
+//    // Michael Pantazoglou: The following queue is used to synchronize the 
+//    // PICK.localRun() with the WAITING.run().
+//    /**************************************************************************/
+//    private SynchronousQueue<Object> synchronizer = new SynchronousQueue<Object>();
 
     public PICK(ActivityInfo self, ScopeFrame scopeFrame, LinkFrame linkFrame) {
         super(self, scopeFrame, linkFrame);
         _opick = (OPickReceive) self.o;
     }
-
-    /**
-     * @see org.apache.ode.jacob.JacobRunnable#run()
-     */
-    public void run() {
+    
+    @Override
+    protected void localRun() {
         PickResponseChannel pickResponseChannel = newChannel(PickResponseChannel.class);
         Date timeout;
         Selector[] selectors;
@@ -113,6 +121,11 @@ class PICK extends ACTIVITY {
             FaultData fault = createFault(e.getQName(), _opick, e.getMessage());
             dpe(_opick.outgoingLinks);
             _self.parent.completed(fault, CompensationHandler.emptySet());
+            
+            /**************************************************************/
+            // Michael Pantazoglou
+            this.faultData = fault;
+            /**************************************************************/
             return;
         } catch (EvaluationException e) {
             String msg = "Unexpected evaluation error evaluating alarm.";
@@ -128,6 +141,17 @@ class PICK extends ACTIVITY {
         }
 
         instance(new WAITING(pickResponseChannel));
+        
+        __log.info("PICK.localRun() completed.");
+        
+//        /**********************************************************************/
+//        // Michael Pantazoglou
+//        try {
+//			synchronizer.take();
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
+//        /**********************************************************************/
     }
 
     /**
@@ -282,6 +306,8 @@ class PICK extends ACTIVITY {
                 private static final long serialVersionUID = -8237296827418738011L;
 
                 public void onRequestRcvd(int selectorIdx, String mexId) {
+                	
+                	__log.info("onRequestRcvd()");
                     OPickReceive.OnMessage onMessage = _opick.onMessages.get(selectorIdx);
 
                     // dead path the non-selected onMessage blocks.
@@ -342,6 +368,17 @@ class PICK extends ACTIVITY {
                         fault = createFault(e.getQName(), onMessage);
                         _self.parent.completed(fault, CompensationHandler.emptySet());
                         dpe(onMessage.activity);
+                        
+//                        /**************************************************************/
+//                        // Michael Pantazoglou
+                        PICK.this.faultData = fault;
+//                        try {
+//							synchronizer.put(new Object());
+//						} catch (InterruptedException e1) {
+//							e1.printStackTrace();
+//						}
+//                        /**************************************************************/
+                        
                         return;
                     }
 
@@ -352,6 +389,27 @@ class PICK extends ACTIVITY {
                     // channels for the child.
                     ActivityInfo child = new ActivityInfo(genMonotonic(), onMessage.activity, _self.self, _self.parent);
                     instance(createChild(child, _scopeFrame, _linkFrame));
+                    
+//                    /**********************************************************/
+//                    // Michael Pantazoglou
+//                    try {
+//						synchronizer.put(new Object());
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//					}
+//                    /**********************************************************/
+                    /**********************************************************/
+                    __log.info("onRequestRcvd() completed.");
+                    BPELCubeNode me = (BPELCubeNode) BPELCubeNode.sharedInstance;
+                	BPELCubeNodeDB db = (BPELCubeNodeDB) me.getNodeDB();
+                	String p2pSessionId = getP2PSessionId();
+                	String activityId = PICK.this._self.o.getType() + "::" + _self.o.getId();
+                    try {
+						notifyAllP2PNodes(me, db, p2pSessionId, activityId);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+                    /**********************************************************/
                 }
 
                 public void onTimeout() {
@@ -366,10 +424,52 @@ class PICK extends ACTIVITY {
                     // channels for the child.
                     ActivityInfo child = new ActivityInfo(genMonotonic(), _alarm.activity, _self.self, _self.parent);
                     instance(createChild(child, _scopeFrame, _linkFrame));
+                    
+//                    /**********************************************************/
+//                    // Michael Pantazoglou
+//                    try {
+//						synchronizer.put(new Object());
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//					}
+//                    /**********************************************************/
+                    /**********************************************************/
+                    __log.info("onTimeout() completed.");
+                    BPELCubeNode me = (BPELCubeNode) BPELCubeNode.sharedInstance;
+                	BPELCubeNodeDB db = (BPELCubeNodeDB) me.getNodeDB();
+                	String p2pSessionId = getP2PSessionId();
+                	String activityId = PICK.this._self.o.getType() + "::" + _self.o.getId();
+                    try {
+						notifyAllP2PNodes(me, db, p2pSessionId, activityId);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+                    /**********************************************************/
                 }
 
                 public void onCancel() {
                     _self.parent.completed(null, CompensationHandler.emptySet());
+                    
+//                    /**********************************************************/
+//                    // Michael Pantazoglou
+//                    try {
+//						synchronizer.put(new Object());
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//					}
+//                    /**********************************************************/
+                    /**********************************************************/
+                    __log.info("onCancel() completed.");
+                    BPELCubeNode me = (BPELCubeNode) BPELCubeNode.sharedInstance;
+                	BPELCubeNodeDB db = (BPELCubeNodeDB) me.getNodeDB();
+                	String p2pSessionId = getP2PSessionId();
+                	String activityId = PICK.this._self.o.getType() + "::" + _self.o.getId();
+                    try {
+						notifyAllP2PNodes(me, db, p2pSessionId, activityId);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+                    /**********************************************************/
                 }
 
             }.or(new TerminationChannelListener(_self.self) {
@@ -378,6 +478,27 @@ class PICK extends ACTIVITY {
                 public void terminate() {
                     getBpelRuntimeContext().cancel(_pickResponseChannel);
                     instance(WAITING.this);
+                    
+//                    /**********************************************************/
+//                    // Michael Pantazoglou
+//                    try {
+//						synchronizer.put(new Object());
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//					}
+//                    /**********************************************************/
+                    /**********************************************************/
+                    __log.info("terminate() completed.");
+                    BPELCubeNode me = (BPELCubeNode) BPELCubeNode.sharedInstance;
+                	BPELCubeNodeDB db = (BPELCubeNodeDB) me.getNodeDB();
+                	String p2pSessionId = getP2PSessionId();
+                	String activityId = PICK.this._self.o.getType() + "::" + _self.o.getId();
+                    try {
+						notifyAllP2PNodes(me, db, p2pSessionId, activityId);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+                    /**********************************************************/
                 }
             }));
         }

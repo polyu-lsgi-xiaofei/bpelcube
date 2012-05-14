@@ -18,9 +18,17 @@
  */
 package org.apache.ode.bpel.runtime;
 
+import java.net.URI;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import javax.xml.namespace.QName;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ode.bpel.common.FaultException;
+import org.apache.ode.bpel.evar.ExternalVariableModuleException;
 import org.apache.ode.bpel.evt.PartnerLinkModificationEvent;
 import org.apache.ode.bpel.evt.ScopeEvent;
 import org.apache.ode.bpel.evt.VariableModificationEvent;
@@ -43,7 +51,6 @@ import org.apache.ode.bpel.runtime.channels.FaultData;
 import org.apache.ode.utils.DOMUtils;
 import org.apache.ode.utils.Namespaces;
 import org.apache.ode.utils.msg.MessageBundle;
-import org.apache.ode.bpel.evar.ExternalVariableModuleException;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -51,15 +58,6 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
-import org.xml.sax.SAXException;
-
-import javax.xml.namespace.QName;
-
-import java.io.IOException;
-import java.net.URI;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Assign activity run-time template.
@@ -76,7 +74,8 @@ class ASSIGN extends ACTIVITY {
         super(self, scopeFrame, linkFrame);
     }
 
-    public void run() {
+    @Override
+    protected void localRun() {
         OAssign oassign = getOAsssign();
 
         FaultData faultData = null;
@@ -103,6 +102,14 @@ class ASSIGN extends ACTIVITY {
             } catch (ExternalVariableModuleException e) {
                 __log.error("Exception while initializing external variable", e);
                 _self.parent.failure(e.toString(), null);
+                
+                /**************************************************************/
+                // Michael Pantazoglou
+                this.executionFailed = true;
+                this.failureReason = e.toString();
+                this.faultData = faultData;
+                /**************************************************************/
+                
                 return;
             }
         }
@@ -112,6 +119,11 @@ class ASSIGN extends ACTIVITY {
                     + ",lineNo=" + faultData.getFaultLineNo()
                     + ",faultExplanation=" + faultData.getExplanation());
             _self.parent.completed(faultData, CompensationHandler.emptySet());
+            
+            /**************************************************************/
+            // Michael Pantazoglou
+            this.faultData = faultData;
+            /**************************************************************/
         } else {
             _self.parent.completed(null, CompensationHandler.emptySet());
         }

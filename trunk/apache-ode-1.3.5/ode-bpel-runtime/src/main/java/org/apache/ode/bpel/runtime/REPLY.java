@@ -37,8 +37,13 @@ class REPLY extends ACTIVITY {
     REPLY(ActivityInfo self, ScopeFrame scopeFrame, LinkFrame linkFrame) {
         super(self, scopeFrame, linkFrame);
     }
-
-    public void run() {
+    
+    /**************************************************************************/
+    // Michael Pantazoglou: Changed run() to localRun()
+    /**************************************************************************/
+    
+    @Override
+    public void localRun() {
         final OReply oreply = (OReply)_self.o;
 
         if (__log.isDebugEnabled()) {
@@ -75,5 +80,10 @@ class REPLY extends ACTIVITY {
         }
 
         _self.parent.completed(fault, CompensationHandler.emptySet());
+        
+        /**********************************************************************/
+        // Michael Pantazoglou
+        this.faultData = fault;
+        /**********************************************************************/
     }
 }

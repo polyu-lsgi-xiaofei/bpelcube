@@ -626,8 +626,12 @@ public class BpelRuntimeContextImpl implements BpelRuntimeContext {
     				__log.debug(null, e);
     			}
             }
+        } else {
+        	
+        	// I dont know who the holder of the variable is. I will have to 
+        	// broadcast a ReadBPELVariableRequest to all nodes involved in the 
+        	// p2p session.
         }
-        
         
         /**********************************************************************/
         
