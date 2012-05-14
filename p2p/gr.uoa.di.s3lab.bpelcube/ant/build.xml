@@ -35,6 +35,8 @@
 		value="${eclipse.workspace}/ode-axis2"/>
 	<property name="ode.bpel.runtime" 
 		value="${eclipse.workspace}/ode-bpel-runtime"/>
+	<property name="ode.bpel.compiler" 
+		value="${eclipse.workspace}/ode-bpel-compiler"/>
 	
 	<target name="install-p2p">
 		<jar destfile="${ode.webapp.lib}/gr.uoa.di.s3lab.p2p.jar" 
@@ -96,6 +98,17 @@
 		</exec>
 		<copy todir="${ode.webapp.lib}" overwrite="true">
 			<fileset dir="${ode.bpel.runtime}/target" includes="*.jar" />
+		</copy>		
+	</target>
+	
+	<target name="install-ode-bpel-compiler">
+		<exec executable="${maven.command}" dir="${ode.bpel.compiler}">
+			<arg value="-o"/>
+			<arg value="-Dmaven.test.skip=true"/>
+			<arg value="install"/>
+		</exec>
+		<copy todir="${ode.webapp.lib}" overwrite="true">
+			<fileset dir="${ode.bpel.compiler}/target" includes="*.jar" />
 		</copy>		
 	</target>
 
