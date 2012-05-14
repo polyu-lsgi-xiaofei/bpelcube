@@ -20,7 +20,9 @@ package org.apache.ode.bpel.runtime;
 
 import gr.uoa.di.s3lab.bpelcube.BPELActivityListener;
 import gr.uoa.di.s3lab.bpelcube.BPELCubeNode;
+import gr.uoa.di.s3lab.bpelcube.BPELCubeNode.Role;
 import gr.uoa.di.s3lab.bpelcube.BPELCubeNodeDB;
+import gr.uoa.di.s3lab.bpelcube.BPELCubeUtils;
 import gr.uoa.di.s3lab.bpelcube.services.BPELActivityCompletedRequest;
 import gr.uoa.di.s3lab.p2p.P2PEndpoint;
 import gr.uoa.di.s3lab.p2p.P2PRequest;
@@ -213,117 +215,150 @@ abstract class ACTIVITY extends BpelJacobRunnable implements IndexedObject {
     }
     
     /**************************************************************************/
-    // Michael Pantazoglou: Additions to support distributed execution of activities
+    // Michael Pantazoglou: Additions to support distributed execution of 
+    // activities.
     
     /**
-     * Attempts to remotely execute this activity.
+     * Indicates whether the execution of this activity has failed or not.
+     */
+    protected boolean executionFailed = false;
+    
+    /**
+     * Contains the description of why the execution of this activity failed.
+     */
+    protected String failureReason = "";
+    
+    /**
+     * The fault data associated with the execution this activity.
+     */
+    protected FaultData faultData;
+    
+    /**
+     * Gets the id of the P2P session that this activity is associated with.
      * 
-     * @return true if the activity was executed remotely by another node
+     * @return
+     */
+    protected String getP2PSessionId() {
+    	BpelRuntimeContextImpl runtimeContext = 
+    			(BpelRuntimeContextImpl) getBpelRuntimeContext();
+    	return runtimeContext.getBpelProcess().getP2PSessionId();
+    }
+    
+    /**
+     * Executes this activity in a distributed manner, by waiting to receive a 
+     * notification with the results of the remote execution.
+     * 
+     * @param me
+     * @param db
+     * @param p2pSessionId
+     * @param activityId
      * @throws Exception
      */
-    public boolean executeRemotely() throws Exception {
+    protected void remoteRun(BPELCubeNode me, BPELCubeNodeDB db, 
+    		String p2pSessionId, String activityId) throws Exception {
     	
-    	BPELCubeNode me = (BPELCubeNode) BPELCubeNode.sharedInstance;
-    	BPELCubeNodeDB db = (BPELCubeNodeDB) me.getNodeDB();
-    	
-    	BpelRuntimeContextImpl runtimeContext = (BpelRuntimeContextImpl) this.getBpelRuntimeContext();
-    	String p2pSessionId = runtimeContext.getBpelProcess().getP2PSessionId();
-    	String activityId = getKey().toString();
-    	
-    	// Check if the activity will be executed locally
-    	if (db.activityExists(p2pSessionId, activityId)) {
-    		__log.info("Activity " + activityId + " will be locally executed");
-    		return false;
-    	}
-    	
-    	// The activity will be executed remotely by another node
     	__log.info("Activity " + activityId + " will be remotely executed");
     	
-    	BPELActivityListener<P2PRequest> activityListener = new BPELActivityListener<P2PRequest>(p2pSessionId, activityId);
+    	BPELActivityListener<P2PRequest> activityListener = 
+    			new BPELActivityListener<P2PRequest>(p2pSessionId, activityId);
     	me.addActivityListener(activityListener);
     	
-    	// Wait until the activity execution is completed
+    	__log.info("P2P session id: " + p2pSessionId);
     	__log.info("Waiting for remote execution to complete...");
-    	BPELActivityCompletedRequest notification = (BPELActivityCompletedRequest) activityListener.listen();
-    	
-    	// Update variable holders
-    	Hashtable<String, P2PEndpoint> newVariableHolders = notification.getNewVariableHolders();
-    	Set<String> variableIds = newVariableHolders.keySet();
-    	for (String variableId : variableIds) {
-    		if (db.variableExists(p2pSessionId, variableId)) {
-    			continue;
-    		}
-    		db.addVariable(p2pSessionId, variableId, newVariableHolders.get(variableId).toString(), null);
-    	}
+    	BPELActivityCompletedRequest notification = 
+    			(BPELActivityCompletedRequest) activityListener.listen();
+    	__log.info("Received notification for activity " + notification.getActivityId());
     	
     	if (notification.isExecutionFailed()) {
     		_self.parent.failure(notification.getFailureMessage(), null);
     	} else {
-    		_self.parent.completed(notification.getFaultData(), CompensationHandler.emptySet());
+    		_self.parent.completed(notification.getFaultData(), 
+    				CompensationHandler.emptySet());
     	}
-    	
-    	return true;
     }
     
     /**
-     * Notifies all neighbors involved in the p2p session of the completion of 
-     * this activity.
-     *  
-     * @param executionFailed
-     * @param failureMessage
-     * @param faultData
+     * Executes locally this activity.
      */
-    public void sendP2PNotification(boolean executionFailed, String failureMessage, FaultData faultData) {
+    protected void localRun() {
+    	// Concrete activity classes must implement this method
+    }
+    
+    /**
+     * Notifies all p2p nodes about the execution results of this activity.
+     * 
+     * @param me
+     * @param db
+     * @param p2pSessionId
+     * @param activityId
+     * @throws Exception
+     */
+    protected void notifyAllP2PNodes(BPELCubeNode me, BPELCubeNodeDB db, 
+    		String p2pSessionId, String activityId) throws Exception {
     	
-    	BPELCubeNode me = (BPELCubeNode) BPELCubeNode.sharedInstance;
-    	BPELCubeNodeDB db = (BPELCubeNodeDB) me.getNodeDB();
-    	
-    	BpelRuntimeContextImpl runtimeContext = (BpelRuntimeContextImpl) this.getBpelRuntimeContext();
-    	String p2pSessionId = runtimeContext.getBpelProcess().getP2PSessionId();
-    	String activityId = getKey().toString();
+    	__log.info("P2P session id: " + p2pSessionId);
+    	__log.info("Preparing to send notification of completion of activity: " + activityId);
     	
     	List<String> p2pSessionNeighbors = db.getP2PSessionNeighbors(p2pSessionId);
-    	
-    	__log.info("Preparing to send notification of completion of activity: " + activityId);
     	
     	BPELActivityCompletedRequest notification = new BPELActivityCompletedRequest();
     	notification.setP2PSessionId(p2pSessionId);
     	notification.setActivityId(activityId);
     	notification.setExecutionFailed(executionFailed);
-    	notification.setFailureMessage(failureMessage);
+    	notification.setFailureMessage(failureReason);
     	notification.setFaultData(faultData);
     	notification.setNewVariableHolders(db.getVariableHolders(p2pSessionId));
     	notification.setNotifiedNodes(p2pSessionNeighbors);
     	
-    	try {
-			for (String neighbor : p2pSessionNeighbors) {
-				__log.info("Sending to: " + neighbor);
-				P2PEndpoint p2pEndpoint = new P2PEndpoint();
-				p2pEndpoint.setAddress(new URI(neighbor));
-				me.invokeOneWayService(p2pEndpoint, notification);
-			}
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
+    	__log.info(p2pSessionNeighbors.size() + " node(s) will be notified");
+    	for (String neighbor : p2pSessionNeighbors) {
+			__log.info("Sending to: " + neighbor);
+			P2PEndpoint p2pEndpoint = new P2PEndpoint();
+			p2pEndpoint.setAddress(new URI(neighbor));
+			me.invokeOneWayService(p2pEndpoint, notification);
 		}
-    }
-    
-    // Michael Pantazoglou: This method must be overriden by concrete activity classes
-    
-    public void localRun() {
-    	
     }
     
     @Override
     public void run() {
     	
+    	BPELCubeNode me = (BPELCubeNode) BPELCubeNode.sharedInstance;
+    	BPELCubeNodeDB db = (BPELCubeNodeDB) me.getNodeDB();
+    	
+    	String p2pSessionId = getP2PSessionId();
+    	String activityId = _self.o.getType() + "::" + _self.o.getId();
+    	String nodeRole = db.getNodeRole(p2pSessionId);
+    	
+    	__log.info("Running activity: " + activityId);
+    	
     	try {
-			if (!executeRemotely()) {
-				localRun();
+			if (nodeRole.equals(Role.MANAGER.toString())) {
+				
+				// MANAGER
+				if (this instanceof PICK) {
+					localRun();
+					return;
+				}
+				
+				if ((!BPELCubeUtils.isRemotelyExecutable(_self.o)) || 
+						db.activityExists(p2pSessionId, activityId)) {
+					localRun();
+					notifyAllP2PNodes(me, db, p2pSessionId, activityId);
+				} else {
+					remoteRun(me, db, p2pSessionId, activityId);
+				}
+			} else {
+				
+				// WORKER 
+				if (db.activityExists(p2pSessionId, activityId)) {
+					localRun();
+					notifyAllP2PNodes(me, db, p2pSessionId, activityId);
+				} else {
+					remoteRun(me, db, p2pSessionId, activityId);
+				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			__log.debug(null, e);
 		}
     }
     

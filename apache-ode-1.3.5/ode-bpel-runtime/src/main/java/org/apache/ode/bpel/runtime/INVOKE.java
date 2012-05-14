@@ -66,7 +66,12 @@ public class INVOKE extends ACTIVITY {
         _invoked = 0;
     }
 
-    public final void run() {
+    /**************************************************************************/
+    // Michael Pantazoglou: Changed run() to localRun()
+    /**************************************************************************/
+    
+    @Override
+    public final void localRun() {
         Element outboundMsg;
         try {
             outboundMsg = setupOutbound(_oinvoke, _oinvoke.initCorrelationsInput, _oinvoke.joinCorrelationsInput);
@@ -74,10 +79,27 @@ public class INVOKE extends ACTIVITY {
             __log.error(e);
             FaultData fault = createFault(e.getQName(), _oinvoke);
             _self.parent.completed(fault, CompensationHandler.emptySet());
+            
+            /******************************************************************/
+            // Michael Pantazoglou
+            
+            this.faultData = fault;
+            
+            /******************************************************************/
+            
             return;
         } catch (ExternalVariableModuleException e) {
             __log.error(e);
             _self.parent.failure(e.toString(), null);
+            
+            /******************************************************************/
+            // Michael Pantazoglou
+            
+            this.executionFailed = true;
+            this.failureReason = e.toString();
+            
+            /******************************************************************/
+            
             return;
         }
         ++_invoked;
@@ -92,6 +114,13 @@ public class INVOKE extends ACTIVITY {
                         _scopeFrame.resolve(_oinvoke.partnerLink),
                         _oinvoke.operation, outboundMsg, null);
                 _self.parent.completed(faultData, CompensationHandler.emptySet());
+                
+                /******************************************************************/
+                // Michael Pantazoglou
+                
+                this.faultData = faultData;
+                
+                /******************************************************************/
 
             } else /* two-way */{
                 final VariableInstance outputVar = _scopeFrame.resolve(_oinvoke.outputVar);
@@ -122,6 +151,14 @@ public class INVOKE extends ACTIVITY {
                         } catch (ExternalVariableModuleException e) {
                             __log.error("Exception while initializing external variable", e);
                             _self.parent.failure(e.toString(), null);
+                            /******************************************************************/
+                            // Michael Pantazoglou
+                            
+                            INVOKE.this.faultData = fault;
+                            INVOKE.this.executionFailed = true;
+                            INVOKE.this.failureReason = e.toString();
+                            
+                            /******************************************************************/
                             return;
                         }
 
@@ -166,6 +203,13 @@ public class INVOKE extends ACTIVITY {
 
                         _self.parent.completed(fault, CompensationHandler.emptySet());
                         getBpelRuntimeContext().releasePartnerMex(mexId, fault == null);
+                        
+                        /******************************************************************/
+                        // Michael Pantazoglou
+                        
+                        INVOKE.this.faultData = fault;
+                        
+                        /******************************************************************/
                     }
 
                     public void onFault() {
@@ -176,6 +220,13 @@ public class INVOKE extends ACTIVITY {
                                 _oinvoke.getOwner().messageTypes.get(msgType), _self.o);
                         _self.parent.completed(fault, CompensationHandler.emptySet());
                         getBpelRuntimeContext().releasePartnerMex(mexId, false);
+                        
+                        /******************************************************************/
+                        // Michael Pantazoglou
+                        
+                        INVOKE.this.faultData = fault;
+                        
+                        /******************************************************************/
                     }
 
                     public void onFailure() {
@@ -190,6 +241,14 @@ public class INVOKE extends ACTIVITY {
                             _self.parent.failure(reason, el);
                         } catch (Exception e) {
                             _self.parent.failure(reason, null);
+                            
+                            /******************************************************************/
+                            // Michael Pantazoglou
+                            
+                            INVOKE.this.executionFailed = true;
+                            INVOKE.this.failureReason = reason;
+                            
+                            /******************************************************************/
                         }
                         // Resuming the process creates a new invoke
                         getBpelRuntimeContext().releasePartnerMex(mexId, false);
@@ -208,6 +267,13 @@ public class INVOKE extends ACTIVITY {
             __log.error(fault);
             FaultData faultData = createFault(fault.getQName(), _oinvoke, fault.getMessage());
             _self.parent.completed(faultData, CompensationHandler.emptySet());
+            
+            /******************************************************************/
+            // Michael Pantazoglou
+            
+            this.faultData = faultData;
+            
+            /******************************************************************/
         }
     }
 

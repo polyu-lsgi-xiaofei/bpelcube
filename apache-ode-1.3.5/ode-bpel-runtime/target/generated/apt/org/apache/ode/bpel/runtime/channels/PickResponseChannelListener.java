@@ -3,7 +3,7 @@
  * 
  *               !!! DO NOT EDIT !!!! 
  * 
- * Generated On  : Sat May 05 00:33:30 EEST 2012
+ * Generated On  : Fri May 11 14:46:51 EEST 2012
  * For Interface : org.apache.ode.bpel.runtime.channels.PickResponse
  */
 
