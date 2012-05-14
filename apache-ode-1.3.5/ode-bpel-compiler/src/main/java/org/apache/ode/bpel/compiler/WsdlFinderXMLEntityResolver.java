@@ -28,6 +28,8 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ode.bpel.compiler.bom.BpelObjectFactory;
+import org.apache.ode.utils.Namespaces;
 import org.apache.xerces.xni.XMLResourceIdentifier;
 import org.apache.xerces.xni.XNIException;
 import org.apache.xerces.xni.parser.XMLEntityResolver;
@@ -80,9 +82,13 @@ public class WsdlFinderXMLEntityResolver implements XMLEntityResolver {
             __log.debug("resolveEntity(" + resourceIdentifier + ")");
 
         XMLInputSource src = new XMLInputSource(resourceIdentifier);
-        URI location;
+        URI location = null;
 
-        if (resourceIdentifier.getLiteralSystemId() == null) {
+        // NKUA: We have identified a case where the 
+        // XML namespace is imported without a schema location. Since we can 
+        // handle such case, we need to modify the following if condition by 
+        // adding: && !resourceIdentifier.getNamespace().equals(Namespaces.XML_URI)
+        if (resourceIdentifier.getLiteralSystemId() == null && !resourceIdentifier.getNamespace().equals(Namespaces.XML_URI)) {
             // import without schemaLocation
             if (__log.isDebugEnabled()) __log.debug("resolveEntity: no schema location for "+resourceIdentifier.getNamespace());
             try {
@@ -95,7 +101,17 @@ public class WsdlFinderXMLEntityResolver implements XMLEntityResolver {
             }
             return null;
         } else {
-            location = _wsdlFinder.resolve(URI.create(resourceIdentifier.getBaseSystemId()), URI.create(resourceIdentifier.getLiteralSystemId()));
+        	// 2011-01-24: Michael Pantazoglou: Here we handle the aforementioned 
+        	// case (see previous comment)
+        	if (resourceIdentifier.getNamespace().equals(Namespaces.XML_URI)) {
+        		try {
+					location = new URI(BpelObjectFactory.XML);
+				} catch (URISyntaxException e) {
+					e.printStackTrace();
+				}
+        	} else {
+        		location = _wsdlFinder.resolve(URI.create(resourceIdentifier.getBaseSystemId()), URI.create(resourceIdentifier.getLiteralSystemId()));
+        	}
         }
 
         if (__log.isDebugEnabled())

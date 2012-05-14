@@ -69,6 +69,31 @@ public class DefaultResourceFinder implements ResourceFinder {
             throw new IllegalArgumentException("Directory does not exist: " + dir);
         }
     }
+    
+    /**
+     * NKUA
+     * This method returns an input stream from the specified URI.
+     * 
+     * @param uri
+     * @return
+     */
+    private InputStream openRemoteResource(URI uri) {
+    	try {
+    		// First try to find the resource locally
+    		InputStream in = LocalResourceFinder.openResource(uri);
+        	if (in == null) {
+        		return uri.toURL().openStream();
+        	} else {
+        		return in;
+        	}
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+			return null;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+    }
 
     public InputStream openResource(URI uri) throws MalformedURLException, IOException {
         uri = relativize(uri);
@@ -89,7 +114,17 @@ public class DefaultResourceFinder implements ResourceFinder {
             if (__log.isDebugEnabled()) {
                 __log.debug("classpath resource not found " + uri);
             }
-            return null;
+            
+            // NKUA: At this point, we cannot find the resource locally, so we 
+            // will attempt to download it directly from the specified URI.
+            __log.debug("trying remote resource for " + uri);
+            r = this.openRemoteResource(uri);
+            if (r != null) {
+            	return r;
+            } else {
+            	__log.debug("remote resource not found " + uri);
+            	return null;
+            }
         }
     
     }
