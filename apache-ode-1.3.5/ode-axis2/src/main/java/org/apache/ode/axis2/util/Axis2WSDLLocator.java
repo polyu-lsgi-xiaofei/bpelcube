@@ -29,6 +29,7 @@ import javax.wsdl.xml.WSDLLocator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ode.bpel.compiler.LocalResourceFinder;
 import org.xml.sax.InputSource;
 
 public class Axis2WSDLLocator implements WSDLLocator {
@@ -88,6 +89,13 @@ public class Axis2WSDLLocator implements WSDLLocator {
     }
 
     public InputStream openResource(URI uri) throws IOException {
+    	
+    	// Michael Pantazoglou: Let's first try on our local cache
+    	InputStream in = LocalResourceFinder.openResource(uri);
+    	if (in != null) {
+    		return in;
+    	}
+    	
         if (uri.isAbsolute() && uri.getScheme().equals("file")) {
             try {
                 return uri.toURL().openStream();

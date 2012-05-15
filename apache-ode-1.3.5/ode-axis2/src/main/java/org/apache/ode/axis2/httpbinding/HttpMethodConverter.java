@@ -19,36 +19,19 @@
 
 package org.apache.ode.axis2.httpbinding;
 
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.methods.DeleteMethod;
-import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.RequestEntity;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.apache.commons.httpclient.params.HostParams;
-import org.apache.commons.httpclient.params.HttpParams;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.ode.utils.Properties;
-import org.apache.ode.axis2.util.URLEncodedTransformer;
-import org.apache.ode.axis2.util.UrlReplacementTransformer;
-import org.apache.ode.bpel.epr.MutableEndpoint;
-import org.apache.ode.bpel.iapi.PartnerRoleMessageExchange;
-import org.apache.ode.utils.DOMUtils;
-import org.apache.ode.utils.Namespaces;
-import org.apache.ode.utils.http.HttpUtils;
 import static org.apache.ode.utils.http.HttpUtils.bodyAllowed;
 import static org.apache.ode.utils.http.StatusCode._202_ACCEPTED;
-import org.apache.ode.utils.wsdl.Messages;
-import org.apache.ode.utils.wsdl.WsdlUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 import javax.wsdl.Binding;
 import javax.wsdl.BindingInput;
@@ -63,14 +46,40 @@ import javax.wsdl.extensions.UnknownExtensibilityElement;
 import javax.wsdl.extensions.http.HTTPOperation;
 import javax.wsdl.extensions.mime.MIMEContent;
 import javax.xml.namespace.QName;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.HashSet;
+
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HeaderElement;
+import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.HttpMethodBase;
+import org.apache.commons.httpclient.NameValuePair;
+import org.apache.commons.httpclient.methods.DeleteMethod;
+import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.PutMethod;
+import org.apache.commons.httpclient.methods.RequestEntity;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.commons.httpclient.params.HostParams;
+import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.apache.commons.httpclient.params.HttpParams;
+import org.apache.commons.httpclient.util.EncodingUtil;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.ode.axis2.util.URLEncodedTransformer;
+import org.apache.ode.axis2.util.UrlReplacementTransformer;
+import org.apache.ode.bpel.epr.MutableEndpoint;
+import org.apache.ode.bpel.iapi.PartnerRoleMessageExchange;
+import org.apache.ode.utils.DOMUtils;
+import org.apache.ode.utils.Namespaces;
+import org.apache.ode.utils.Properties;
+import org.apache.ode.utils.http.HttpUtils;
+import org.apache.ode.utils.wsdl.Messages;
+import org.apache.ode.utils.wsdl.WsdlUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 public class HttpMethodConverter {
 
@@ -250,7 +259,8 @@ public class HttpMethodConverter {
      * Notice that the last header value overrides any values set previoulsy. Meaning that message headers might get overriden by parts bound to headers.
      *
      */
-    public void setHttpRequestHeaders(HttpMethod method, BindingOperation opBinding, Map<String, Element> partValues, Map<String, Node> headers, HttpParams params) {
+    @SuppressWarnings("rawtypes")
+	public void setHttpRequestHeaders(HttpMethod method, BindingOperation opBinding, Map<String, Element> partValues, Map<String, Node> headers, HttpParams params) {
         BindingInput inputBinding = opBinding.getBindingInput();
         Message inputMessage = opBinding.getOperation().getInput().getMessage();
 
@@ -333,7 +343,8 @@ public class HttpMethodConverter {
     }
 
 
-    protected Map<String, Element> extractPartElements(Message msgDef, Element message) {
+    @SuppressWarnings("rawtypes")
+	protected Map<String, Element> extractPartElements(Message msgDef, Element message) {
         if (msgDef.getParts().size() != 0 && message == null) {
             throw new IllegalArgumentException(msgs.msgOdeMessageExpected());
         }
@@ -474,7 +485,10 @@ public class HttpMethodConverter {
         boolean isBodyMandatory = isBodyExpected && bodyAllowed(status) && status != _202_ACCEPTED;
         final String body;
         try {
-            body = method.getResponseBodyAsString();
+        	// Michael Pantazoglou: (Original code commented out below)
+        	log.debug("Ready to download response body.");
+        	body = this.downloadResponseBody(method);
+//            body = method.getResponseBodyAsString();        	
         } catch (IOException e) {
             throw new RuntimeException("Unable to get the request body : " + e.getMessage());
         }
@@ -529,7 +543,10 @@ public class HttpMethodConverter {
 
         final String body;
         try {
-            body = method.getResponseBodyAsString();
+        	// Michael Pantazoglou: (Original code commented out below)
+        	log.debug("Ready to download response body.");
+        	body = this.downloadResponseBody(method);
+//            body = method.getResponseBodyAsString();
         } catch (IOException e) {
             throw new RuntimeException("Unable to get the request body : " + e.getMessage(), e);
         }
@@ -586,6 +603,86 @@ public class HttpMethodConverter {
                 return new Object[]{faultName, response};
             }
         }
+    }
+    
+    /**
+     * Michael Pantazoglou: Downloads the response body of the specified HTTP method and 
+     * returns it as string.
+     * 
+     * @param method
+     * @return
+     * @throws IOException
+     */
+    String downloadResponseBody(HttpMethod method) throws IOException {
+    	String body = null;
+        byte[] responseBody = null;
+
+        // Retrieve the response body as stream to start downloading
+
+        InputStream instream = method.getResponseBodyAsStream();
+        if (instream != null) {
+            long contentLength = ((HttpMethodBase) method).getResponseContentLength();
+            log.debug("Content length = " + contentLength);
+            if (contentLength > Integer.MAX_VALUE)
+                throw new IOException("Content too large to be buffered: " + contentLength + " bytes");
+            int limit = method.getParams().getIntParameter(HttpMethodParams.BUFFER_WARN_TRIGGER_LIMIT, 1024 * 1024);
+            if ((contentLength == -1) || (contentLength > limit)) {
+                if (contentLength > limit)
+                    log.debug("Content length > " + limit);
+                log.debug("Going to buffer response body of large or unknown size.");
+            }
+
+            // Start downloading...
+
+            log.info("Buffering response body");
+            ByteArrayOutputStream outstream = new ByteArrayOutputStream(30 * 1024 * 1024);
+            byte[] buffer = new byte[8 * 1024];
+            int len;
+            long totalLength = 0;
+            while (true) {
+                len = instream.read(buffer);
+                if (len <= 0)
+                    break;
+                totalLength += len;
+                log.debug("Buffered " + totalLength + " bytes");
+                outstream.write(buffer, 0, len);
+            }
+            instream.close();
+            log.info("Response body read finished");
+
+            // Download completed!
+
+            log.info("Converting output stream to byte array...");
+            responseBody = outstream.toByteArray();
+            log.info("Response body converted to byte array");
+
+            // Resolve charset
+
+            String charset = null;
+            Header contentheader = method.getResponseHeader("Content-Type");
+            if (contentheader != null) {
+                HeaderElement values[] = contentheader.getElements();
+                // I expect only one header element to be there
+                // No more. no less
+                if (values.length == 1) {
+                    NameValuePair param = values[0].getParameterByName("charset");
+                    if (param != null)
+                        // If I get anything "funny" 
+                        // UnsupportedEncondingException will result
+                        charset = param.getValue();
+                }
+            }
+            if (charset == null) {
+                charset = method.getParams().getContentCharset();
+                log.debug("Default charset used: " + charset);
+            }
+
+            body = EncodingUtil.getString(responseBody, charset);
+            log.debug("Output stream to byte array conversion completed");
+        } else
+            log.debug("Response body stream is null");
+
+        return body;
     }
 
 }

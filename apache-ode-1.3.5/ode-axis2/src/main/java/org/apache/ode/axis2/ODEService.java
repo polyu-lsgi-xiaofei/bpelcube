@@ -185,7 +185,9 @@ public class ODEService {
     			}
     		} else {
     			
-    			db.addP2PSessionNeighor(p2pSessionId, LRU.asP2PEndpoint().toString());
+    			if (!db.p2pSessionNeighborExists(p2pSessionId, LRU.asP2PEndpoint().toString())) {
+    				db.addP2PSessionNeighor(p2pSessionId, LRU.asP2PEndpoint().toString());
+    			}
     			
     			// Start the recruitment of worker nodes
         		RecruitRequest recruitRequest = new RecruitRequest();
@@ -194,7 +196,8 @@ public class ODEService {
         		recruitRequest.setP2PSessionCreationTime(p2pSessionCreationTime);
         		recruitRequest.setP2PSessionId(p2pSessionId);
         		recruitRequest.setRequesterEndpoint(me.getEndpoint());
-        		recruitRequest.setMessageContext(originalMessageContext);
+        		recruitRequest.setProcessEndpointAddress(originalMessageContext.getTo().getAddress());
+        		recruitRequest.setProcessSOAPRequest(originalMessageContext.getEnvelope().toString());
         		
         		try {
 					me.invokeOneWayService(LRU.asP2PEndpoint(), recruitRequest);
