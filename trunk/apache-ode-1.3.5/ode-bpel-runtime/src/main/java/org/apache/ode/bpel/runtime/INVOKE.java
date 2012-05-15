@@ -84,6 +84,11 @@ public class INVOKE extends ACTIVITY {
             // Michael Pantazoglou
             
             this.faultData = fault;
+            try {
+				notifyAllP2PNodes();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
             
             /******************************************************************/
             
@@ -97,6 +102,11 @@ public class INVOKE extends ACTIVITY {
             
             this.executionFailed = true;
             this.failureReason = e.toString();
+            try {
+				notifyAllP2PNodes();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
             
             /******************************************************************/
             
@@ -119,6 +129,11 @@ public class INVOKE extends ACTIVITY {
                 // Michael Pantazoglou
                 
                 this.faultData = faultData;
+                try {
+    				notifyAllP2PNodes();
+    			} catch (Exception ex) {
+    				ex.printStackTrace();
+    			}
                 
                 /******************************************************************/
 
@@ -157,6 +172,11 @@ public class INVOKE extends ACTIVITY {
                             INVOKE.this.faultData = fault;
                             INVOKE.this.executionFailed = true;
                             INVOKE.this.failureReason = e.toString();
+                            try {
+                				notifyAllP2PNodes();
+                			} catch (Exception ex) {
+                				ex.printStackTrace();
+                			}
                             
                             /******************************************************************/
                             return;
@@ -208,6 +228,11 @@ public class INVOKE extends ACTIVITY {
                         // Michael Pantazoglou
                         
                         INVOKE.this.faultData = fault;
+                        try {
+    						notifyAllP2PNodes();
+    					} catch (Exception e) {
+    						e.printStackTrace();
+    					}
                         
                         /******************************************************************/
                     }
@@ -225,6 +250,11 @@ public class INVOKE extends ACTIVITY {
                         // Michael Pantazoglou
                         
                         INVOKE.this.faultData = fault;
+                        try {
+            				notifyAllP2PNodes();
+            			} catch (Exception ex) {
+            				ex.printStackTrace();
+            			}
                         
                         /******************************************************************/
                     }
@@ -239,6 +269,11 @@ public class INVOKE extends ACTIVITY {
                         try {
                             Element el = DOMUtils.stringToDOM("<invokeFailure><![CDATA["+reason+"]]></invokeFailure>");
                             _self.parent.failure(reason, el);
+                            try {
+                				notifyAllP2PNodes();
+                			} catch (Exception ex) {
+                				ex.printStackTrace();
+                			}
                         } catch (Exception e) {
                             _self.parent.failure(reason, null);
                             
@@ -247,6 +282,11 @@ public class INVOKE extends ACTIVITY {
                             
                             INVOKE.this.executionFailed = true;
                             INVOKE.this.failureReason = reason;
+                            try {
+                				notifyAllP2PNodes();
+                			} catch (Exception ex) {
+                				ex.printStackTrace();
+                			}
                             
                             /******************************************************************/
                         }
@@ -259,6 +299,15 @@ public class INVOKE extends ACTIVITY {
 
                     public void terminate() {
                         _self.parent.completed(null, CompensationHandler.emptySet());
+                        
+                        /******************************************************/
+                        // Michael Pantazoglou
+                        try {
+            				notifyAllP2PNodes();
+            			} catch (Exception ex) {
+            				ex.printStackTrace();
+            			}
+                        /******************************************************/
                     }
                 }));
 
@@ -272,6 +321,11 @@ public class INVOKE extends ACTIVITY {
             // Michael Pantazoglou
             
             this.faultData = faultData;
+            try {
+				notifyAllP2PNodes();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
             
             /******************************************************************/
         }

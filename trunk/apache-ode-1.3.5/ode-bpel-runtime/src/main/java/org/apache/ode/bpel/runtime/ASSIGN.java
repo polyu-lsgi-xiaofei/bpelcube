@@ -108,6 +108,11 @@ class ASSIGN extends ACTIVITY {
                 this.executionFailed = true;
                 this.failureReason = e.toString();
                 this.faultData = faultData;
+                try {
+					notifyAllP2PNodes();
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
                 /**************************************************************/
                 
                 return;
@@ -126,6 +131,15 @@ class ASSIGN extends ACTIVITY {
             /**************************************************************/
         } else {
             _self.parent.completed(null, CompensationHandler.emptySet());
+            
+            /******************************************************************/
+            // Michael Pantazoglou
+            try {
+				notifyAllP2PNodes();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+            /******************************************************************/
         }
     }
 
