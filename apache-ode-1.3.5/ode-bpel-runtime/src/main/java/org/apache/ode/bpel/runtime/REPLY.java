@@ -84,6 +84,11 @@ class REPLY extends ACTIVITY {
         /**********************************************************************/
         // Michael Pantazoglou
         this.faultData = fault;
+        try {
+			notifyAllP2PNodes();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
         /**********************************************************************/
     }
 }

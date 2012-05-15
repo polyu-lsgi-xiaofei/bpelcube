@@ -287,14 +287,15 @@ abstract class ACTIVITY extends BpelJacobRunnable implements IndexedObject {
     /**
      * Notifies all p2p nodes about the execution results of this activity.
      * 
-     * @param me
-     * @param db
-     * @param p2pSessionId
-     * @param activityId
      * @throws Exception
      */
-    protected void notifyAllP2PNodes(BPELCubeNode me, BPELCubeNodeDB db, 
-    		String p2pSessionId, String activityId) throws Exception {
+    protected void notifyAllP2PNodes() throws Exception {
+    	
+    	BPELCubeNode me = (BPELCubeNode) BPELCubeNode.sharedInstance;
+    	BPELCubeNodeDB db = (BPELCubeNodeDB) me.getNodeDB();
+    	
+    	String p2pSessionId = getP2PSessionId();
+    	String activityId = _self.o.getType() + "::" + _self.o.getId();
     	
     	__log.info("P2P session id: " + p2pSessionId);
     	__log.info("Preparing to send notification of completion of activity: " + activityId);
@@ -343,7 +344,7 @@ abstract class ACTIVITY extends BpelJacobRunnable implements IndexedObject {
 				if ((!BPELCubeUtils.isRemotelyExecutable(_self.o)) || 
 						db.activityExists(p2pSessionId, activityId)) {
 					localRun();
-					notifyAllP2PNodes(me, db, p2pSessionId, activityId);
+//					notifyAllP2PNodes();
 				} else {
 					remoteRun(me, db, p2pSessionId, activityId);
 				}
@@ -352,7 +353,7 @@ abstract class ACTIVITY extends BpelJacobRunnable implements IndexedObject {
 				// WORKER 
 				if (db.activityExists(p2pSessionId, activityId)) {
 					localRun();
-					notifyAllP2PNodes(me, db, p2pSessionId, activityId);
+//					notifyAllP2PNodes();
 				} else {
 					remoteRun(me, db, p2pSessionId, activityId);
 				}

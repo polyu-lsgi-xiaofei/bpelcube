@@ -18,15 +18,11 @@
  */
 package org.apache.ode.bpel.runtime;
 
-import gr.uoa.di.s3lab.bpelcube.BPELCubeNode;
-import gr.uoa.di.s3lab.bpelcube.BPELCubeNodeDB;
-
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.SynchronousQueue;
 
 import javax.xml.namespace.QName;
 
@@ -369,15 +365,15 @@ class PICK extends ACTIVITY {
                         _self.parent.completed(fault, CompensationHandler.emptySet());
                         dpe(onMessage.activity);
                         
-//                        /**************************************************************/
-//                        // Michael Pantazoglou
+                        /**************************************************************/
+                        // Michael Pantazoglou
                         PICK.this.faultData = fault;
-//                        try {
-//							synchronizer.put(new Object());
-//						} catch (InterruptedException e1) {
-//							e1.printStackTrace();
-//						}
-//                        /**************************************************************/
+                        try {
+    						notifyAllP2PNodes();
+    					} catch (Exception e1) {
+    						e1.printStackTrace();
+    					}
+                        /**************************************************************/
                         
                         return;
                     }
@@ -390,22 +386,11 @@ class PICK extends ACTIVITY {
                     ActivityInfo child = new ActivityInfo(genMonotonic(), onMessage.activity, _self.self, _self.parent);
                     instance(createChild(child, _scopeFrame, _linkFrame));
                     
-//                    /**********************************************************/
-//                    // Michael Pantazoglou
-//                    try {
-//						synchronizer.put(new Object());
-//					} catch (InterruptedException e) {
-//						e.printStackTrace();
-//					}
-//                    /**********************************************************/
                     /**********************************************************/
+                    // Michael Pantazoglou
                     __log.info("onRequestRcvd() completed.");
-                    BPELCubeNode me = (BPELCubeNode) BPELCubeNode.sharedInstance;
-                	BPELCubeNodeDB db = (BPELCubeNodeDB) me.getNodeDB();
-                	String p2pSessionId = getP2PSessionId();
-                	String activityId = PICK.this._self.o.getType() + "::" + _self.o.getId();
                     try {
-						notifyAllP2PNodes(me, db, p2pSessionId, activityId);
+						notifyAllP2PNodes();
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -425,22 +410,11 @@ class PICK extends ACTIVITY {
                     ActivityInfo child = new ActivityInfo(genMonotonic(), _alarm.activity, _self.self, _self.parent);
                     instance(createChild(child, _scopeFrame, _linkFrame));
                     
-//                    /**********************************************************/
-//                    // Michael Pantazoglou
-//                    try {
-//						synchronizer.put(new Object());
-//					} catch (InterruptedException e) {
-//						e.printStackTrace();
-//					}
-//                    /**********************************************************/
                     /**********************************************************/
+                    // Michael Pantazoglou
                     __log.info("onTimeout() completed.");
-                    BPELCubeNode me = (BPELCubeNode) BPELCubeNode.sharedInstance;
-                	BPELCubeNodeDB db = (BPELCubeNodeDB) me.getNodeDB();
-                	String p2pSessionId = getP2PSessionId();
-                	String activityId = PICK.this._self.o.getType() + "::" + _self.o.getId();
                     try {
-						notifyAllP2PNodes(me, db, p2pSessionId, activityId);
+						notifyAllP2PNodes();
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -450,22 +424,11 @@ class PICK extends ACTIVITY {
                 public void onCancel() {
                     _self.parent.completed(null, CompensationHandler.emptySet());
                     
-//                    /**********************************************************/
-//                    // Michael Pantazoglou
-//                    try {
-//						synchronizer.put(new Object());
-//					} catch (InterruptedException e) {
-//						e.printStackTrace();
-//					}
-//                    /**********************************************************/
                     /**********************************************************/
+                    // Michael Pantazoglou
                     __log.info("onCancel() completed.");
-                    BPELCubeNode me = (BPELCubeNode) BPELCubeNode.sharedInstance;
-                	BPELCubeNodeDB db = (BPELCubeNodeDB) me.getNodeDB();
-                	String p2pSessionId = getP2PSessionId();
-                	String activityId = PICK.this._self.o.getType() + "::" + _self.o.getId();
                     try {
-						notifyAllP2PNodes(me, db, p2pSessionId, activityId);
+						notifyAllP2PNodes();
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -479,22 +442,11 @@ class PICK extends ACTIVITY {
                     getBpelRuntimeContext().cancel(_pickResponseChannel);
                     instance(WAITING.this);
                     
-//                    /**********************************************************/
-//                    // Michael Pantazoglou
-//                    try {
-//						synchronizer.put(new Object());
-//					} catch (InterruptedException e) {
-//						e.printStackTrace();
-//					}
-//                    /**********************************************************/
                     /**********************************************************/
+                    // Michael Pantazoglou
                     __log.info("terminate() completed.");
-                    BPELCubeNode me = (BPELCubeNode) BPELCubeNode.sharedInstance;
-                	BPELCubeNodeDB db = (BPELCubeNodeDB) me.getNodeDB();
-                	String p2pSessionId = getP2PSessionId();
-                	String activityId = PICK.this._self.o.getType() + "::" + _self.o.getId();
                     try {
-						notifyAllP2PNodes(me, db, p2pSessionId, activityId);
+						notifyAllP2PNodes();
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
