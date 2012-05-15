@@ -53,15 +53,10 @@ public class GenericWebServiceClient {
 		
 	}
 	
-	/**
-	 * 
-	 * @param msgContext
-	 * @param p2pSessionId
-	 */
-	public void invoke(MessageContext msgContext, String p2pSessionId, int bpelEnginePort)  {
+	public void invoke(String processEndpointAddress, String processSOAPRequest, String p2pSessionId, int bpelEnginePort)  {
 		
 		try {
-			String toAddressAsString = msgContext.getTo().getAddress();
+			String toAddressAsString = processEndpointAddress;
 			URL toAddress = new URL(toAddressAsString);
 			
 			StringBuilder sb = new StringBuilder();
@@ -76,7 +71,7 @@ public class GenericWebServiceClient {
 			options.setTo(new EndpointReference(newToAddressAsString));
 			serviceClient.setOptions(options);
 			
-			String soapRequestAsString = msgContext.getEnvelope().toString();
+			String soapRequestAsString = processSOAPRequest;
 			OMElement omElement = AXIOMUtil.stringToOM(soapRequestAsString);
 			StAXSOAPModelBuilder builder = new StAXSOAPModelBuilder(omElement.getXMLStreamReader());
 			SOAPEnvelope soapRequest = builder.getSOAPEnvelope();

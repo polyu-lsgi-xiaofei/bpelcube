@@ -58,14 +58,18 @@ public class RecruitService extends BPELCubeService {
 			// invoke the BPEL process locally
 			me.getLog().debug("Invoking BPEL process...");
 			GenericWebServiceClient wsClient = new GenericWebServiceClient();
-			wsClient.invoke(request.getMessageContext(), request.getP2PSessionId(), 
+			wsClient.invoke(request.getProcessEndpointAddress(), 
+					request.getProcessSOAPRequest(), request.getP2PSessionId(), 
 					me.getBPELEnginePort());
 		}
 		
 		String activityId = request.getActivityIds().remove(0);
 		db.addP2PSessionActivity(request.getP2PSessionId(), activityId);
-		db.addP2PSessionNeighor(request.getP2PSessionId(), 
+		if (!db.p2pSessionNeighborExists(request.getP2PSessionId(), 
+				request.getRequesterEndpoint().toString())) {
+			db.addP2PSessionNeighor(request.getP2PSessionId(), 
 				request.getRequesterEndpoint().toString());
+		}		
 		
 		me.setLastUsed(System.currentTimeMillis());
 		for (Neighbor n : me.getNeighborSet()) {
@@ -86,7 +90,11 @@ public class RecruitService extends BPELCubeService {
 			try {
 				Neighbor LRU = me.getLRUNeighbor();
 				me.getLog().debug("LRU neighbor: " + Hypercube.vectorAsString(LRU.getPositionVector()));
-				db.addP2PSessionNeighor(request.getP2PSessionId(), LRU.toString());
+				if (!db.p2pSessionNeighborExists(request.getP2PSessionId(), 
+						LRU.asP2PEndpoint().toString())) {
+					db.addP2PSessionNeighor(request.getP2PSessionId(), 
+							LRU.asP2PEndpoint().toString());
+				}
 				me.invokeOneWayService(LRU.asP2PEndpoint(), request);
 			} catch (Exception e) {
 				e.printStackTrace();
