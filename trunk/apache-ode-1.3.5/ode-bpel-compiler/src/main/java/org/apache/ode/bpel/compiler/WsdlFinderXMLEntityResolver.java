@@ -84,7 +84,7 @@ public class WsdlFinderXMLEntityResolver implements XMLEntityResolver {
         XMLInputSource src = new XMLInputSource(resourceIdentifier);
         URI location = null;
 
-        // NKUA: We have identified a case where the 
+        // Michael Pantazoglou: We have identified a case where the 
         // XML namespace is imported without a schema location. Since we can 
         // handle such case, we need to modify the following if condition by 
         // adding: && !resourceIdentifier.getNamespace().equals(Namespaces.XML_URI)
