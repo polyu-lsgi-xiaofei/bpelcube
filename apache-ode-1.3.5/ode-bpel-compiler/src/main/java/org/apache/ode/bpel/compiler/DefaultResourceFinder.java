@@ -71,7 +71,7 @@ public class DefaultResourceFinder implements ResourceFinder {
     }
     
     /**
-     * NKUA
+     * Michael Pantazoglou:
      * This method returns an input stream from the specified URI.
      * 
      * @param uri
@@ -115,7 +115,7 @@ public class DefaultResourceFinder implements ResourceFinder {
                 __log.debug("classpath resource not found " + uri);
             }
             
-            // NKUA: At this point, we cannot find the resource locally, so we 
+            // Michael Pantazoglou: At this point, we cannot find the resource locally, so we 
             // will attempt to download it directly from the specified URI.
             __log.debug("trying remote resource for " + uri);
             r = this.openRemoteResource(uri);
