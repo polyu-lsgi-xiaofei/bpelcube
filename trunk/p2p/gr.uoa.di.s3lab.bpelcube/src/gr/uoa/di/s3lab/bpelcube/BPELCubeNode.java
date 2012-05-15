@@ -171,7 +171,9 @@ public class BPELCubeNode extends HypercubeNode {
 		} else {
 			// Recruit LRU
 			getLog().debug("LRU neighbor: " + Hypercube.vectorAsString(LRU.getPositionVector()));
-			db.addP2PSessionNeighor(p2pSessionId, LRU.asP2PEndpoint().toString());
+			if (!db.p2pSessionNeighborExists(p2pSessionId, LRU.asP2PEndpoint().toString())) {
+				db.addP2PSessionNeighor(p2pSessionId, LRU.asP2PEndpoint().toString());
+			}
 			try {
 				invokeOneWayService(LRU.asP2PEndpoint(), recruitRequest);
 				

@@ -376,6 +376,44 @@ public class BPELCubeNodeDB extends P2PNodeDB {
 	}
 	
 	/**
+	 * Returns true if the specified p2p session neighbor exists in the database.
+	 * 
+	 * @param p2pSessionId
+	 * @param neighborEndpoint
+	 * @return
+	 */
+	public boolean p2pSessionNeighborExists(String p2pSessionId, String neighborEndpoint) {
+		PreparedStatement stmt = null;
+		ResultSet rset = null;
+		try {
+			String SQL = "SELECT 1 FROM P2P_SESSION_NEIGHBORS " +
+					"WHERE P2P_SESSION_ID=? AND NEIGHBOR_ENDPOINT=?";
+			stmt = this.connection.prepareStatement(SQL);
+			stmt.setString(1, p2pSessionId);
+			stmt.setString(2, neighborEndpoint);
+			rset = stmt.executeQuery();
+			if (rset.next()) {
+				return true;
+			}
+			return false;
+		} catch (SQLException e) {
+			log.debug(e.getMessage());
+			return false;
+		} finally {
+			try {
+				if (rset != null) {
+					rset.close();
+					rset = null;
+				}
+				if (stmt != null) {
+					stmt.close();
+					stmt = null;
+				}
+			} catch (SQLException e) {}
+		}
+	}
+	
+	/**
 	 * Adds a new P2P_SESSION_NEIGHBORS row.
 	 * 
 	 * @param p2pSessionId

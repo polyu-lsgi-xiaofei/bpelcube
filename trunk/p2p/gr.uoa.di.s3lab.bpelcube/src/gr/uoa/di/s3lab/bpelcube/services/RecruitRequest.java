@@ -22,8 +22,6 @@ import gr.uoa.di.s3lab.p2p.P2PService;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.axis2.context.MessageContext;
-
 /**
  * 
  * @author Michael Pantazoglou
@@ -54,10 +52,20 @@ public class RecruitRequest extends P2PRequest {
 	 */
 	private P2PEndpoint requesterEndpoint;
 	
+//	/**
+//	 * The SOAP request message that will be used to invoke the BPEL process.
+//	 */
+//	private MessageContext messageContext;
+	
 	/**
-	 * The SOAP request message that will be used to invoke the BPEL process.
+	 * The endpoint address of the BPEL process to be invoked.
 	 */
-	private MessageContext messageContext;
+	private String processEndpointAddress;
+	
+	/**
+	 * The SOAP request for the invocation of the BPEL process.
+	 */
+	private String processSOAPRequest;
 	
 	/**
 	 * Constructor.
@@ -112,12 +120,28 @@ public class RecruitRequest extends P2PRequest {
 		this.requesterEndpoint = requesterEndpoint;
 	}
 
-	public MessageContext getMessageContext() {
-		return messageContext;
+	public String getProcessEndpointAddress() {
+		return processEndpointAddress;
 	}
 
-	public void setMessageContext(MessageContext messageContext) {
-		this.messageContext = messageContext;
+	public void setProcessEndpointAddress(String processEndpointAddress) {
+		this.processEndpointAddress = processEndpointAddress;
 	}
+
+	public String getProcessSOAPRequest() {
+		return processSOAPRequest;
+	}
+
+	public void setProcessSOAPRequest(String processSOAPRequest) {
+		this.processSOAPRequest = processSOAPRequest;
+	}
+
+//	public MessageContext getMessageContext() {
+//		return messageContext;
+//	}
+//
+//	public void setMessageContext(MessageContext messageContext) {
+//		this.messageContext = messageContext;
+//	}
 
 }
