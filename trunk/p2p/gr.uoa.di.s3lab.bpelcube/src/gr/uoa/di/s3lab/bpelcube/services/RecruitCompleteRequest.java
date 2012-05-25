@@ -15,6 +15,7 @@
  */
 package gr.uoa.di.s3lab.bpelcube.services;
 
+import gr.uoa.di.s3lab.p2p.P2PEndpoint;
 import gr.uoa.di.s3lab.p2p.P2PRequest;
 import gr.uoa.di.s3lab.p2p.P2PService;
 
@@ -30,6 +31,11 @@ public class RecruitCompleteRequest extends P2PRequest {
 	 * Id of the P2P session for which recruitment is complete.
 	 */
 	private String p2pSessionId;
+	
+	/**
+	 * The p2p endpoint of the sender of this request.
+	 */
+	private P2PEndpoint senderEndpoint;
 	
 	/**
 	 * Constructor.
@@ -49,6 +55,14 @@ public class RecruitCompleteRequest extends P2PRequest {
 	
 	public void setP2PSessionId(String p2pSessionId) {
 		this.p2pSessionId = p2pSessionId;
+	}
+
+	public P2PEndpoint getSenderEndpoint() {
+		return senderEndpoint;
+	}
+
+	public void setSenderEndpoint(P2PEndpoint senderEndpoint) {
+		this.senderEndpoint = senderEndpoint;
 	}
 
 }

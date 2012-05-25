@@ -27,6 +27,7 @@ import gr.uoa.di.s3lab.p2p.hypercube.Neighbor;
 
 import java.io.File;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -311,6 +312,55 @@ public class BPELCubeNode extends HypercubeNode {
 
 	public void setBPELEnginePort(int bpelEnginePort) {
 		this.bpelEnginePort = bpelEnginePort;
+	}
+	
+	/**
+	 * Returns the next recipient neighbor that participates in the specified 
+	 * p2p session. This method is used each time a node needs to propagate a
+	 * notification to all nodes participating in a p2p session.
+	 * 
+	 * @param p2pSessionId the p2p session id
+	 * @param notifiedNodes list of nodes that have been already notified
+	 * @return the next recipient neighbor
+	 */
+	public Neighbor getNextRecipientNeighborInP2PSession(String p2pSessionId, 
+			List<String> notifiedNodes) {
+		
+		List<String> p2pSessionNeighbors = db.getP2PSessionNeighbors(p2pSessionId);
+		getLog().debug("I have + " + p2pSessionNeighbors.size() + " neighbors in p2p session " + p2pSessionId);
+		
+		
+		int minDimension = Hypercube.MAX_NUMBER_OF_DIMENSIONS - 1;
+		Neighbor nextRecipientNeighbor = null;
+		for (String endpoint : p2pSessionNeighbors) {
+			if (notifiedNodes.contains(endpoint)) {
+				getLog().debug("Neighbor " + endpoint + " has been already notified.");
+				continue;
+			}
+			try {
+				URI networkAddress = new URI(endpoint);
+				Neighbor neighbor = this.getNeighbor(networkAddress);
+				int d = Hypercube.getLinkDimensionality(getPositionVector(), 
+						neighbor.getPositionVector());
+				if (d <= minDimension) {
+					getLog().debug("Prospective next recipient is neighbor " + networkAddress + " in dimension " + d);
+					minDimension = d;
+					nextRecipientNeighbor = neighbor;
+					if (minDimension == 0) {
+						break;
+					}
+				}
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+				continue;
+			}
+		}
+		
+		if (nextRecipientNeighbor != null) {
+			getLog().debug("Next recipient is neighbor " + nextRecipientNeighbor.asP2PEndpoint());
+		}
+		
+		return nextRecipientNeighbor;
 	}
 
 }

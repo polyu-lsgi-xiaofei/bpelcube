@@ -103,6 +103,7 @@ public class RecruitService extends BPELCubeService {
 			// notify the manager of the P2P session that recruitment is complete
 			RecruitCompleteRequest recruitCompleteRequest = new RecruitCompleteRequest();
 			recruitCompleteRequest.setP2PSessionId(request.getP2PSessionId());
+			recruitCompleteRequest.setSenderEndpoint(me.getEndpoint());
 			try {
 				me.invokeOneWayService(request.getManagerEndpoint(), recruitCompleteRequest);
 			} catch (Exception e) {

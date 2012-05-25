@@ -47,9 +47,15 @@ public class RecruitCompleteService extends BPELCubeService {
 	@Override
 	public void execute() {
 		
-		// Notify the BPEL process execution listener that the recruitment is 
-		// complete.
+		// Persist sender endpoint in p2p session neighbours
 		String p2pSessionId = request.getP2PSessionId();
+		String senderEndpoint = request.getSenderEndpoint().toString();
+		
+		if (!db.p2pSessionNeighborExists(p2pSessionId, senderEndpoint)) {
+			db.addP2PSessionNeighor(p2pSessionId, senderEndpoint);
+		}
+		
+		// Notify the BPEL process execution listener that the recruitment is complete.
 		me.getLog().debug("Notifying the process execution listener of P2P session: " + p2pSessionId);
 		
 		BPELProcessExecutionListener<P2PRequest> processExecutionListener = null;
