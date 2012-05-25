@@ -3,7 +3,7 @@
  * 
  *               !!! DO NOT EDIT !!!! 
  * 
- * Generated On  : Tue May 15 14:56:46 EEST 2012
+ * Generated On  : Fri May 25 16:30:10 EEST 2012
  * For Interface : org.apache.ode.bpel.runtime.channels.InvokeResponse
  */
 
