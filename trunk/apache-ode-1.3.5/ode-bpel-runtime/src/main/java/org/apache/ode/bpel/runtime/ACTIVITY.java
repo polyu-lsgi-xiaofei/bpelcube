@@ -24,16 +24,13 @@ import gr.uoa.di.s3lab.bpelcube.BPELCubeNode.Role;
 import gr.uoa.di.s3lab.bpelcube.BPELCubeNodeDB;
 import gr.uoa.di.s3lab.bpelcube.BPELCubeUtils;
 import gr.uoa.di.s3lab.bpelcube.services.BPELActivityCompletedRequest;
-import gr.uoa.di.s3lab.p2p.P2PEndpoint;
 import gr.uoa.di.s3lab.p2p.P2PRequest;
+import gr.uoa.di.s3lab.p2p.hypercube.Neighbor;
 
 import java.io.Serializable;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -300,23 +297,41 @@ abstract class ACTIVITY extends BpelJacobRunnable implements IndexedObject {
     	__log.info("P2P session id: " + p2pSessionId);
     	__log.info("Preparing to send notification of completion of activity: " + activityId);
     	
-    	List<String> p2pSessionNeighbors = db.getP2PSessionNeighbors(p2pSessionId);
+//    	List<String> p2pSessionNeighbors = db.getP2PSessionNeighbors(p2pSessionId);
     	
-    	BPELActivityCompletedRequest notification = new BPELActivityCompletedRequest();
+//    	notification.setNotifiedNodes(p2pSessionNeighbors);
+//    	
+//    	__log.info(p2pSessionNeighbors.size() + " node(s) will be notified");
+//    	for (String neighbor : p2pSessionNeighbors) {
+//			__log.info("Sending to: " + neighbor);
+//			P2PEndpoint p2pEndpoint = new P2PEndpoint();
+//			p2pEndpoint.setAddress(new URI(neighbor));
+//			me.invokeOneWayService(p2pEndpoint, notification);
+//		}
+    	
+    	List<String> notifiedNodes = new ArrayList<String>();
+		Neighbor toBeNotified = me.getNextRecipientNeighborInP2PSession(
+				p2pSessionId, notifiedNodes);
+		if (toBeNotified == null) {
+			return;
+		}
+		notifiedNodes.add(toBeNotified.getNetworkAddress().toString());
+		notifiedNodes.add(me.getEndpoint().toString());
+		
+		BPELActivityCompletedRequest notification = new BPELActivityCompletedRequest();
     	notification.setP2PSessionId(p2pSessionId);
     	notification.setActivityId(activityId);
     	notification.setExecutionFailed(executionFailed);
     	notification.setFailureMessage(failureReason);
     	notification.setFaultData(faultData);
     	notification.setNewVariableHolders(db.getVariableHolders(p2pSessionId));
-    	notification.setNotifiedNodes(p2pSessionNeighbors);
-    	
-    	__log.info(p2pSessionNeighbors.size() + " node(s) will be notified");
-    	for (String neighbor : p2pSessionNeighbors) {
-			__log.info("Sending to: " + neighbor);
-			P2PEndpoint p2pEndpoint = new P2PEndpoint();
-			p2pEndpoint.setAddress(new URI(neighbor));
-			me.invokeOneWayService(p2pEndpoint, notification);
+		notification.setNotifiedNodes(notifiedNodes);
+		
+		try {
+			__log.info("Sending notification to " + toBeNotified.getNetworkAddress());
+			me.invokeOneWayService(toBeNotified.asP2PEndpoint(), notification);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
     }
     
