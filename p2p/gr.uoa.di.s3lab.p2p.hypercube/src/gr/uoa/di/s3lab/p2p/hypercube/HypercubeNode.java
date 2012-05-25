@@ -178,6 +178,22 @@ public class HypercubeNode extends P2PNode {
 	}
 	
 	/**
+	 * Gets the neighbor with the specified network address, or null if no 
+	 * such neighbor exists.
+	 * 
+	 * @param networkAddress
+	 * @return
+	 */
+	public Neighbor getNeighbor(URI networkAddress) {
+		for (Neighbor n : neighborSet) {
+			if (n.getNetworkAddress().equals(networkAddress)) {
+				return n;
+			}
+		}
+		return null;
+	}
+	
+	/**
 	 * Gets the Least Recently Used (LRU) neighbor of this node. If there are 
 	 * two or more LRU neighbors, the one in the lowest dimension is returned.
 	 * 
