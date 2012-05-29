@@ -43,7 +43,6 @@ public class BPELCubeServlet extends HttpServlet {
 			throws ServletException, IOException {
 		
 		BPELCubeNode me = (BPELCubeNode) BPELCubeNode.sharedInstance;
-		BPELCubeNodeDB db = (BPELCubeNodeDB) me.getNodeDB();
 		
 		StringBuilder sb = new StringBuilder();
 		

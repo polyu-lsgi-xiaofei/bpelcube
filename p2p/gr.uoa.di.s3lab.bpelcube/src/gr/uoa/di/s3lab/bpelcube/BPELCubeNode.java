@@ -291,6 +291,9 @@ public class BPELCubeNode extends HypercubeNode {
 	public List<String> getCurrentlyDeployedProcessBundles() {
 		this.getLog().debug("Getting bundle folders from deploy directory: " + this.bpelEngineDeployDirectory);
 		List<String> deployedBundles = new ArrayList<String>();
+		if (this.bpelEngineDeployDirectory == null) {
+			return deployedBundles;
+		}
 		File dir = new File(this.bpelEngineDeployDirectory);
 		String[] dirContents = dir.list();
 		if (dirContents.length == 0) {

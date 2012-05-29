@@ -53,7 +53,11 @@ public class GenericWebServiceClient {
 		
 	}
 	
-	public void invoke(String processEndpointAddress, String processSOAPRequest, String p2pSessionId, int bpelEnginePort)  {
+	public void invoke(String processEndpointAddress, 
+			String processSOAPRequest, 
+			EndpointReference replyTo, 
+			String p2pSessionId, 
+			int bpelEnginePort)  {
 		
 		try {
 			String toAddressAsString = processEndpointAddress;
@@ -78,13 +82,25 @@ public class GenericWebServiceClient {
 			
 			soapRequest.getHeader();
 			SOAPFactory soapFactory = (SOAPFactory)soapRequest.getOMFactory();
-			OMNamespace omNS = soapFactory.createOMNamespace(BPELCubeUtils.SOAP_HEADER_P2P_SESSION_ID.getNamespaceURI(), "bpelcube");
-			SOAPHeader header = soapFactory.createSOAPHeader(soapRequest);
-			SOAPHeaderBlock headerBlock = header.addHeaderBlock(BPELCubeUtils.SOAP_HEADER_P2P_SESSION_ID.getLocalPart(), omNS);
-			headerBlock.setText(p2pSessionId);
+			OMNamespace omNS = soapFactory.createOMNamespace(BPELCubeUtils.BPELCUBE_NS, "bpelcube");
+			if (p2pSessionId != null) {
+				SOAPHeader header = soapFactory.createSOAPHeader(soapRequest);
+				SOAPHeaderBlock headerBlock = header.addHeaderBlock(BPELCubeUtils.SOAP_HEADER_P2P_SESSION_ID.getLocalPart(), omNS);
+				headerBlock.setText(p2pSessionId);
+			}
+			
+			if (soapRequest.getHeader() == null) {
+				soapFactory.createSOAPHeader(soapRequest);
+			}
+//			SOAPHeader header = soapFactory.createSOAPHeader(soapRequest);
+			SOAPHeaderBlock headerBlock = soapRequest.getHeader().addHeaderBlock(BPELCubeUtils.SOAP_HEADER_ROUTED.getLocalPart(), omNS);
+			headerBlock.setText("true");
 			
 			MessageContext newMessageContext = new MessageContext();
 			newMessageContext.setEnvelope(soapRequest);
+			if (replyTo != null) {
+				newMessageContext.setReplyTo(replyTo);
+			}
 			
 			OperationClient operationClient = serviceClient.createClient(ServiceClient.ANON_OUT_IN_OP);
 			operationClient.addMessageContext(newMessageContext);

@@ -34,10 +34,18 @@ public class BPELCubeUtils {
 	 */
 	private static long processInstanceCounter = 0L;
 	
+	public static final String BPELCUBE_NS = "urn:bpelcube";
+	
 	/**
 	 * The qualified name of the p2p session id soap header extension.
 	 */
-	public static final QName SOAP_HEADER_P2P_SESSION_ID = new QName("urn:bpelcube", "P2PSessionId");
+	public static final QName SOAP_HEADER_P2P_SESSION_ID = new QName(BPELCUBE_NS, "P2PSessionId");
+	
+	/**
+	 * The qualified name of the soap header extension that indicates whether a
+	 * soap request was routed within the hypercube or not.
+	 */
+	public static final QName SOAP_HEADER_ROUTED = new QName(BPELCUBE_NS, "Routed");
 	
 	/**
 	 * Creates and returns a new P2P session ID. Uniqueness is attempted to be 
