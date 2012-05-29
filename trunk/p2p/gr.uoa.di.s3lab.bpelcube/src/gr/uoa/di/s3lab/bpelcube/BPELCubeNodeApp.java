@@ -21,6 +21,7 @@ import gr.uoa.di.s3lab.p2p.hypercube.Hypercube;
 import gr.uoa.di.s3lab.p2p.hypercube.HypercubeNodeApp;
 import gr.uoa.di.s3lab.p2p.hypercube.Neighbor;
 import gr.uoa.di.s3lab.p2p.hypercube.services.HelloRequest;
+import gr.uoa.di.s3lab.p2p.hypercube.services.ShortestPathRouteRequest;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -208,6 +209,38 @@ public class BPELCubeNodeApp extends BPELCubeNode {
 		gbc.weighty = 0;
 		deployPanel.add(deployButton, gbc);
 		tabbedPane.addTab("Deploy", deployPanel);
+		
+		// Add shortest-path route test tab
+		JPanel shortestPathRoutePanel = new JPanel();
+		shortestPathRoutePanel.setLayout(new GridBagLayout());
+		JButton shortestPathRouteButton = new JButton("Shortest-path route test");
+		shortestPathRouteButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				int[] p_dest = Hypercube.getRandomPositionVector();
+				getLog().debug("Starting shortest-path routing with destination: " + Hypercube.vectorAsString(p_dest));
+				HelloRequest helloRequest = new HelloRequest();
+				helloRequest.setMessage("Hello! Testing shortest-path routing!!");
+				ShortestPathRouteRequest sprRequest = new ShortestPathRouteRequest();
+				sprRequest.setDestinationPositionVector(p_dest);
+				sprRequest.setServiceRequest(helloRequest);
+				Neighbor n = getNextNeighborInShortestPath(p_dest);
+				try {
+					getLog().debug("Routing to neighbor at position: " + Hypercube.vectorAsString(n.getPositionVector()));
+					invokeOneWayService(n.asP2PEndpoint(), sprRequest);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		gbc = new GridBagConstraints();
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.weightx = 1;
+		gbc.weighty = 0;
+		shortestPathRoutePanel.add(shortestPathRouteButton, gbc);
+		tabbedPane.addTab("Shortest-Path Route", shortestPathRoutePanel);
 		
 		// Add buttons
 		JPanel buttonsPanel = new JPanel();
