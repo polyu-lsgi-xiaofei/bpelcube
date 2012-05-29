@@ -18,8 +18,10 @@ package gr.uoa.di.s3lab.p2p.hypercube;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 /**
+ * Implements various utility methods that are needed by the hypercube protocols.
  * 
  * @author Michael Pantazoglou
  *
@@ -167,6 +169,23 @@ public class Hypercube {
 		}
 		
 		return sb.toString();
+	}
+	
+	/**
+	 * Generates and returns a random position vector.
+	 * 
+	 * @return a random position vector as an int array
+	 */
+	public static int[] getRandomPositionVector() {
+		
+		Random random = new Random();
+		
+		int[] p = new int[MAX_NUMBER_OF_DIMENSIONS];
+		for (int i=0; i<MAX_NUMBER_OF_DIMENSIONS; i++) {
+			p[i] = random.nextBoolean()?1:0;
+		}
+		
+		return p;
 	}
 	
 	/**

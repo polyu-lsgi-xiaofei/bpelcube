@@ -645,5 +645,34 @@ public class HypercubeNode extends P2PNode {
 			}
 		}
 	}
+	
+	/**
+	 * Gets the next neighbor of this node in the shortest path to the specified 
+	 * destination position.
+	 * 
+	 * @param destinationPosition the position vector of the destination node
+	 * @return
+	 */
+	public Neighbor getNextNeighborInShortestPath(int[] destinationPosition) {
+		
+		int[] xor = Hypercube.XOR(positionVector, destinationPosition);
+		
+		// The dimension of the next neighbor in the shortest path equals to the
+		// position of the first '1' found in the xor vector.
+		for (int i=0; i<Hypercube.MAX_NUMBER_OF_DIMENSIONS; i++) {
+			if (xor[i] == 1) {
+				// We found the dimension of the next neighbor in the shortest path
+				for (Neighbor n : neighborSet) {
+					int dim = Hypercube.getLinkDimensionality(positionVector, n.getPositionVector());
+					if (dim == i) {
+						// We found the next neighbor in the shortest path
+						return n;
+					}
+				}
+			}
+		}
+		
+		return null;
+	}
 
 }
