@@ -131,7 +131,7 @@ public class ODEService {
     	if (soapHeader != null) {
     		
     		ArrayList soapHeaderBlocks = soapHeader.getHeaderBlocksWithNSURI(
-    				BPELCubeUtils.SOAP_HEADER_P2P_SESSION_ID.getNamespaceURI());
+    				BPELCubeUtils.BPELCUBE_NS);
     		if (soapHeaderBlocks != null) {
     			
     			for (int i=0; i<soapHeaderBlocks.size(); i++) {

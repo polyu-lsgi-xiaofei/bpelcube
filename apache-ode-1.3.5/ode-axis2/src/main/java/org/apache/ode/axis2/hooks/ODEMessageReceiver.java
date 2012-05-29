@@ -19,6 +19,18 @@
 
 package org.apache.ode.axis2.hooks;
 
+import gr.uoa.di.s3lab.bpelcube.BPELCubeNode;
+import gr.uoa.di.s3lab.bpelcube.BPELCubeUtils;
+import gr.uoa.di.s3lab.bpelcube.services.ExecuteBPELProcessRequest;
+import gr.uoa.di.s3lab.p2p.hypercube.Hypercube;
+import gr.uoa.di.s3lab.p2p.hypercube.Neighbor;
+import gr.uoa.di.s3lab.p2p.hypercube.services.ShortestPathRouteRequest;
+
+import java.util.ArrayList;
+
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPHeader;
+import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisOperation;
@@ -38,8 +50,85 @@ public class ODEMessageReceiver extends AbstractMessageReceiver {
     private static final Log __log = LogFactory.getLog(ODEMessageReceiver.class);
 
     private ODEService _service;
+    
+    /**
+     * Michael Pantazoglou: Starts a random walk within the BPELcube in order 
+     * to find the node that will actually execute the BPEL process.
+     * 
+     * @param msgContext contains the SOAP request for the BPEL process
+     */
+    private void doRandomWalk(MessageContext msgContext) {
+    	BPELCubeNode me = (BPELCubeNode) BPELCubeNode.sharedInstance;
+    	// Prepare ExecuteBPELProcessRequest
+		ExecuteBPELProcessRequest executeBPELProcessRequest = new ExecuteBPELProcessRequest();
+		executeBPELProcessRequest.setProcessEndpointAddress(msgContext.getTo().getAddress());
+		executeBPELProcessRequest.setProcessSOAPRequest(msgContext.getEnvelope().toString());
+		executeBPELProcessRequest.setReplyTo(msgContext.getFrom());
+		// Start random walk
+		__log.info("Starting random walk in BPELcube");
+		int[] destination = Hypercube.getRandomPositionVector();
+		__log.info("Random walk destination: " + Hypercube.vectorAsString(destination));
+		ShortestPathRouteRequest shortestPathRouteRequest = new ShortestPathRouteRequest();
+		shortestPathRouteRequest.setDestinationPositionVector(destination);
+		shortestPathRouteRequest.setServiceRequest(executeBPELProcessRequest);
+		Neighbor n = me.getNextNeighborInShortestPath(destination);
+		if (n != null) {
+			try {
+				__log.info("Next neighbor in shortest path routing: " + Hypercube.vectorAsString(n.getPositionVector()) + " (" + n.getNetworkAddress() + ")");
+				me.invokeOneWayService(n.asP2PEndpoint(), shortestPathRouteRequest);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return;
+		}
+    }
 
-    public final void invokeBusinessLogic(final MessageContext msgContext) throws AxisFault {
+    @SuppressWarnings("rawtypes")
+	public final void invokeBusinessLogic(final MessageContext msgContext) throws AxisFault {
+    	
+    	/**********************************************************************/
+    	// Michael Pantazoglou: 
+    	// Check if shortest-path routing has been performed or not
+    	
+    	SOAPEnvelope soapEnvelope = msgContext.getEnvelope();
+    	SOAPHeader soapHeader = soapEnvelope.getHeader();
+    	if (soapHeader != null) { // the soap request contains a header
+    		ArrayList soapHeaderBlocks = soapHeader.getHeaderBlocksWithNSURI(
+    				BPELCubeUtils.BPELCUBE_NS);
+    		if (soapHeaderBlocks != null) { // the header contains bpelcube header blocks
+    			boolean isRouted = false;
+    			for (int i=0; i<soapHeaderBlocks.size(); i++) {
+    				SOAPHeaderBlock soapHeaderBlock = (SOAPHeaderBlock) soapHeaderBlocks.get(i);
+    				if (soapHeaderBlock.getLocalName().equals(BPELCubeUtils.SOAP_HEADER_ROUTED.getLocalPart())) {
+    					// the routed bpelcube header block was found.
+    					// this means that this node must proceed with the 
+    					// execution of the incoming soap request
+    					isRouted = true;
+    					break;
+    				}
+    			}
+    			if (!isRouted) {
+    				// after processing all bpelcube header blocks, we didn't 
+    				// find the routed header block. This means that this node
+    				// must start a random walk.
+    				doRandomWalk(msgContext);
+    				return;
+    			}
+    		} else { 
+    			// no bpelcube header blocks were found, which means that this 
+    			// node will start a random walk
+    			doRandomWalk(msgContext);
+    			return;
+    		}
+    	} else { 
+    		// no header was found, so this node will do a random walk
+    		doRandomWalk(msgContext);
+    		return;
+    	}
+    	// If this point is reached, it means that a random walk has already 
+    	// been performed and thus this soap request must be processed.
+    	/**********************************************************************/
+    	
         if (hasResponse(msgContext.getAxisOperation())) {
             if (__log.isDebugEnabled())
                 __log.debug("Received request message for " + msgContext.getAxisService().getName() + "."
