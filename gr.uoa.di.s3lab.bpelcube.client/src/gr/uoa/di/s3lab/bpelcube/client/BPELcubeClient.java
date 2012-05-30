@@ -365,6 +365,15 @@ public class BPELcubeClient {
 			}
 		}
 		
+		// Allow active invocation threads to gracefully complete
+		try {
+			System.out.println("Waiting for active invocations to complete...");
+			Thread.sleep(minute);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		System.out.println("Experiment finished.");
 		System.out.println("Avg execution time: " + app.getAvgExecutionTime() + " ms");
 	}
 
