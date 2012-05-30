@@ -68,66 +68,67 @@ public class ODEMessageReceiver extends AbstractMessageReceiver {
 		__log.info("Starting random walk in BPELcube");
 		int[] destination = Hypercube.getRandomPositionVector();
 		__log.info("Random walk destination: " + Hypercube.vectorAsString(destination));
-		ShortestPathRouteRequest shortestPathRouteRequest = new ShortestPathRouteRequest();
-		shortestPathRouteRequest.setDestinationPositionVector(destination);
-		shortestPathRouteRequest.setServiceRequest(executeBPELProcessRequest);
 		Neighbor n = me.getNextNeighborInShortestPath(destination);
 		if (n != null) {
 			try {
-				__log.info("Next neighbor in shortest path routing: " + Hypercube.vectorAsString(n.getPositionVector()) + " (" + n.getNetworkAddress() + ")");
+				__log.info("Next position in shortest path routing: " + Hypercube.vectorAsString(n.getPositionVector()) + " (" + n.getNetworkAddress() + ")");
+				ShortestPathRouteRequest shortestPathRouteRequest = new ShortestPathRouteRequest();
+				shortestPathRouteRequest.setDestinationPositionVector(destination);
+				shortestPathRouteRequest.setServiceRequest(executeBPELProcessRequest);
 				me.invokeOneWayService(n.asP2PEndpoint(), shortestPathRouteRequest);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			return;
+		} else {
+			// The destination position is covered by me 
 		}
     }
 
     @SuppressWarnings("rawtypes")
 	public final void invokeBusinessLogic(final MessageContext msgContext) throws AxisFault {
     	
-    	/**********************************************************************/
-    	// Michael Pantazoglou: 
-    	// Check if shortest-path routing has been performed or not
-    	
-    	SOAPEnvelope soapEnvelope = msgContext.getEnvelope();
-    	SOAPHeader soapHeader = soapEnvelope.getHeader();
-    	if (soapHeader != null) { // the soap request contains a header
-    		ArrayList soapHeaderBlocks = soapHeader.getHeaderBlocksWithNSURI(
-    				BPELCubeUtils.BPELCUBE_NS);
-    		if (soapHeaderBlocks != null) { // the header contains bpelcube header blocks
-    			boolean isRouted = false;
-    			for (int i=0; i<soapHeaderBlocks.size(); i++) {
-    				SOAPHeaderBlock soapHeaderBlock = (SOAPHeaderBlock) soapHeaderBlocks.get(i);
-    				if (soapHeaderBlock.getLocalName().equals(BPELCubeUtils.SOAP_HEADER_ROUTED.getLocalPart())) {
-    					// the routed bpelcube header block was found.
-    					// this means that this node must proceed with the 
-    					// execution of the incoming soap request
-    					isRouted = true;
-    					break;
-    				}
-    			}
-    			if (!isRouted) {
-    				// after processing all bpelcube header blocks, we didn't 
-    				// find the routed header block. This means that this node
-    				// must start a random walk.
-    				doRandomWalk(msgContext);
-    				return;
-    			}
-    		} else { 
-    			// no bpelcube header blocks were found, which means that this 
-    			// node will start a random walk
-    			doRandomWalk(msgContext);
-    			return;
-    		}
-    	} else { 
-    		// no header was found, so this node will do a random walk
-    		doRandomWalk(msgContext);
-    		return;
-    	}
-    	// If this point is reached, it means that a random walk has already 
-    	// been performed and thus this soap request must be processed.
-    	/**********************************************************************/
+//    	/**********************************************************************/
+//    	// Michael Pantazoglou: 
+//    	// Check if shortest-path routing has been performed or not
+//    	
+//    	SOAPEnvelope soapEnvelope = msgContext.getEnvelope();
+//    	SOAPHeader soapHeader = soapEnvelope.getHeader();
+//    	if (soapHeader != null) { // the soap request contains a header
+//    		ArrayList soapHeaderBlocks = soapHeader.getHeaderBlocksWithNSURI(
+//    				BPELCubeUtils.BPELCUBE_NS);
+//    		if (soapHeaderBlocks != null) { // the header contains bpelcube header blocks
+//    			boolean isRouted = false;
+//    			for (int i=0; i<soapHeaderBlocks.size(); i++) {
+//    				SOAPHeaderBlock soapHeaderBlock = (SOAPHeaderBlock) soapHeaderBlocks.get(i);
+//    				if (soapHeaderBlock.getLocalName().equals(BPELCubeUtils.SOAP_HEADER_ROUTED.getLocalPart())) {
+//    					// the routed bpelcube header block was found.
+//    					// this means that this node must proceed with the 
+//    					// execution of the incoming soap request
+//    					isRouted = true;
+//    					break;
+//    				}
+//    			}
+//    			if (!isRouted) {
+//    				// after processing all bpelcube header blocks, we didn't 
+//    				// find the routed header block. This means that this node
+//    				// must start a random walk.
+//    				doRandomWalk(msgContext);
+//    				return;
+//    			}
+//    		} else { 
+//    			// no bpelcube header blocks were found, which means that this 
+//    			// node will start a random walk
+//    			doRandomWalk(msgContext);
+//    			return;
+//    		}
+//    	} else { 
+//    		// no header was found, so this node will do a random walk
+//    		doRandomWalk(msgContext);
+//    		return;
+//    	}
+//    	// If this point is reached, it means that a random walk has already 
+//    	// been performed and thus this soap request must be processed.
+//    	/**********************************************************************/
     	
         if (hasResponse(msgContext.getAxisOperation())) {
             if (__log.isDebugEnabled())
