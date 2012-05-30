@@ -46,12 +46,12 @@ public class ExecuteBPELProcessService extends BPELCubeService {
 
 	@Override
 	public void execute() {
-		me.getLog().debug("Invoking BPEL process...");
+		me.getLog().debug("[ExecuteBPELProcessService] Invoking BPEL process...");
 		GenericWebServiceClient wsClient = new GenericWebServiceClient();
 		wsClient.invoke(request.getProcessEndpointAddress(), 
 				request.getProcessSOAPRequest(), 
 				null, 
-				null, 
+				null, // p2p session id is null, because this will be the first actual invocation
 				me.getBPELEnginePort());
 	}
 
