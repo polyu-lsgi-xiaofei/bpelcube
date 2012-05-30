@@ -87,7 +87,7 @@ public class ShortestPathRouteService extends HypercubeService {
 		}
 		
 		try {
-			me.getLog().debug("Routing to neighbor at position: " + Hypercube.vectorAsString(next.getPositionVector()));
+			me.getLog().debug("Next position in shortest path routing: " + Hypercube.vectorAsString(next.getPositionVector()) + "(" + next.getNetworkAddress() + ")");
 			me.invokeOneWayService(next.asP2PEndpoint(), request);
 		} catch (Exception e) {
 			e.printStackTrace();

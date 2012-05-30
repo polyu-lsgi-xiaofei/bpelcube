@@ -655,6 +655,10 @@ public class HypercubeNode extends P2PNode {
 	 */
 	public Neighbor getNextNeighborInShortestPath(int[] destinationPosition) {
 		
+		if (isPositionCovered(destinationPosition)) {
+			return null;
+		}
+		
 		int[] xor = Hypercube.XOR(positionVector, destinationPosition);
 		
 		// The dimension of the next neighbor in the shortest path equals to the
@@ -673,6 +677,24 @@ public class HypercubeNode extends P2PNode {
 		}
 		
 		return null;
+	}
+	
+	/**
+	 * Returns true if the specified position is covered by this node.
+	 * 
+	 * @param position the specified position vector
+	 * @return true or false
+	 */
+	public boolean isPositionCovered(int[] position) {
+		String positionAsString = Hypercube.vectorAsString(position);
+		List<int[]> coveredPositions = Hypercube.getCoveredPositions(positionVector, coverMapVector);
+		for (int[] p : coveredPositions) {
+			String pAsString = Hypercube.vectorAsString(p);
+			if (pAsString.equals(positionAsString)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
