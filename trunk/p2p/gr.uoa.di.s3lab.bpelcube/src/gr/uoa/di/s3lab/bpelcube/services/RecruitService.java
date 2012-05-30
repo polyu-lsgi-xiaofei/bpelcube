@@ -56,7 +56,7 @@ public class RecruitService extends BPELCubeService {
 					request.getP2PSessionCreationTime(), null);
 			
 			// invoke the BPEL process locally
-			me.getLog().debug("Invoking BPEL process...");
+			me.getLog().debug("[RecruitService] Invoking BPEL process...");
 			GenericWebServiceClient wsClient = new GenericWebServiceClient();
 			wsClient.invoke(request.getProcessEndpointAddress(), 
 					request.getProcessSOAPRequest(), 
