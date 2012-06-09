@@ -18,6 +18,11 @@
  */
 package org.apache.ode.bpel.runtime;
 
+import gr.uoa.di.s3lab.bpelcube.BPELCubeNode;
+import gr.uoa.di.s3lab.bpelcube.BPELCubeNodeDB;
+import gr.uoa.di.s3lab.bpelcube.util.BPELVariablesCache;
+
+import java.io.IOException;
 import java.net.URI;
 import java.util.Calendar;
 import java.util.Date;
@@ -58,6 +63,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
+import org.xml.sax.SAXException;
 
 /**
  * Assign activity run-time template.
@@ -69,6 +75,11 @@ class ASSIGN extends ACTIVITY {
 
     private static final ASSIGNMessages __msgs = MessageBundle
             .getMessages(ASSIGNMessages.class);
+    
+    /**************************************************************************/
+    // Michael Pantazoglou
+    BPELVariablesCache cache;
+    /**************************************************************************/
 
     public ASSIGN(ActivityInfo self, ScopeFrame scopeFrame, LinkFrame linkFrame) {
         super(self, scopeFrame, linkFrame);
@@ -76,7 +87,13 @@ class ASSIGN extends ACTIVITY {
 
     @Override
     protected void localRun() {
-        OAssign oassign = getOAsssign();
+    	
+    	/**********************************************************************/
+    	// Michael Pantazoglou
+    	cache = new BPELVariablesCache(this.getP2PSessionId());
+    	/**********************************************************************/
+    	
+    	OAssign oassign = getOAsssign();
 
         FaultData faultData = null;
 
@@ -131,16 +148,18 @@ class ASSIGN extends ACTIVITY {
             /**************************************************************/
         } else {
             _self.parent.completed(null, CompensationHandler.emptySet());
-            
-            /******************************************************************/
-            // Michael Pantazoglou
-            try {
-				notifyAllP2PNodes();
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-            /******************************************************************/
         }
+        
+        /******************************************************************/
+        // Michael Pantazoglou
+        try {
+        	cache.persistUpdates();
+        	cache.clear();
+			notifyAllP2PNodes();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+        /******************************************************************/
     }
 
     protected Log log() {
@@ -167,8 +186,27 @@ class ASSIGN extends ACTIVITY {
                 if (__log.isDebugEnabled()) __log.debug(to + ": " + msg);
                 throw new FaultException(getOAsssign().getOwner().constants.qnSelectionFailure, msg);
             }
-            if (!napi.isVariableInitialized(lvar)) {
-                Document doc = DOMUtils.newDocument();
+            
+            /******************************************************************/
+            // Michael Pantazoglou
+            boolean isVariableInitialized = true;
+            String variableId = lvar.declaration.declaringScope.name + ":" + lvar.declaration.name;
+            BPELCubeNode me = (BPELCubeNode) BPELCubeNode.sharedInstance;
+            BPELCubeNodeDB db = (BPELCubeNodeDB) me.getNodeDB();
+            if (db.getVariableHolder(getP2PSessionId(), variableId) == null) {
+            	// the variable has not been assigned to a bpelcube node yet;
+            	// maybe it has been initialized but is still in the cache.
+            	if (cache.read(variableId) == null) {
+            		isVariableInitialized = false;
+            	}
+            }
+            /******************************************************************/
+            /******************************************************************/
+            // Michael Pantazoglou
+//            if (!napi.isVariableInitialized(lvar)) {
+            if (!isVariableInitialized) {
+            /******************************************************************/
+            	Document doc = DOMUtils.newDocument();
                 Node val = to.getVariable().type.newInstance(doc);
                 if (val.getNodeType() == Node.TEXT_NODE) {
                     Element tempwrapper = doc.createElementNS(null, "temporary-simple-type-wrapper");
@@ -385,6 +423,10 @@ class ASSIGN extends ACTIVITY {
                     .isMessageRef())
                     && ocopy.from instanceof VariableRef
                     && ((VariableRef) ocopy.from).isMessageRef()) {
+            	
+            	/**************************************************************/
+            	__log.info("**1**");
+            	/**************************************************************/
 
                 final VariableInstance lval = _scopeFrame.resolve(ocopy.to
                         .getVariable());
@@ -404,6 +446,9 @@ class ASSIGN extends ACTIVITY {
                         "Message/Non-Message Assignment:  " + ocopy);
             }
         } else {
+        	/**************************************************************/
+        	__log.info("**2**");
+        	/**************************************************************/
             // Conventional Assignment logic.
             Node rvalue = evalRValue(ocopy.from);
             Node lvalue = evalLValue(ocopy.to);
@@ -416,6 +461,9 @@ class ASSIGN extends ACTIVITY {
             Node lvaluePtr = lvalue;
             boolean headerAssign = false;
             if (ocopy.to instanceof OAssign.DirectRef) {
+            	/**************************************************************/
+            	__log.info("**3**");
+            	/**************************************************************/
                 DirectRef dref = ((DirectRef) ocopy.to);
                 Element el = DOMUtils.findChildByName((Element)lvalue, dref.elName);
                 if (el == null) {
@@ -424,17 +472,26 @@ class ASSIGN extends ACTIVITY {
                 }
                 lvaluePtr = el;
             } else if (ocopy.to instanceof OAssign.VariableRef) {
+            	/**************************************************************/
+            	__log.info("**4**");
+            	/**************************************************************/
                 VariableRef varRef = ((VariableRef) ocopy.to);
                 if (varRef.headerPart != null) headerAssign = true;
                 lvaluePtr = evalQuery(lvalue, varRef.part != null ? varRef.part : varRef.headerPart, varRef.location,
                         new EvaluationContextProxy(varRef.getVariable(), lvalue));
             } else if (ocopy.to instanceof OAssign.PropertyRef) {
+            	/**************************************************************/
+            	__log.info("**5**");
+            	/**************************************************************/
                 PropertyRef propRef = ((PropertyRef) ocopy.to);
                 lvaluePtr = evalQuery(lvalue, propRef.propertyAlias.part,
                         propRef.propertyAlias.location,
                         new EvaluationContextProxy(propRef.getVariable(),
                                 lvalue));
             } else if (ocopy.to instanceof OAssign.LValueExpression) {
+            	/**************************************************************/
+            	__log.info("**6**");
+            	/**************************************************************/
                 LValueExpression lexpr = (LValueExpression) ocopy.to;
                 lexpr.setInsertMissingToData(ocopy.insertMissingToData);
                 lvaluePtr = evalQuery(lvalue, null, lexpr.expression,
@@ -445,12 +502,18 @@ class ASSIGN extends ACTIVITY {
 
             // For partner link assignmenent, the whole content is assigned.
             if (ocopy.to instanceof OAssign.PartnerLinkRef) {
+            	/**************************************************************/
+            	__log.info("**7**");
+            	/**************************************************************/
                 OAssign.PartnerLinkRef pLinkRef = ((OAssign.PartnerLinkRef) ocopy.to);
                 PartnerLinkInstance plval = _scopeFrame
                         .resolve(pLinkRef.partnerLink);
                 replaceEndpointRefence(plval, rvalue);
                 se = new PartnerLinkModificationEvent(((OAssign.PartnerLinkRef) ocopy.to).partnerLink.getName());
             } else {
+            	/**************************************************************/
+            	__log.info("**8**");
+            	/**************************************************************/
                 // Sneakily converting the EPR if it's not the format expected by the lvalue
                 if (ocopy.from instanceof OAssign.PartnerLinkRef) {
                     rvalue = getBpelRuntimeContext().convertEndpointReference((Element)rvalue, lvaluePtr);
@@ -486,7 +549,25 @@ class ASSIGN extends ACTIVITY {
     Node fetchVariableData(VariableInstance variable, boolean forWriting)
             throws FaultException {
         try {
-            return super.fetchVariableData(variable, forWriting);
+        	/******************************************************************/
+        	// Michael Pantazoglou
+        	String variableId = variable.declaration.declaringScope.name + ":" + variable.declaration.name;
+        	String variableValue = cache.read(variableId);
+        	if (variableValue != null) {
+        		try {
+					return DOMUtils.stringToDOM(variableValue);
+				} catch (SAXException e) {
+					e.printStackTrace();
+					return null;
+				} catch (IOException e) {
+					e.printStackTrace();
+					return null;
+				}
+        	}
+        	Node variableData = super.fetchVariableData(variable, forWriting);
+        	cache.addReadVariable(variableId, DOMUtils.domToString(variableData));
+        	return variableData;
+        	/******************************************************************/
         } catch (FaultException fe) {
             if (forWriting) {
                 fe = new FaultException(fe.getQName(), fe.getMessage(), new Throwable("throwUninitializedToVariable"));
@@ -494,6 +575,24 @@ class ASSIGN extends ACTIVITY {
             throw fe;
         }
     }
+    
+    /**************************************************************************/
+    // Michael Pantazoglou
+    
+    @Override
+    Node initializeVariable(VariableInstance lvar, Node val) throws ExternalVariableModuleException {
+    	String variableId = lvar.declaration.declaringScope.name + ":" + lvar.declaration.name;
+    	cache.write(variableId, DOMUtils.domToString(val));
+    	return val;
+    }
+    
+    @Override
+    void commitChanges(VariableInstance lval, Node lvalue) throws ExternalVariableModuleException {
+    	String variableId = lval.declaration.declaringScope.name + ":" + lval.declaration.name;
+    	cache.write(variableId, DOMUtils.domToString(lvalue));
+    }
+    
+    /**************************************************************************/
     
     private void replaceEndpointRefence(PartnerLinkInstance plval, Node rvalue) throws FaultException {
       if (rvalue.getNodeType() == Node.ATTRIBUTE_NODE){
