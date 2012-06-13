@@ -3,7 +3,7 @@
  * 
  *               !!! DO NOT EDIT !!!! 
  * 
- * Generated On  : Fri May 25 16:30:10 EEST 2012
+ * Generated On  : Sat Jun 09 23:20:44 EEST 2012
  * For Interface : org.apache.ode.bpel.runtime.channels.ParentScope
  */
 
