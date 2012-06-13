@@ -36,6 +36,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
+import org.apache.axis2.client.async.AxisCallback;
 import org.apache.axis2.context.MessageContext;
 
 /**
@@ -238,6 +239,9 @@ public class BPELcubeClient {
 	 */
 	private void invoke() {
 		new Thread(new Runnable() {
+			
+			long start;
+			
 			public void run() {
 				try {
 					
@@ -247,9 +251,6 @@ public class BPELcubeClient {
 					System.out.println("Invoking BPEL process in node: " + nodes[nodeIndex]);
 					
 					ServiceClient serviceClient = new ServiceClient();
-					Options options = new Options();
-					options.setTo(getBPELProcessEndpoint(nodes[nodeIndex]));
-					serviceClient.setOptions(options);
 					
 					OMElement omElement = AXIOMUtil.stringToOM(request);
 					StAXSOAPModelBuilder builder = new StAXSOAPModelBuilder(omElement.getXMLStreamReader());
@@ -257,14 +258,48 @@ public class BPELcubeClient {
 					MessageContext newMessageContext = new MessageContext();
 					newMessageContext.setEnvelope(soapRequest);
 					
+					Options options = newMessageContext.getOptions();
+					options.setTo(getBPELProcessEndpoint(nodes[nodeIndex]));
+					options.setTimeOutInMilliSeconds(2000*100*100);
+					options.setUseSeparateListener(true);
+//					serviceClient.setOptions(options);
+					
 					OperationClient operationClient = serviceClient.createClient(ServiceClient.ANON_OUT_IN_OP);
 					operationClient.addMessageContext(newMessageContext);
-					
-					long start = System.currentTimeMillis();
-					operationClient.execute(true);
-					operationClient.complete(newMessageContext);
-					long end = System.currentTimeMillis();
-					addExecutionTime(end - start);
+					operationClient.setCallback(new AxisCallback() {
+
+						@Override
+						public void onComplete() {
+							System.out.println("Invocation completed.");
+							long end = System.currentTimeMillis();
+							addExecutionTime(end - start);
+						}
+
+						@Override
+						public void onError(Exception e) {
+							System.out.println("Exception received.");
+							long end = System.currentTimeMillis();
+							addExecutionTime(end - start);
+						}
+
+						@Override
+						public void onFault(MessageContext msgContext) {
+							System.out.println("Fault received.");
+							long end = System.currentTimeMillis();
+							addExecutionTime(end - start);
+						}
+
+						@Override
+						public void onMessage(MessageContext msgContext) {
+							System.out.println("Message received.");
+							long end = System.currentTimeMillis();
+							addExecutionTime(end - start);
+						}
+						
+					});
+					start = System.currentTimeMillis();
+					operationClient.execute(false);
+//					operationClient.complete(newMessageContext);					
 				} catch (AxisFault e) {
 					e.printStackTrace();
 				} catch (XMLStreamException e) {
