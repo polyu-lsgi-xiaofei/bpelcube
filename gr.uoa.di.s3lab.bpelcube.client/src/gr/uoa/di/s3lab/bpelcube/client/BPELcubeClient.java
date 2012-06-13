@@ -279,14 +279,14 @@ public class BPELcubeClient {
 						public void onError(Exception e) {
 							System.out.println("Exception received.");
 							long end = System.currentTimeMillis();
-							addExecutionTime(end - start);
+//							addExecutionTime(end - start);
 						}
 
 						@Override
 						public void onFault(MessageContext msgContext) {
 							System.out.println("Fault received.");
 							long end = System.currentTimeMillis();
-							addExecutionTime(end - start);
+//							addExecutionTime(end - start);
 						}
 
 						@Override
@@ -299,7 +299,7 @@ public class BPELcubeClient {
 					});
 					start = System.currentTimeMillis();
 					operationClient.execute(false);
-//					operationClient.complete(newMessageContext);					
+					operationClient.complete(newMessageContext);					
 				} catch (AxisFault e) {
 					e.printStackTrace();
 				} catch (XMLStreamException e) {
