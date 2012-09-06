@@ -239,7 +239,7 @@ public class IntegrateNodeService extends HypercubeService {
 				for (Neighbor n : myNeighborSet) {
 					int distance = Hypercube.getDistance(n.getPositionVector(), 
 							neighborPosition);
-					if (distance < minDistance) {
+					if (distance <= minDistance) {
 						minDistance = distance;
 						closestNeighbor = n;
 					}
