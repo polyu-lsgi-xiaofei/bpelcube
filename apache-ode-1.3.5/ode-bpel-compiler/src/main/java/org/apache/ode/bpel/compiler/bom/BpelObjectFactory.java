@@ -255,7 +255,17 @@ public class BpelObjectFactory {
         _mappings.put(ExtensibilityQNames.FAILURE_HANDLING_RETRY_FOR, FailureHandling.RetryFor.class);
         _mappings.put(ExtensibilityQNames.FAILURE_HANDLING_RETRY_DELAY, FailureHandling.RetryDelay.class);
         _mappings.put(ExtensibilityQNames.FAILURE_HANDLING_FAULT_ON, FailureHandling.FaultOnFailure.class);
+     
         
+//        @date 17/09/2012
+//        @author George Athanasopoulos (gathaans-at-di.uoa.gr)
+//        Envision related extensions 
+        _mappings.put(EnvisionExtensionQNames.ENVISION_OUTCOME_QNAME, EnvOutcome.class);
+        _mappings.put(EnvisionExtensionQNames.ENVISION_MULTIPOLY_QNAME, EnvMPolygon.class);
+        _mappings.put(EnvisionExtensionQNames.ENVISION_POLY_QNAME, EnvPolygon.class);
+        _mappings.put(EnvisionExtensionQNames.ENVISION_TIMEINTERVAL_QNAME, EnvTimeInterval.class);
+        _mappings.put(EnvisionExtensionQNames.ENVISION_NODE_QNAME, EnvNode.class);
+        _mappings.put(EnvisionExtensionQNames.ENVISION_POINT_QNAME, EnvPoint.class);
     }
 
     public static BpelObjectFactory getInstance() {
