@@ -9,7 +9,8 @@ Lab site: http://s3lab.di.uoa.gr, Project site: http://www.envision-project.eu
 <xs:schema version="1.0"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
            xmlns:sawsdl="http://www.w3.org/ns/sawsdl"
-           elementFormDefault="qualified" targetNamespace="http://purl.org/nkua/s3lab/ode/1.3.5/envision" xmlns:tns="http://purl.org/nkua/s3lab/ode/1.3.5/envision">
+           targetNamespace="http://purl.org/nkua/s3lab/ode/1.3.5/envision" 
+           xmlns:tns="http://purl.org/nkua/s3lab/ode/1.3.5/envision">
     
     <xs:import namespace="http://www.w3.org/ns/sawsdl" schemaLocation="http://www.w3.org/ns/sawsdl"/>
     
@@ -37,22 +38,22 @@ Lab site: http://s3lab.di.uoa.gr, Project site: http://www.envision-project.eu
             <xs:element name="endTime" type="xs:dateTime"></xs:element>
         </xs:sequence>
     </xs:complexType>
+    
+    <xs:complexType name="multiPolygonT">
+        <xs:sequence>
+            <xs:element name="Polygon" type="polygonT" maxOccurs="unbounded"></xs:element>
+        </xs:sequence>
+    </xs:complexType>
 
     <xs:complexType name="polygonT">
         <xs:sequence>
             <xs:element name="node" maxOccurs="unbounded">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element name="point" type="xs:float" maxOccurs="2"></xs:element>
+                        <xs:element name="point" type="xs:float" maxOccurs="2"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-        </xs:sequence>
-    </xs:complexType>
-    
-    <xs:complexType name="multiPolygonT">
-        <xs:sequence>
-            <xs:element name="Polygon" type="polygonT" maxOccurs="unbounded"></xs:element>
         </xs:sequence>
     </xs:complexType>
     
