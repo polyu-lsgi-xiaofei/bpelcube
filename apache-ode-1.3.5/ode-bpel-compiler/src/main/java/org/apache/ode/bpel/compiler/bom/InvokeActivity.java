@@ -18,6 +18,8 @@
  */
 package org.apache.ode.bpel.compiler.bom;
 
+import java.net.URI;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -29,7 +31,13 @@ import org.w3c.dom.Element;
  * BOM representation of a BPEL <code>&lt;invoke&gt;</code> activity.
  */
 public class InvokeActivity extends ScopeLikeActivity implements Communication {
-
+    
+    /** @since 17-09-2012, 
+     * @author George Athanasopoulos
+     * This private memeber is used for holding the specified meta-information used for DDA-SoP
+     */
+    private EnvOutcome _envisionExtensions;
+    
     /** Mix-In for handling the {@link Communication} interface methods. */
     private CommunicationHelper _commHelper;
     
@@ -43,8 +51,27 @@ public class InvokeActivity extends ScopeLikeActivity implements Communication {
         
         // One of the few times where multiple inheritence would come in handy.
         _commHelper = new CommunicationHelper(el);
+        
+//        @author George Athanasopoulos
+        Element outcomeElement = this.getExtensibilityElement(EnvisionExtensionQNames.ENVISION_OUTCOME_QNAME);
+        _envisionExtensions = new EnvOutcome(outcomeElement);
     }
 
+    public Collection<URI> getMetamodelReference(){
+        return _envisionExtensions.getModelReference();
+    }
+    public URI getLiftingScheme(){
+        return _envisionExtensions.getLiftingScheme();
+    }
+    public URI getLoweringScheme(){
+        return _envisionExtensions.getLoweringScheme();
+    }
+    public Collection<EnvMPolygon> getMultiPolygons(){
+        return _envisionExtensions.getMultiPolygons();
+    }
+    public Collection<EnvTimeInterval> getTimeIntervals(){
+        return _envisionExtensions.getTimeIntervals();
+    }
     /**
      * Get the input variable.
      * 
