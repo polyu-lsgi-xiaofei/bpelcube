@@ -16,7 +16,7 @@ package org.apache.ode.bpel.pmapi;
 public interface CommunicationType extends org.apache.xmlbeans.XmlObject
 {
     public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-        org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(CommunicationType.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("communicationtype4dcftype");
+        org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(CommunicationType.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s9B789CAC40C7D90F10BED321578EF822").resolveHandle("communicationtype4dcftype");
     
     /**
      * Gets the "processType" element
@@ -168,7 +168,7 @@ public interface CommunicationType extends org.apache.xmlbeans.XmlObject
     public interface ServiceConfig extends org.apache.xmlbeans.XmlObject
     {
         public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-            org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(ServiceConfig.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("serviceconfig2052elemtype");
+            org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(ServiceConfig.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s9B789CAC40C7D90F10BED321578EF822").resolveHandle("serviceconfig2052elemtype");
         
         /**
          * Gets the "service" element
@@ -230,7 +230,7 @@ public interface CommunicationType extends org.apache.xmlbeans.XmlObject
     public interface Exchange extends org.apache.xmlbeans.XmlObject
     {
         public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-            org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(Exchange.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("exchange094eelemtype");
+            org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(Exchange.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s9B789CAC40C7D90F10BED321578EF822").resolveHandle("exchange094eelemtype");
         
         /**
          * Gets the "type" element

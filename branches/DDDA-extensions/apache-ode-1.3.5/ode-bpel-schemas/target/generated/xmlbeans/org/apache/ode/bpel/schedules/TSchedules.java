@@ -16,7 +16,7 @@ package org.apache.ode.bpel.schedules;
 public interface TSchedules extends org.apache.xmlbeans.XmlObject
 {
     public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-        org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(TSchedules.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("tschedules1a0dtype");
+        org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(TSchedules.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s9B789CAC40C7D90F10BED321578EF822").resolveHandle("tschedules1a0dtype");
     
     /**
      * Gets a List of "schedule" elements

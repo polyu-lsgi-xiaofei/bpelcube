@@ -20,7 +20,7 @@
         </xs:documentation>
     </xs:annotation>
     
-    <xs:complexType name="activityOutcomeExtensionT">
+    <xs:complexType name="outcomeExtensionT">
         <xs:sequence>
             <xs:element name="TimeInterval" type="tns:timeIntervalT" nillable="true" maxOccurs="unbounded" minOccurs="0"></xs:element>
             <xs:element name="MultiPolygon" type="tns:multiPolygonT" minOccurs="0" nillable="true" maxOccurs="unbounded"></xs:element>
@@ -55,5 +55,20 @@
         </xs:sequence>
     </xs:complexType>
     
-    <xs:element name="OutcomeExtensions" type="tns:activityOutcomeExtensionT"></xs:element>
+    <xs:complexType name="queryT">
+        <xs:complexContent>
+            <xs:extension base="tns:outcomeExtensionT">
+                <xs:attribute name="variable" type="xs:string"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+   
+    <xs:element name="OutcomeExtensions" type="tns:outcomeExtensionT"></xs:element>
+    <xs:element name="OutcomeQueries">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="Query" type="tns:queryT" maxOccurs="unbounded"></xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
 </xs:schema>

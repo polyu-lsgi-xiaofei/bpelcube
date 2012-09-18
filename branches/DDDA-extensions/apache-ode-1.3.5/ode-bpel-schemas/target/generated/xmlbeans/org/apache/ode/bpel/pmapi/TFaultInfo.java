@@ -16,7 +16,7 @@ package org.apache.ode.bpel.pmapi;
 public interface TFaultInfo extends org.apache.xmlbeans.XmlObject
 {
     public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-        org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(TFaultInfo.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("tfaultinfo448dtype");
+        org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(TFaultInfo.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s9B789CAC40C7D90F10BED321578EF822").resolveHandle("tfaultinfo448dtype");
     
     /**
      * Gets the "name" element
@@ -131,7 +131,7 @@ public interface TFaultInfo extends org.apache.xmlbeans.XmlObject
     public interface Data extends org.apache.xmlbeans.XmlObject
     {
         public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-            org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(Data.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("datae787elemtype");
+            org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(Data.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s9B789CAC40C7D90F10BED321578EF822").resolveHandle("datae787elemtype");
         
         /**
          * A factory class with static methods for creating instances

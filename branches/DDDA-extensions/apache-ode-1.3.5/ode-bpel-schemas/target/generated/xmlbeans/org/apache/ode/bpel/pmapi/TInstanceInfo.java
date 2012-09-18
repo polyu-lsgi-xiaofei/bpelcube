@@ -16,7 +16,7 @@ package org.apache.ode.bpel.pmapi;
 public interface TInstanceInfo extends org.apache.xmlbeans.XmlObject
 {
     public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-        org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(TInstanceInfo.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("tinstanceinfo42f6type");
+        org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(TInstanceInfo.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s9B789CAC40C7D90F10BED321578EF822").resolveHandle("tinstanceinfo42f6type");
     
     /**
      * Gets the "iid" element
@@ -301,7 +301,7 @@ public interface TInstanceInfo extends org.apache.xmlbeans.XmlObject
     public interface CorrelationProperties extends org.apache.xmlbeans.XmlObject
     {
         public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-            org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(CorrelationProperties.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("correlationproperties6170elemtype");
+            org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(CorrelationProperties.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s9B789CAC40C7D90F10BED321578EF822").resolveHandle("correlationproperties6170elemtype");
         
         /**
          * Gets a List of "correlation-property" elements
@@ -374,7 +374,7 @@ public interface TInstanceInfo extends org.apache.xmlbeans.XmlObject
     public interface EventInfo extends org.apache.xmlbeans.XmlObject
     {
         public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-            org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(EventInfo.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("eventinfo7653elemtype");
+            org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(EventInfo.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s9B789CAC40C7D90F10BED321578EF822").resolveHandle("eventinfo7653elemtype");
         
         /**
          * Gets the "count" element

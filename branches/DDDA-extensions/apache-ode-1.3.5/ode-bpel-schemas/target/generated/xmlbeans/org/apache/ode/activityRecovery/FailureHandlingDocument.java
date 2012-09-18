@@ -17,7 +17,7 @@ package org.apache.ode.activityRecovery;
 public interface FailureHandlingDocument extends org.apache.xmlbeans.XmlObject
 {
     public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-        org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(FailureHandlingDocument.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("failurehandlingc4a9doctype");
+        org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(FailureHandlingDocument.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s9B789CAC40C7D90F10BED321578EF822").resolveHandle("failurehandlingc4a9doctype");
     
     /**
      * Gets the "failureHandling" element
@@ -42,7 +42,7 @@ public interface FailureHandlingDocument extends org.apache.xmlbeans.XmlObject
     public interface FailureHandling extends org.apache.xmlbeans.XmlObject
     {
         public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-            org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(FailureHandling.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("failurehandlingb00eelemtype");
+            org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(FailureHandling.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s9B789CAC40C7D90F10BED321578EF822").resolveHandle("failurehandlingb00eelemtype");
         
         /**
          * Gets the "retryFor" element

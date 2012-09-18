@@ -18,9 +18,12 @@
  */
 package org.apache.ode.bpel.o;
 
+import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -29,6 +32,20 @@ import java.util.List;
  */
 public class OSwitch extends OActivity {
     static final long serialVersionUID = -1L  ;
+
+    /**@since 18-09-2012
+     * @author George Athanasopoulos
+     * Extensions catering for DDA-SoP information
+     */
+    public boolean adaptationSwitch = false;
+    /**Each element should be associated to a single variable. if/switch statement may use several variables thus multiple queries to 
+     * the SCS Engine may be required to support the retrieval of information and writing to process instance variables.
+     */
+    public Map<String, Collection<URI>> _varMetamodelReferences;
+    public Map<String, URI> _varLiftingScheme;
+    public Map<String,URI> _varLoweringScheme;
+    public Map<String, Collection<String>> _varTimeIntervals;
+    public Map<String, Collection<String>> _varMPolygons;
 
     /**
      * The cases declared within the <code>&lt;switch&gt;</code> actvity.
