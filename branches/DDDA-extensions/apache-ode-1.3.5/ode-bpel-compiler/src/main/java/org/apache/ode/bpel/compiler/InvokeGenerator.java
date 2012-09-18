@@ -53,7 +53,7 @@ class InvokeGenerator extends DefaultActivityGenerator {
     public void compile(OActivity output, Activity srcx) {
         InvokeActivity src = (InvokeActivity) srcx;
         final OInvoke oinvoke = (OInvoke) output;
-
+            
         oinvoke.partnerLink = _context.resolvePartnerLink(src.getPartnerLink());
         oinvoke.operation = _context.resolvePartnerRoleOperation(oinvoke.partnerLink, src.getOperation());
         assert oinvoke.operation.getInput() != null; // ensured by

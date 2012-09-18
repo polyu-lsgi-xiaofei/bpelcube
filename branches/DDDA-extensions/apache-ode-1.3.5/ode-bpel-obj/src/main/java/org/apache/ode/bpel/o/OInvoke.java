@@ -21,7 +21,9 @@ package org.apache.ode.bpel.o;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.lang.reflect.Field;
+import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.wsdl.Operation;
@@ -39,6 +41,10 @@ public class OInvoke extends OActivity {
     public OScope.Variable outputVar;
     public Operation operation;
 
+    public Collection<URI> metamodelReferences;
+    public URI liftingScheme;
+    public URI loweringScheme;
+    
     /** Correlation sets initialized on the input message. */
     public final List<OScope.CorrelationSet> initCorrelationsInput = new ArrayList<OScope.CorrelationSet>();
 
