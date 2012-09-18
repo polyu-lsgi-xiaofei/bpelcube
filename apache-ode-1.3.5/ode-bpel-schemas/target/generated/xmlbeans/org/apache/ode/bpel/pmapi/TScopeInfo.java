@@ -16,7 +16,7 @@ package org.apache.ode.bpel.pmapi;
 public interface TScopeInfo extends org.apache.xmlbeans.XmlObject
 {
     public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-        org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(TScopeInfo.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s11093E0331F2B92EDBB3B653C769F555").resolveHandle("tscopeinfoef3ftype");
+        org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(TScopeInfo.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("tscopeinfoef3ftype");
     
     /**
      * Gets the "siid" element
@@ -226,7 +226,7 @@ public interface TScopeInfo extends org.apache.xmlbeans.XmlObject
     public interface Children extends org.apache.xmlbeans.XmlObject
     {
         public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-            org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(Children.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s11093E0331F2B92EDBB3B653C769F555").resolveHandle("children3944elemtype");
+            org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(Children.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("children3944elemtype");
         
         /**
          * Gets a List of "child-ref" elements
@@ -299,7 +299,7 @@ public interface TScopeInfo extends org.apache.xmlbeans.XmlObject
     public interface Activities extends org.apache.xmlbeans.XmlObject
     {
         public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-            org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(Activities.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s11093E0331F2B92EDBB3B653C769F555").resolveHandle("activitiesdb96elemtype");
+            org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(Activities.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("activitiesdb96elemtype");
         
         /**
          * Gets a List of "activity-info" elements
@@ -372,7 +372,7 @@ public interface TScopeInfo extends org.apache.xmlbeans.XmlObject
     public interface Variables extends org.apache.xmlbeans.XmlObject
     {
         public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-            org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(Variables.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s11093E0331F2B92EDBB3B653C769F555").resolveHandle("variablesdefcelemtype");
+            org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(Variables.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("variablesdefcelemtype");
         
         /**
          * Gets a List of "variable-ref" elements
@@ -445,7 +445,7 @@ public interface TScopeInfo extends org.apache.xmlbeans.XmlObject
     public interface CorrelationSets extends org.apache.xmlbeans.XmlObject
     {
         public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-            org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(CorrelationSets.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s11093E0331F2B92EDBB3B653C769F555").resolveHandle("correlationsets2de7elemtype");
+            org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(CorrelationSets.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("correlationsets2de7elemtype");
         
         /**
          * Gets a List of "correlation-set" elements
@@ -501,7 +501,7 @@ public interface TScopeInfo extends org.apache.xmlbeans.XmlObject
         public interface CorrelationSet extends org.apache.xmlbeans.XmlObject
         {
             public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-                org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(CorrelationSet.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s11093E0331F2B92EDBB3B653C769F555").resolveHandle("correlationset252aelemtype");
+                org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(CorrelationSet.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("correlationset252aelemtype");
             
             /**
              * Gets a List of "correlation-property" elements

@@ -16,7 +16,7 @@ package org.apache.ode.bpel.pmapi;
 public interface TInstanceSummary extends org.apache.xmlbeans.XmlObject
 {
     public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-        org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(TInstanceSummary.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s11093E0331F2B92EDBB3B653C769F555").resolveHandle("tinstancesummary6deetype");
+        org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(TInstanceSummary.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("tinstancesummary6deetype");
     
     /**
      * Gets a List of "instances" elements
@@ -97,7 +97,7 @@ public interface TInstanceSummary extends org.apache.xmlbeans.XmlObject
     public interface Instances extends org.apache.xmlbeans.XmlObject
     {
         public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-            org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(Instances.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s11093E0331F2B92EDBB3B653C769F555").resolveHandle("instances9f44elemtype");
+            org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(Instances.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("instances9f44elemtype");
         
         /**
          * Gets the "state" attribute

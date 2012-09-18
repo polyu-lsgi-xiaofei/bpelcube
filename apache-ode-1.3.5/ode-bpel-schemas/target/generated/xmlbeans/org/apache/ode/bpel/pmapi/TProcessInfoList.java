@@ -16,7 +16,7 @@ package org.apache.ode.bpel.pmapi;
 public interface TProcessInfoList extends org.apache.xmlbeans.XmlObject
 {
     public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-        org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(TProcessInfoList.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s11093E0331F2B92EDBB3B653C769F555").resolveHandle("tprocessinfolist0c18type");
+        org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(TProcessInfoList.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("tprocessinfolist0c18type");
     
     /**
      * Gets a List of "process-info" elements
