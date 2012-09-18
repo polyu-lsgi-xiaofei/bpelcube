@@ -16,7 +16,7 @@ package org.apache.ode.bpel.pmapi;
 public interface TEndpointReferences extends org.apache.xmlbeans.XmlObject
 {
     public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-        org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(TEndpointReferences.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s11093E0331F2B92EDBB3B653C769F555").resolveHandle("tendpointreferencese750type");
+        org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(TEndpointReferences.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("tendpointreferencese750type");
     
     /**
      * Gets a List of "endpoint-ref" elements
@@ -72,7 +72,7 @@ public interface TEndpointReferences extends org.apache.xmlbeans.XmlObject
     public interface EndpointRef extends org.apache.xmlbeans.XmlObject
     {
         public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-            org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(EndpointRef.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s11093E0331F2B92EDBB3B653C769F555").resolveHandle("endpointref2547elemtype");
+            org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(EndpointRef.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("endpointref2547elemtype");
         
         /**
          * Gets the "partner-link" attribute

@@ -16,7 +16,7 @@ package org.apache.ode.bpel.dd;
 public interface TProcessEvents extends org.apache.ode.bpel.dd.TEnableEventList
 {
     public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-        org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(TProcessEvents.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s11093E0331F2B92EDBB3B653C769F555").resolveHandle("tprocessevents869ftype");
+        org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(TProcessEvents.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("tprocessevents869ftype");
     
     /**
      * Gets a List of "scope-events" elements
@@ -102,7 +102,7 @@ public interface TProcessEvents extends org.apache.ode.bpel.dd.TEnableEventList
     public interface Generate extends org.apache.xmlbeans.XmlString
     {
         public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-            org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(Generate.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s11093E0331F2B92EDBB3B653C769F555").resolveHandle("generate0174attrtype");
+            org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(Generate.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("generate0174attrtype");
         
         org.apache.xmlbeans.StringEnumAbstractBase enumValue();
         void set(org.apache.xmlbeans.StringEnumAbstractBase e);

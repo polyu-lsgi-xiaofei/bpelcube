@@ -16,7 +16,7 @@ package org.apache.ode.bpel.pmapi;
 public interface TFailureInfo extends org.apache.xmlbeans.XmlObject
 {
     public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-        org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(TFailureInfo.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s11093E0331F2B92EDBB3B653C769F555").resolveHandle("tfailureinfo7cb5type");
+        org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(TFailureInfo.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("tfailureinfo7cb5type");
     
     /**
      * Gets the "dt-failure" element

@@ -16,7 +16,7 @@ package org.apache.ode.bpel.dd;
 public interface TDeployment extends org.apache.xmlbeans.XmlObject
 {
     public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-        org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(TDeployment.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s11093E0331F2B92EDBB3B653C769F555").resolveHandle("tdeploymentb82ctype");
+        org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(TDeployment.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("tdeploymentb82ctype");
     
     /**
      * Gets a List of "process" elements
@@ -72,7 +72,7 @@ public interface TDeployment extends org.apache.xmlbeans.XmlObject
     public interface Process extends org.apache.xmlbeans.XmlObject
     {
         public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-            org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(Process.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s11093E0331F2B92EDBB3B653C769F555").resolveHandle("processb871elemtype");
+            org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(Process.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("processb871elemtype");
         
         /**
          * Gets the "active" element
@@ -562,7 +562,7 @@ public interface TDeployment extends org.apache.xmlbeans.XmlObject
         public interface Property extends org.apache.xmlbeans.XmlObject
         {
             public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-                org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(Property.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s11093E0331F2B92EDBB3B653C769F555").resolveHandle("property50a0elemtype");
+                org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(Property.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("property50a0elemtype");
             
             /**
              * Gets the "name" attribute
@@ -609,7 +609,7 @@ public interface TDeployment extends org.apache.xmlbeans.XmlObject
         public interface MexInterceptors extends org.apache.xmlbeans.XmlObject
         {
             public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-                org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(MexInterceptors.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s11093E0331F2B92EDBB3B653C769F555").resolveHandle("mexinterceptors2c7aelemtype");
+                org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(MexInterceptors.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("mexinterceptors2c7aelemtype");
             
             /**
              * Gets a List of "mex-interceptor" elements

@@ -16,7 +16,7 @@ package org.apache.ode.bpel.dd;
 public interface TMexInterceptor extends org.apache.xmlbeans.XmlObject
 {
     public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-        org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(TMexInterceptor.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s11093E0331F2B92EDBB3B653C769F555").resolveHandle("tmexinterceptor604ctype");
+        org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(TMexInterceptor.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("tmexinterceptor604ctype");
     
     /**
      * Gets the "class-name" element

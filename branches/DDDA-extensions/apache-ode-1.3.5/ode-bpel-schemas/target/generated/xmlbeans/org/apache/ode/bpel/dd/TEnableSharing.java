@@ -16,7 +16,7 @@ package org.apache.ode.bpel.dd;
 public interface TEnableSharing extends org.apache.xmlbeans.XmlObject
 {
     public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-        org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(TEnableSharing.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s11093E0331F2B92EDBB3B653C769F555").resolveHandle("tenablesharing8ccetype");
+        org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(TEnableSharing.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("tenablesharing8ccetype");
     
     /**
      * A factory class with static methods for creating instances
