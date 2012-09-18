@@ -16,5 +16,27 @@ public class EnvTimeInterval extends BpelObject{
         super(el);
     }
     
+    public String serialize(){
+        String interval=this.getEndTime()+" "+this.getStartTime();
+        return interval;
+    }
     
+    //////////
+    //  Private assistive methods
+    
+    private String getStartTime(){
+        Element extensibilityElement = this.getExtensibilityElement(EnvisionExtensionQNames.ENVISION_STARTTIME_QNAME);
+        if(extensibilityElement!=null)
+            return extensibilityElement.getNodeValue();
+        
+        return null;
+    }
+    
+    private String getEndTime(){
+        Element extensibilityElement = this.getExtensibilityElement(EnvisionExtensionQNames.ENVISION_ENDTIME_QNAME);
+        if(extensibilityElement!=null)
+            return extensibilityElement.getNodeValue();
+        
+        return null;
+    }
 }

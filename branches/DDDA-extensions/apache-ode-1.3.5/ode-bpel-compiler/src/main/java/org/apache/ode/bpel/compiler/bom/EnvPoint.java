@@ -11,7 +11,8 @@ import org.w3c.dom.Element;
  * @author gathanas
  */
 public class EnvPoint extends BpelObject {
-
+    public static final String POINT_DELIMITER=" ";
+    
     public EnvPoint(Element el) {
         super(el);
     }

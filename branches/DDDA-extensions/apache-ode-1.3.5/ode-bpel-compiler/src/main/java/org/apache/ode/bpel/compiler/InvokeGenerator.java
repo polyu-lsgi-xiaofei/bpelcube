@@ -37,6 +37,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.apache.ode.bpel.compiler.bom.EnvMPolygon;
+import org.apache.ode.bpel.compiler.bom.EnvTimeInterval;
 
 /**
  * Generates code for <code>&lt;invoke&gt;</code> activities.
@@ -56,6 +58,29 @@ class InvokeGenerator extends DefaultActivityGenerator {
             
         oinvoke.partnerLink = _context.resolvePartnerLink(src.getPartnerLink());
         oinvoke.operation = _context.resolvePartnerRoleOperation(oinvoke.partnerLink, src.getOperation());
+        
+        /**
+         * @since 18-09-2012
+         * @author George Athanasopoulos transferring envision outcome related information to OInvoke activity
+         */
+        {
+            oinvoke._metamodelReferences = src.getMetamodelReference();
+            oinvoke._liftingScheme = src.getLiftingScheme();
+            oinvoke._loweringScheme = src.getLoweringScheme();
+//         setting mutli-polygons
+            for (EnvMPolygon mPoly : src.getMultiPolygons()) {
+                if (oinvoke._mPolygons == null)
+                    oinvoke._mPolygons = new ArrayList();
+                oinvoke._mPolygons.add(mPoly.serialize());
+            }
+//       setting time intervals
+            for (EnvTimeInterval tInterval : src.getTimeIntervals()) {
+                if (oinvoke._timeIntervals == null)
+                    oinvoke._timeIntervals = new ArrayList();
+                oinvoke._timeIntervals.add(tInterval.serialize());
+            }
+        }// end of Envision extensions
+            
         assert oinvoke.operation.getInput() != null; // ensured by
         // resolvePartnerRoleOperation
         assert oinvoke.operation.getInput().getMessage() != null; // ensured

@@ -31,7 +31,7 @@ import javax.wsdl.Operation;
 import org.apache.ode.bpel.o.OScope.CorrelationSet;
 
 /**
- * Compiled rerpresentation of the BPEL <code>&lt;invoke&gt;</code> activity.
+ * Compiled representation of the BPEL <code>&lt;invoke&gt;</code> activity.
  */
 public class OInvoke extends OActivity {
   
@@ -41,9 +41,15 @@ public class OInvoke extends OActivity {
     public OScope.Variable outputVar;
     public Operation operation;
 
-    public Collection<URI> metamodelReferences;
-    public URI liftingScheme;
-    public URI loweringScheme;
+    /**@since 18-09-2012
+     * @author George Athanasopoulos
+     * Extensions catering for DDA-SoP required information
+     */
+    public Collection<URI> _metamodelReferences;
+    public URI _liftingScheme;
+    public URI _loweringScheme;
+    public Collection<String> _timeIntervals;
+    public Collection<String> _mPolygons;
     
     /** Correlation sets initialized on the input message. */
     public final List<OScope.CorrelationSet> initCorrelationsInput = new ArrayList<OScope.CorrelationSet>();
