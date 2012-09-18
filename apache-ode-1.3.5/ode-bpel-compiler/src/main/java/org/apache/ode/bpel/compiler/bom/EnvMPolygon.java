@@ -21,4 +21,14 @@ public class EnvMPolygon extends BpelObject{
         return getChildren(EnvPolygon.class);
     }
     
+    public String serialize(){
+        String mPolygon="";
+        for(EnvPolygon polygon:getPolygons())
+            mPolygon+=polygon.serialize()+EnvPolygon.POLYGON_DELIMITER;
+//        remove trailing delimiter
+        mPolygon= mPolygon.substring(0, mPolygon.lastIndexOf(EnvPolygon.POLYGON_DELIMITER));
+
+        mPolygon="'MULTIPOLYGON"+(mPolygon.isEmpty()?" EMPTY'":"("+mPolygon+")'");
+        return mPolygon;
+    }
 }

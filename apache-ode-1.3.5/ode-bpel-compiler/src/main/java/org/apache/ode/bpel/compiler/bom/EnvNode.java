@@ -12,7 +12,8 @@ import org.w3c.dom.Element;
  * @author gathanas
  */
 public class EnvNode extends BpelObject {
-
+    public static final String NODE_DELIMITER=",";
+    
     public EnvNode(Element el) {
         super(el);
     }
@@ -26,12 +27,12 @@ public class EnvNode extends BpelObject {
         
         return nodeArray;
     }
-    public String getPointsConcated(){
+    public String serialize(){
         
         List<EnvPoint> children = this.getChildren(EnvPoint.class);
         String nodeArray = "";
         for(EnvPoint point:children)
-            nodeArray+=point.serialize()+" ";
+            nodeArray+=point.serialize()+EnvPoint.POINT_DELIMITER;
         
         return nodeArray.trim();
     }

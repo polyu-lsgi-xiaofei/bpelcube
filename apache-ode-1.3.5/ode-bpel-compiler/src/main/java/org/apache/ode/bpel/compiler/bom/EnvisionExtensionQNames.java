@@ -18,6 +18,8 @@ public final class EnvisionExtensionQNames {
     
     public static final QName ENVISION_OUTCOME_QNAME = new QName(ENVISION_EXTENSIONS_NAMESPACE, "OutcomeExtensions");
     public static final QName ENVISION_TIMEINTERVAL_QNAME = new QName(ENVISION_EXTENSIONS_NAMESPACE, "TimeInterval");
+    public static final QName ENVISION_STARTTIME_QNAME = new QName(ENVISION_EXTENSIONS_NAMESPACE, "startTime");
+    public static final QName ENVISION_ENDTIME_QNAME = new QName(ENVISION_EXTENSIONS_NAMESPACE, "endTime");
     public static final QName ENVISION_MULTIPOLY_QNAME = new QName(ENVISION_EXTENSIONS_NAMESPACE, "MultiPolygon");
     public static final QName ENVISION_POLY_QNAME = new QName(ENVISION_EXTENSIONS_NAMESPACE, "Polygon");
     public static final QName ENVISION_NODE_QNAME = new QName(ENVISION_EXTENSIONS_NAMESPACE, "node");
