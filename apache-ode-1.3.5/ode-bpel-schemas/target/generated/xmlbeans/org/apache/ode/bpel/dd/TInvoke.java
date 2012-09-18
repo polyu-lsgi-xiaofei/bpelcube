@@ -16,7 +16,7 @@ package org.apache.ode.bpel.dd;
 public interface TInvoke extends org.apache.xmlbeans.XmlObject
 {
     public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-        org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(TInvoke.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("tinvoke47d9type");
+        org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(TInvoke.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s9B789CAC40C7D90F10BED321578EF822").resolveHandle("tinvoke47d9type");
     
     /**
      * Gets the "service" element
@@ -141,7 +141,7 @@ public interface TInvoke extends org.apache.xmlbeans.XmlObject
     public interface Binding extends org.apache.xmlbeans.XmlObject
     {
         public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-            org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(Binding.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("bindingc1c8elemtype");
+            org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(Binding.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s9B789CAC40C7D90F10BED321578EF822").resolveHandle("bindingc1c8elemtype");
         
         /**
          * Gets the "name" attribute

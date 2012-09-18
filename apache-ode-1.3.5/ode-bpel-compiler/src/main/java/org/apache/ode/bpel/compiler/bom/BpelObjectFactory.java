@@ -260,6 +260,8 @@ public class BpelObjectFactory {
 //        @date 17/09/2012
 //        @author George Athanasopoulos (gathaans-at-di.uoa.gr)
 //        Envision related extensions 
+        _mappings.put(EnvisionExtensionQNames.ENVISION_OUTCOME_QNAME, EnvOutcomeQueries.class);
+        _mappings.put(EnvisionExtensionQNames.ENVISION_OUTCOME_QNAME, EnvOutcomeQuery.class);
         _mappings.put(EnvisionExtensionQNames.ENVISION_OUTCOME_QNAME, EnvOutcome.class);
         _mappings.put(EnvisionExtensionQNames.ENVISION_MULTIPOLY_QNAME, EnvMPolygon.class);
         _mappings.put(EnvisionExtensionQNames.ENVISION_POLY_QNAME, EnvPolygon.class);

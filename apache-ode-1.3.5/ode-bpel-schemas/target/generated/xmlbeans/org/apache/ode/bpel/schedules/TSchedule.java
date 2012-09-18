@@ -16,7 +16,7 @@ package org.apache.ode.bpel.schedules;
 public interface TSchedule extends org.apache.xmlbeans.XmlObject
 {
     public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-        org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(TSchedule.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("tschedule449etype");
+        org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(TSchedule.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s9B789CAC40C7D90F10BED321578EF822").resolveHandle("tschedule449etype");
     
     /**
      * Gets a List of "cleanup" elements

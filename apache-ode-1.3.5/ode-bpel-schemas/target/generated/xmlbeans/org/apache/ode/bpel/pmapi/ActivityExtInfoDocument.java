@@ -17,7 +17,7 @@ package org.apache.ode.bpel.pmapi;
 public interface ActivityExtInfoDocument extends org.apache.xmlbeans.XmlObject
 {
     public static final org.apache.xmlbeans.SchemaType type = (org.apache.xmlbeans.SchemaType)
-        org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(ActivityExtInfoDocument.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s02839AC7654EA15CE105967CDCFDC4A1").resolveHandle("activityextinfod587doctype");
+        org.apache.xmlbeans.XmlBeans.typeSystemForClassLoader(ActivityExtInfoDocument.class.getClassLoader(), "schemaorg_apache_xmlbeans.system.s9B789CAC40C7D90F10BED321578EF822").resolveHandle("activityextinfod587doctype");
     
     /**
      * Gets the "activity-ext-info" element

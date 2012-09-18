@@ -16,6 +16,9 @@ public final class EnvisionExtensionQNames {
     
     public static final String ENVISION_EXTENSIONS_NAMESPACE =  "http://purl.org/nkua/s3lab/ode/1.3.5/envision";
     
+    public static final QName ENVISION_OUTCOME_QUERIES_QNAME = new QName(ENVISION_EXTENSIONS_NAMESPACE, "OutcomeQueries");
+    public static final QName ENVISION_OUTCOME_QUERY_QNAME = new QName(ENVISION_EXTENSIONS_NAMESPACE, "Query");
+    public static final QName ENVISION_OUTCOME_QUERY_VARIABLE_QNAME = new QName(ENVISION_EXTENSIONS_NAMESPACE, "variable");
     public static final QName ENVISION_OUTCOME_QNAME = new QName(ENVISION_EXTENSIONS_NAMESPACE, "OutcomeExtensions");
     public static final QName ENVISION_TIMEINTERVAL_QNAME = new QName(ENVISION_EXTENSIONS_NAMESPACE, "TimeInterval");
     public static final QName ENVISION_STARTTIME_QNAME = new QName(ENVISION_EXTENSIONS_NAMESPACE, "startTime");
