@@ -18,26 +18,36 @@
  */
 package org.apache.ode.bpel.compiler.bom;
 
+import java.util.Collection;
 import org.w3c.dom.Element;
 
 import java.util.List;
 
 /**
- * Representation of the BPEL <code>&lt;switch&gt;</code> activity.
+ * Representation of the BPEL
+ * <code>&lt;switch&gt;</code> activity.
  */
 public class IfActivity extends Activity {
+
+    private EnvOutcomeQueries _queries;
+
     public IfActivity(Element el) {
         super(el);
+        _queries = this.getFirstChild(EnvOutcomeQueries.class);
+
     }
-    
+
+    public Collection<EnvOutcomeQuery> getQueries() {
+        return _queries.getEnvQueries();
+    }
+
     public Expression getCondition() {
         return getFirstChild(Expression.class);
     }
-    
+
     /**
-     * Get the activity for this if. BPEL 2.0 draft mandated the inclusion of the
-     * condition success activity in a <then> element. In that case this will be
-     * null. For BPEL 2.0 final this should return the condition success activity.
+     * Get the activity for this if. BPEL 2.0 draft mandated the inclusion of the condition success activity in a <then>
+     * element. In that case this will be null. For BPEL 2.0 final this should return the condition success activity.
      *
      * @return activity enabled when case is satisfied
      */
@@ -47,7 +57,7 @@ public class IfActivity extends Activity {
 
     /**
      * Get the cases for this switch.
-     * 
+     *
      * @return the cases
      */
     public List<Case> getCases() {
@@ -55,7 +65,8 @@ public class IfActivity extends Activity {
     }
 
     /**
-     * BPEL object model representation of a <code>&lt;case&gt;</code>.
+     * BPEL object model representation of a
+     * <code>&lt;case&gt;</code>.
      */
     public static class Case extends BpelObject {
 
@@ -65,7 +76,7 @@ public class IfActivity extends Activity {
 
         /**
          * Get the activity for this case.
-         * 
+         *
          * @return activity enabled when case is satisfied
          */
         public Activity getActivity() {
@@ -74,12 +85,11 @@ public class IfActivity extends Activity {
 
         /**
          * Get the condition associated with this case.
-         * 
+         *
          * @return the condition
          */
         public Expression getCondition() {
             return getFirstChild(Expression.class);
         }
-
     }
 }
