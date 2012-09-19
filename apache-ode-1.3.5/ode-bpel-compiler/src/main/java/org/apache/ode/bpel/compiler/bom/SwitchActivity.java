@@ -18,6 +18,7 @@
  */
 package org.apache.ode.bpel.compiler.bom;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.w3c.dom.Element;
@@ -29,10 +30,18 @@ import org.w3c.dom.Element;
  */
 public class SwitchActivity extends Activity {
 
+    private EnvOutcomeQueries _queries;
+    
     public SwitchActivity(Element el) {
         super(el);
+        
+        _queries = this.getFirstChild(EnvOutcomeQueries.class);
     }
 
+    
+    public Collection<EnvOutcomeQuery> getQueries(){
+        return _queries.getEnvQueries();
+    }
     /**
      * Get the cases for this switch.
      * 
