@@ -1,0 +1,138 @@
+<?xml version="1.0"?>
+<process name="landSlide-gen" targetNamespace="www.brgm.fr/envision/landslide/bpel" 
+xmlns:bpws="http://docs.oasis-open.org/wsbpel/2.0/process/executable" 
+xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+xmlns:ns3="http://www.opengis.net/ows/1.1" 
+xmlns:ns2="http://www.opengis.net/wps/1.0.0" 
+xmlns:ns1="http://www.opengis.net/wfs" 
+xmlns="http://docs.oasis-open.org/wsbpel/2.0/process/executable" 
+xmlns:ddasop="http://purl.org/nkua/s3lab/ode/1.3.5/envision"
+xmlns:sawsdl="http://www.w3.org/ns/sawsdl"
+xmlns:tns="www.brgm.fr/envision/landslide/bpel" 
+xmlns:ns0="http://www.opengis.net/sos/1.0">
+    
+    <import location="landSlide-gen.wsdl" importType="http://schemas.xmlsoap.org/wsdl/" namespace="http://www.brgm.fr/envision/landslide/wsdl"/>
+    <import location="Precipitation.wsdl" importType="http://schemas.xmlsoap.org/wsdl/" namespace="http://www.opengis.net/sos_precipitation.wsdl"/>
+    <import location="ProbabilitiesLSComputation.wsdl" importType="http://schemas.xmlsoap.org/wsdl/" namespace="http://www.opengis.net/wps_ProbabilitiesLSComputation.wsdl"/>
+    <import location="HydrologicalModelling.wsdl" importType="http://schemas.xmlsoap.org/wsdl/" namespace="http://www.opengis.net/wps_HydrologicalModelling.wsdl"/>
+    <!--import location="SRTM3.wsdl" importType="http://schemas.xmlsoap.org/wsdl/" namespace="http://www.opengis.net/wcs_SRTM3.wsdl"/-->
+    <partnerLinks>
+        <partnerLink partnerLinkType="tns:landSlide_PLType" name="landSlide" myRole="landSlideRole" xmlns:tns="http://www.brgm.fr/envision/landslide/wsdl"/>
+        <partnerLink partnerLinkType="tns:Precipitation_PLType" name="Precipitation" partnerRole="PrecipitationRole" xmlns:tns="http://www.brgm.fr/envision/landslide/wsdl"/>
+        <partnerLink partnerLinkType="tns:ProbabilitiesLSComputation_PLType" name="ProbabilitiesLSComputation" partnerRole="ProbabilitiesLSComputationRole" xmlns:tns="http://www.brgm.fr/envision/landslide/wsdl"/>
+        <partnerLink partnerLinkType="tns:HydrologicalModelling_PLType" name="HydrologicalModelling" partnerRole="HydrologicalModellingRole" xmlns:tns="http://www.brgm.fr/envision/landslide/wsdl"/>
+        <!--partnerLink partnerLinkType="tns:Srtm3_PLType" name="Srtm3" partnerRole="Srtm3Role" xmlns:tns="http://www.brgm.fr/envision/landslide/wsdl"/-->
+    </partnerLinks>
+    <variables>
+        <variable name="GetObservationRequest" messageType="tns:GetObservationRequest" xmlns:tns="http://www.opengis.net/sos_precipitation.wsdl"/>
+        <variable name="ExecuteRequest_Prob" messageType="tns:ExecuteRequest" xmlns:tns="http://www.opengis.net/wps_ProbabilitiesLSComputation.wsdl"/>
+        <variable name="ExecuteResponse_Prob" messageType="tns:ExecuteResponse" xmlns:tns="http://www.opengis.net/wps_ProbabilitiesLSComputation.wsdl"/>
+        <variable name="ExecuteResponse_Hydro" messageType="tns:ExecuteResponse" xmlns:tns="http://www.opengis.net/wps_HydrologicalModelling.wsdl"/>
+        <!--variable name="GetCoverageRequest" messageType="tns:GetCoverageRequest" xmlns:tns="http://www.opengis.net/wcs_SRTM3.wsdl"/>
+        <variable name="GetCoverageResponse" messageType="tns:GetCoverageResponse" xmlns:tns="http://www.opengis.net/wcs_SRTM3.wsdl"/-->
+        <variable name="GetObservationResponse" messageType="tns:GetObservationResponse" xmlns:tns="http://www.opengis.net/sos_precipitation.wsdl"/>
+        <variable name="ExecuteRequest_Hydro" messageType="tns:ExecuteRequest" xmlns:tns="http://www.opengis.net/wps_HydrologicalModelling.wsdl"/>
+        <variable name="landslideOutput" messageType="tns:ExecuteResponse" xmlns:tns="http://www.brgm.fr/envision/landslide/wsdl"/>
+        <variable name="landslideInput" messageType="tns:ExecuteRequest" xmlns:tns="http://www.brgm.fr/envision/landslide/wsdl"/>
+    </variables>
+    <sequence>
+        <receive portType="tns:landSlide_Interface" name="Receive" variable="landslideInput" partnerLink="landSlide" operation="Execute" createInstance="yes" xmlns:tns="http://www.brgm.fr/envision/landslide/wsdl"/>
+        <assign name="preparePrecipitationInput">
+            <copy>
+                <from>
+                    <literal>
+                        <GetObservation xmlns="http://www.opengis.net/sos/1.0" version="1.0.0" service="SOS" xmlns:om="http://www.opengis.net/om/1.0" xmlns:ogc="http://www.opengis.net/ogc" xmlns:sos="http://www.opengis.net/sos/1.0" xmlns:gml="http://www.opengis.net/gml" xsi:schemaLocation="http://www.opengis.net/sos/1.0 http://schemas.opengis.net/sos/1.0.0/sosGetObservation.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                            <offering>offering-allSensor</offering>
+                            <eventTime>
+                                <ogc:TM_During xmlns:ogc="http://www.opengis.net/ogc">
+                                    <gml:TimePeriod xmlns:gml="http://www.opengis.net/gml">
+                                        <gml:beginPosition></gml:beginPosition>
+                                        <gml:endPosition></gml:endPosition>
+                                    </gml:TimePeriod>
+                                </ogc:TM_During>
+                            </eventTime>
+                            <observedProperty>depth</observedProperty>
+                            <responseFormat>text/xml; subtype="om/1.0.0"</responseFormat>
+                            <resultModel/>
+                            <responseMode>inline</responseMode>
+                        </GetObservation>
+                    </literal>
+                </from>
+                <to variable="GetObservationRequest" part="request"/>
+            </copy>
+        </assign>
+        <invoke portType="tns:Precipitation_PortType" name="Precipitation" outputVariable="GetObservationResponse" partnerLink="Precipitation" operation="GetObservation" inputVariable="GetObservationRequest" xmlns:tns="http://www.opengis.net/sos_precipitation.wsdl">
+            <ddasop:OutcomeExtensions sawsdl:modelReference="http://purl.org/ifgi/landslide#precipitation"></ddasop:OutcomeExtensions>
+        </invoke>
+        <assign name="prepareHydrologicalInput">
+            <copy>
+                <from>
+                    <literal>
+                        <wps:Execute service="WPS" version="1.0.0" xmlns:wps="http://www.opengis.net/wps/1.0.0" xmlns:ows="http://www.opengis.net/ows/1.1">
+                            <ows:Identifier>HydrologicalModelling</ows:Identifier>
+                            <wps:DataInputs>
+                                <wps:Input>
+                                    <ows:Identifier>CSVData</ows:Identifier>
+                                    <ows:Title>CSVData</ows:Title>
+                                    <wps:Data></wps:Data>
+                                </wps:Input>
+                                <wps:Input>
+                                    <ows:Identifier>ETPH</ows:Identifier>
+                                    <ows:Title>ETPH</ows:Title>
+                                    <wps:Data></wps:Data>
+                                </wps:Input>
+                                <wps:Input>
+                                    <ows:Identifier>THG</ows:Identifier>
+                                    <ows:Title>THG</ows:Title>
+                                    <wps:Data></wps:Data>
+                                </wps:Input>
+                                <wps:Input>
+                                    <ows:Identifier>RUIPER</ows:Identifier>
+                                    <ows:Title>RUIPER</ows:Title>
+                                    <wps:Data></wps:Data>
+                                </wps:Input>
+                                <wps:Input>
+                                    <ows:Identifier>TG1</ows:Identifier>
+                                    <ows:Title>TG1</ows:Title>
+                                    <wps:Data></wps:Data>
+                                </wps:Input>
+                                <wps:Input>
+                                    <ows:Identifier>RFUMAX</ows:Identifier>
+                                    <ows:Title>RFUMAX</ows:Title>
+                                    <wps:Data> </wps:Data>
+                                </wps:Input>
+                            </wps:DataInputs>
+                            <wps:ProcessOutputs>
+                                <wps:Output>
+                                    <wps:LiteralOutput>
+                                        <ows:Identifier>WaterSaturationRatio</ows:Identifier>
+                                    </wps:LiteralOutput>
+                                </wps:Output>
+                            </wps:ProcessOutputs>
+                        </wps:Execute>
+                    </literal>
+                </from>
+                <to variable="ExecuteRequest_Hydro" part="request"/>
+            </copy>
+        </assign>
+        <invoke portType="tns:wpsPortType" name="HydrologicalModelling" outputVariable="ExecuteResponse_Hydro" partnerLink="HydrologicalModelling" operation="Execute" inputVariable="ExecuteRequest_Hydro" xmlns:tns="http://www.opengis.net/wps_HydrologicalModelling.wsdl"/>
+        <!--Manually insert the data transformation here by copy statements, xslt script etc.-->
+        <assign name="prepareProbabInput">
+            <copy>
+                <from>
+                    bpws:doXslTransform("MakeProbabInput.xsl", $landslideInput.request)
+                </from>
+                <to variable="ExecuteRequest_Prob" part="request"/>
+            </copy>
+        </assign>
+        <invoke portType="tns:wpsPortType" name="ProbabilitiesLSComputation" outputVariable="ExecuteResponse_Prob" partnerLink="ProbabilitiesLSComputation" operation="Execute" inputVariable="ExecuteRequest_Prob" xmlns:tns="http://www.opengis.net/wps_ProbabilitiesLSComputation.wsdl"/>
+        <!--Manually insert the data transformation here by copy statements, xslt script etc.-->
+        <assign name="prepareOutput">
+            <copy>
+                <from variable="ExecuteResponse_Prob" part="response"/>
+                <to variable="landslideOutput" part="response"/>
+            </copy>
+        </assign>
+        <reply portType="tns:landSlide_Interface" name="Reply" variable="landslideOutput" partnerLink="landSlide" operation="Execute" xmlns:tns="http://www.brgm.fr/envision/landslide/wsdl"/>
+    </sequence>
+</process>

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+
+
+<csw:GetRecords resultType="results" outputFormat="application/xml" outputSchema="csw:IsoRecord" maxRecords="50" service="CSW" version="2.0.2" xmlns:rim25="urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5" xmlns:cat="http://www.opengis.net/cat/csw" xmlns:ns26="http://www.opengis.net/gml/" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:fra="http://www.cnig.gouv.fr/2005/fra" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:ns22="http://www.opengis.net/ows/1.1" xmlns:ogc="http://www.opengis.net/ogc" xmlns:gfc="http://www.isotc211.org/2005/gfc" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:ins="http://www.inspire.org" xmlns:wrs09="http://www.opengis.net/cat/wrs" xmlns:rim="urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:icism="urn:us:gov:ic:ism:v2" xmlns:wrs="http://www.opengis.net/cat/wrs/1.0" xmlns:dc2="http://www.purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/" xmlns:ows="http://www.opengis.net/ows" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:dct2="http://www.purl.org/dc/terms/" xmlns:gml="http://www.opengis.net/gml" xmlns:sml1="http://www.opengis.net/sensorML/1.0" xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:swe1="http://www.opengis.net/swe/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gmi="http://www.isotc211.org/2005/gmi">
+    <csw:DistributedSearch/>
+    <csw:Query typeNames="gmd:MD_Metadata">
+        <csw:ElementSetName>full</csw:ElementSetName>
+        <csw:Constraint version="1.1.0">
+            <ogc:Filter>
+                <ogc:MatchesGoal>
+                    <ogc:Literal>wsmlVariant _"http://www.wsmo.org/wsml/wsml-syntax/wsml-full"
+
+
+goal _"http://s3lab.di.uoa.gr/WSMOGoal/4139486690095264768"
+       capability _"http://s3lab.di.uoa.gr/WSMOGoal/4139486690095264768#default_capability"
+              precondition _"http://s3lab.di.uoa.gr/WSMOGoal/4139486690095264768#default_precond"
+                     definedBy
+                            ?x memberOf _"http://purl.org/ifgi/landslide#water_saturation". 
+                            
+              effect _"http://s3lab.di.uoa.gr/WSMOGoal/4139486690095264768#default_effect"
+                     definedBy
+                            ?var1 memberOf _"http://giv-wfs.uni-muenster.de/jcr/repository/y2review/WPS10_WpsnetTestServer/HydrologicalModelling.rdf#ExecuteInput_THG"
+                             and ?var2 memberOf _"http://giv-wfs.uni-muenster.de/jcr/repository/y2review/WPS10_WpsnetTestServer/HydrologicalModelling.rdf#ExecuteInput_RFUMAX"
+                             and ?var3 memberOf _"http://giv-wfs.uni-muenster.de/jcr/repository/y2review/WPS10_WpsnetTestServer/HydrologicalModelling.rdf#ExecuteInput_RUIPER"
+                             and ?var4 memberOf _"http://giv-wfs.uni-muenster.de/jcr/repository/y2review/WPS10_WpsnetTestServer/HydrologicalModelling.rdf#ExecuteInput_TG1"
+                             and ?var8[_"http://purl.org/ifgi/posm#hasInput" hasValue {?var1, ?var5, ?var2, ?var6, ?var3, ?var4}, _"http://purl.org/ifgi/posm#hasOutput" hasValue ?var7] memberOf _"http://giv-wfs.uni-muenster.de/jcr/repository/y2review/WPS10_WpsnetTestServer/HydrologicalModelling.rdf#ExecuteOperation"
+                             and ?var5[_"http://swing.uni-muenster.de/core/Swing/annotates" hasValue ?var9] memberOf _"http://giv-wfs.uni-muenster.de/jcr/repository/y2review/WPS10_WpsnetTestServer/HydrologicalModelling.rdf#ExecuteInput_CSVData"
+                             and ?var6[_"http://swing.uni-muenster.de/core/Swing/annotates" hasValue ?var10] memberOf _"http://giv-wfs.uni-muenster.de/jcr/repository/y2review/WPS10_WpsnetTestServer/HydrologicalModelling.rdf#ExecuteInput_ETPH"
+                             and ?var7[_"http://swing.uni-muenster.de/core/Swing/annotates" hasValue ?var11] memberOf _"http://giv-wfs.uni-muenster.de/jcr/repository/y2review/WPS10_WpsnetTestServer/HydrologicalModelling.rdf#ExecuteOutput_WaterSaturationRatio"
+                             and ?var9[_"http://purl.org/ifgi/dul#hasLocation" hasValue ?var12] memberOf _"http://purl.org/ifgi/landslide#precipitation"
+                             and ?var10[_"http://purl.org/ifgi/dul#hasLocation" hasValue ?var12] memberOf _"http://purl.org/ifgi/landslide#evapotranspiration"
+                             and ?var11[_"http://purl.org/ifgi/dul#hasLocation" hasValue ?var12] memberOf _"http://purl.org/ifgi/landslide#water_saturation"
+                             and ?var12[_"http://purl.org/ifgi/dul#hasQuality" hasValue ?var11] memberOf _"http://purl.org/ifgi/geounits#landcover_unit". 
+                             </ogc:Literal>
+                </ogc:MatchesGoal>
+            </ogc:Filter>
+        </csw:Constraint>
+    </csw:Query>
+</csw:GetRecords>
+
+<csw:GetRecords resultType="results" outputFormat="application/xml" outputSchema="csw:IsoRecord" maxRecords="50" service="CSW" version="2.0.2" xmlns:rim25="urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5" xmlns:cat="http://www.opengis.net/cat/csw" xmlns:ns26="http://www.opengis.net/gml/" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:fra="http://www.cnig.gouv.fr/2005/fra" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:ns22="http://www.opengis.net/ows/1.1" xmlns:ogc="http://www.opengis.net/ogc" xmlns:gfc="http://www.isotc211.org/2005/gfc" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:ins="http://www.inspire.org" xmlns:wrs09="http://www.opengis.net/cat/wrs" xmlns:rim="urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:icism="urn:us:gov:ic:ism:v2" xmlns:wrs="http://www.opengis.net/cat/wrs/1.0" xmlns:dc2="http://www.purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/" xmlns:ows="http://www.opengis.net/ows" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:dct2="http://www.purl.org/dc/terms/" xmlns:gml="http://www.opengis.net/gml" xmlns:sml1="http://www.opengis.net/sensorML/1.0" xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:swe1="http://www.opengis.net/swe/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gmi="http://www.isotc211.org/2005/gmi">
+    <csw:DistributedSearch/>
+    <csw:Query typeNames="gmd:MD_Metadata">
+        <csw:ElementSetName>full</csw:ElementSetName>
+        <csw:Constraint version="1.1.0">
+            <ogc:Filter>
+                <ogc:MatchesGoal>
+                    <ogc:Literal>wsmlVariant _"http://www.wsmo.org/wsml/wsml-syntax/wsml-full"
+
+
+goal _"http://s3lab.di.uoa.gr/WSMOGoal/8626936231651985408"
+       capability _"http://s3lab.di.uoa.gr/WSMOGoal/8626936231651985408#default_capability"
+              precondition _"http://s3lab.di.uoa.gr/WSMOGoal/8626936231651985408#default_precond"
+                     definedBy
+                            ?x memberOf _"http://purl.org/ifgi/landslide#landslide_probability". 
+                            
+              effect _"http://s3lab.di.uoa.gr/WSMOGoal/8626936231651985408#default_effect"
+                     definedBy
+                            ?var1 memberOf _"http://giv-wfs.uni-muenster.de/jcr/repository/y2review/WPS10_WpsnetTestServer/HydrologicalModelling.rdf#ExecuteInput_THG"
+                             and ?var2 memberOf _"http://giv-wfs.uni-muenster.de/jcr/repository/y2review/WPS10_WpsnetTestServer/HydrologicalModelling.rdf#ExecuteInput_RFUMAX"
+                             and ?var3 memberOf _"http://giv-wfs.uni-muenster.de/jcr/repository/y2review/WPS10_WpsnetTestServer/HydrologicalModelling.rdf#ExecuteInput_RUIPER"
+                             and ?var4 memberOf _"http://giv-wfs.uni-muenster.de/jcr/repository/y2review/WPS10_WpsnetTestServer/HydrologicalModelling.rdf#ExecuteInput_TG1"
+                             and ?var8[_"http://purl.org/ifgi/posm#hasInput" hasValue {?var1, ?var5, ?var2, ?var6, ?var3, ?var4}, _"http://purl.org/ifgi/posm#hasOutput" hasValue ?var7] memberOf _"http://giv-wfs.uni-muenster.de/jcr/repository/y2review/WPS10_WpsnetTestServer/HydrologicalModelling.rdf#ExecuteOperation"
+                             and ?var5[_"http://swing.uni-muenster.de/core/Swing/annotates" hasValue ?var9] memberOf _"http://giv-wfs.uni-muenster.de/jcr/repository/y2review/WPS10_WpsnetTestServer/HydrologicalModelling.rdf#ExecuteInput_CSVData"
+                             and ?var6[_"http://swing.uni-muenster.de/core/Swing/annotates" hasValue ?var10] memberOf _"http://giv-wfs.uni-muenster.de/jcr/repository/y2review/WPS10_WpsnetTestServer/HydrologicalModelling.rdf#ExecuteInput_ETPH"
+                             and ?var7[_"http://swing.uni-muenster.de/core/Swing/annotates" hasValue ?var11] memberOf _"http://giv-wfs.uni-muenster.de/jcr/repository/y2review/WPS10_WpsnetTestServer/HydrologicalModelling.rdf#ExecuteOutput_WaterSaturationRatio"
+                             and ?var9[_"http://purl.org/ifgi/dul#hasLocation" hasValue ?var12] memberOf _"http://purl.org/ifgi/landslide#precipitation"
+                             and ?var10[_"http://purl.org/ifgi/dul#hasLocation" hasValue ?var12] memberOf _"http://purl.org/ifgi/landslide#evapotranspiration"
+                             and ?var11[_"http://purl.org/ifgi/dul#hasLocation" hasValue ?var12] memberOf _"http://purl.org/ifgi/landslide#water_saturation"
+                             and ?var12[_"http://purl.org/ifgi/dul#hasQuality" hasValue ?var11] memberOf _"http://purl.org/ifgi/geounits#landcover_unit". 
+                             </ogc:Literal>
+                </ogc:MatchesGoal>
+            </ogc:Filter>
+        </csw:Constraint>
+    </csw:Query>
+</csw:GetRecords>
+
+
+<csw:GetRecords resultType="results" outputFormat="application/xml" outputSchema="csw:IsoRecord" maxRecords="50" service="CSW" version="2.0.2" xmlns:rim25="urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5" xmlns:cat="http://www.opengis.net/cat/csw" xmlns:ns26="http://www.opengis.net/gml/" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:fra="http://www.cnig.gouv.fr/2005/fra" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:ns22="http://www.opengis.net/ows/1.1" xmlns:ogc="http://www.opengis.net/ogc" xmlns:gfc="http://www.isotc211.org/2005/gfc" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:ins="http://www.inspire.org" xmlns:wrs09="http://www.opengis.net/cat/wrs" xmlns:rim="urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:icism="urn:us:gov:ic:ism:v2" xmlns:wrs="http://www.opengis.net/cat/wrs/1.0" xmlns:dc2="http://www.purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/" xmlns:ows="http://www.opengis.net/ows" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:dct2="http://www.purl.org/dc/terms/" xmlns:gml="http://www.opengis.net/gml" xmlns:sml1="http://www.opengis.net/sensorML/1.0" xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:swe1="http://www.opengis.net/swe/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gmi="http://www.isotc211.org/2005/gmi">
+    <csw:DistributedSearch/>
+    <csw:Query typeNames="gmd:MD_Metadata">
+        <csw:ElementSetName>full</csw:ElementSetName>
+        <csw:Constraint version="1.1.0">
+            <ogc:Filter>
+                <ogc:MatchesGoal>
+                    <ogc:Literal>wsmlVariant _"http://www.wsmo.org/wsml/wsml-syntax/wsml-full"
+
+
+goal _"http://s3lab.di.uoa.gr/WSMOGoal/4182757853711236096"
+       capability _"http://s3lab.di.uoa.gr/WSMOGoal/4182757853711236096#default_capability"
+              precondition _"http://s3lab.di.uoa.gr/WSMOGoal/4182757853711236096#default_precond"
+                     definedBy
+                            ?x memberOf _"http://purl.org/ifgi/landslide#precipitation". 
+                            
+              effect _"http://s3lab.di.uoa.gr/WSMOGoal/4182757853711236096#default_effect"
+                     definedBy
+                            ?var1 memberOf _"http://giv-wfs.uni-muenster.de/jcr/repository/y2review/WPS10_WpsnetTestServer/HydrologicalModelling.rdf#ExecuteInput_THG"
+                             and ?var2 memberOf _"http://giv-wfs.uni-muenster.de/jcr/repository/y2review/WPS10_WpsnetTestServer/HydrologicalModelling.rdf#ExecuteInput_RFUMAX"
+                             and ?var3 memberOf _"http://giv-wfs.uni-muenster.de/jcr/repository/y2review/WPS10_WpsnetTestServer/HydrologicalModelling.rdf#ExecuteInput_RUIPER"
+                             and ?var4 memberOf _"http://giv-wfs.uni-muenster.de/jcr/repository/y2review/WPS10_WpsnetTestServer/HydrologicalModelling.rdf#ExecuteInput_TG1"
+                             and ?var8[_"http://purl.org/ifgi/posm#hasInput" hasValue {?var1, ?var5, ?var2, ?var6, ?var3, ?var4}, _"http://purl.org/ifgi/posm#hasOutput" hasValue ?var7] memberOf _"http://giv-wfs.uni-muenster.de/jcr/repository/y2review/WPS10_WpsnetTestServer/HydrologicalModelling.rdf#ExecuteOperation"
+                             and ?var5[_"http://swing.uni-muenster.de/core/Swing/annotates" hasValue ?var9] memberOf _"http://giv-wfs.uni-muenster.de/jcr/repository/y2review/WPS10_WpsnetTestServer/HydrologicalModelling.rdf#ExecuteInput_CSVData"
+                             and ?var6[_"http://swing.uni-muenster.de/core/Swing/annotates" hasValue ?var10] memberOf _"http://giv-wfs.uni-muenster.de/jcr/repository/y2review/WPS10_WpsnetTestServer/HydrologicalModelling.rdf#ExecuteInput_ETPH"
+                             and ?var7[_"http://swing.uni-muenster.de/core/Swing/annotates" hasValue ?var11] memberOf _"http://giv-wfs.uni-muenster.de/jcr/repository/y2review/WPS10_WpsnetTestServer/HydrologicalModelling.rdf#ExecuteOutput_WaterSaturationRatio"
+                             and ?var9[_"http://purl.org/ifgi/dul#hasLocation" hasValue ?var12] memberOf _"http://purl.org/ifgi/landslide#precipitation"
+                             and ?var10[_"http://purl.org/ifgi/dul#hasLocation" hasValue ?var12] memberOf _"http://purl.org/ifgi/landslide#evapotranspiration"
+                             and ?var11[_"http://purl.org/ifgi/dul#hasLocation" hasValue ?var12] memberOf _"http://purl.org/ifgi/landslide#water_saturation"
+                             and ?var12[_"http://purl.org/ifgi/dul#hasQuality" hasValue ?var11] memberOf _"http://purl.org/ifgi/geounits#landcover_unit". 
+                             </ogc:Literal>
+                </ogc:MatchesGoal>
+            </ogc:Filter>
+        </csw:Constraint>
+    </csw:Query>
+</csw:GetRecords>

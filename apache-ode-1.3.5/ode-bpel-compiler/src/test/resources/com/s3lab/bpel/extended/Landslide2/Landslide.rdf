@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	xmlns:sm="http://metis.di.uoa.gr/Landslide.rdf#"
+	xmlns:wps="http://purl.org/ifgi/wps#"
+	xmlns:wsl="http://purl.org/ifgi/wsl#"
+	xmlns:ows="http://purl.org/ifgi/ows/0.2#"
+	xmlns:sawsdl="http://www.w3.org/ns/sawsdl#"
+	xmlns:owl="http://www.w3.org/2002/07/owl#"
+	xmlns:wsml="http://www.wsmo.org/wsml/wsml-syntax#"
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:posm="http://purl.org/ifgi/posm#">
+<owl:Ontology rdf:nodeID="node16mj3fb1tx1">
+	<owl:imports rdf:resource="http://purl.org/ifgi/wps#"/>
+	<owl:imports rdf:resource="http://purl.org/ifgi/ows/0.2#"/>
+</owl:Ontology>
+
+<posm:Service rdf:about="http://metis.di.uoa.gr/Landslide.rdf#Landslide">
+	<dc:title>ProbabilitiesLSComputation</dc:title>
+	<rdfs:seeAlso rdf:resource="http://meti.di.uoa.gr/landSlide-gen.wsdl"/>
+	<rdfs:seeAlso rdf:resource="http://semantic-proxy.appspot.com/api/get?sid=2000be39%26service=WPS%26version=1.0.0%26request=GetCapabilities"/>
+	<sawsdl:modelReference rdf:resource="http://purl.org/ifgi/wps#WebProcessingService"/>
+	<posm:hasOperation rdf:resource="http://purl.org/ifgi/ows/0.2#DefaultGetCapabilities"/>
+	<posm:hasOperation rdf:resource="http://purl.org/ifgi/wps#DefaultDescribeProcess"/>
+	<posm:hasOperation>
+		<wps:Execute rdf:about="http://metis.di.uoa.gr/Landslide.rdf#Execute">
+			<dc:title>Execute: Landslide</dc:title>
+			<sawsdl:modelReference rdf:resource="http://metis.di.uoa.gr/Landslide.rdf#ExecuteOutputDefinition"/>
+			<posm:hasInput rdf:resource="http://metis.di.uoa.gr/Landslide.rdf#ExecuteRequest"/>
+			<posm:hasOutput rdf:resource="http://metis.di.uoa.gr/Landslide.rdf#ExecuteResponse"/>
+		</wps:Execute>
+	</posm:hasOperation>
+</posm:Service>
+
+<wps:ExecuteRequest rdf:about="http://metis.di.uoa.gr/Landslide.rdf#ExecuteRequest">
+	<dc:title>Execute Request: ProbabilitiesLSComputation</dc:title>
+	<sawsdl:modelReference>
+		<rdfs:Class rdf:about="http://metis.di.uoa.gr/Landslide.rdf#ExecuteInput_iterations">
+			<dc:title>Process Input: iterations</dc:title>
+			<dc:identifier>iterations</dc:identifier>
+			<rdfs:subClassOf rdf:resource="http://purl.org/ifgi/wps#ExecuteInput"/>
+			<rdfs:isDefinedBy rdf:resource="http://metis.di.uoa.gr/Landslide.rdf#ExecuteInputDefinition"/>
+		</rdfs:Class>
+	</sawsdl:modelReference>
+</wps:ExecuteRequest>
+
+<rdf:Description rdf:about="http://metis.di.uoa.gr/Landslide.rdf#ExecuteOperation">
+	<posm:hasInput rdf:resource="http://metis.di.uoa.gr/Landslide.rdf#ExecuteInput_iterations"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://metis.di.uoa.gr/Landslide.rdf#ExecuteRequest">
+	<sawsdl:modelReference>
+		<rdfs:Class rdf:about="http://metis.di.uoa.gr/Landslide.rdf#ExecuteInput_format">
+			<dc:title>Process Input: format</dc:title>
+			<dc:identifier>format</dc:identifier>
+			<rdfs:subClassOf rdf:resource="http://purl.org/ifgi/wps#ExecuteInput"/>
+			<rdfs:isDefinedBy rdf:resource="http://metis.di.uoa.gr/Landslide.rdf#ExecuteInputDefinition"/>
+		</rdfs:Class>
+	</sawsdl:modelReference>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://metis.di.uoa.gr/Landslide.rdf#ExecuteOperation">
+	<posm:hasInput rdf:resource="http://metis.di.uoa.gr/Landslide.rdf#ExecuteInput_format"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://metis.di.uoa.gr/Landslide.rdf#ExecuteRequest">
+	<sawsdl:modelReference>
+		<rdfs:Class rdf:about="http://metis.di.uoa.gr/Landslide.rdf#ExecuteInput_minDepth">
+			<dc:title>Process Input: minDepth</dc:title>
+			<dc:identifier>minDepth</dc:identifier>
+			<rdfs:subClassOf rdf:resource="http://purl.org/ifgi/wps#ExecuteInput"/>
+			<rdfs:isDefinedBy rdf:resource="http://metis.di.uoa.gr/Landslide.rdf#ExecuteInputDefinition"/>
+		</rdfs:Class>
+	</sawsdl:modelReference>
+</rdf:Description>
+<rdf:Description rdf:about="http://metis.di.uoa.gr/Landslide.rdf#ExecuteOperation">
+	<posm:hasInput rdf:resource="http://metis.di.uoa.gr/Landslide.rdf#ExecuteInput_minDepth"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://metis.di.uoa.gr/Landslide.rdf#ExecuteRequest">
+	<sawsdl:modelReference>
+		<rdfs:Class rdf:about="http://metis.di.uoa.gr/Landslide.rdf#ExecuteInput_maxDepth">
+			<dc:title>Process Input: maxDepth</dc:title>
+			<dc:identifier>maxDepth</dc:identifier>
+			<rdfs:subClassOf rdf:resource="http://purl.org/ifgi/wps#ExecuteInput"/>
+			<rdfs:isDefinedBy rdf:resource="http://metis.di.uoa.gr/Landslide.rdf#ExecuteInputDefinition"/>
+		</rdfs:Class>
+	</sawsdl:modelReference>
+</rdf:Description>
+<rdf:Description rdf:about="http://metis.di.uoa.gr/Landslide.rdf#ExecuteOperation">
+	<posm:hasInput rdf:resource="http://metis.di.uoa.gr/Landslide.rdf#ExecuteInput_maxDepth"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://metis.di.uoa.gr/Landslide.rdf#ExecuteRequest">
+	<sawsdl:modelReference>
+		<rdfs:Class rdf:about="http://metis.di.uoa.gr/Landslide.rdf#ExecuteInput_waterSaturationRatio">
+			<dc:title>Process Input: waterSaturationRatio</dc:title>
+			<dc:identifier>waterSaturationRatio</dc:identifier>
+			<rdfs:subClassOf rdf:resource="http://purl.org/ifgi/wps#ExecuteInput"/>
+			<rdfs:isDefinedBy rdf:resource="http://metis.di.uoa.gr/Landslide.rdf#ExecuteInputDefinition"/>
+		</rdfs:Class>
+	</sawsdl:modelReference>
+</rdf:Description>
+<rdf:Description rdf:about="http://metis.di.uoa.gr/Landslide.rdf#ExecuteOperation">
+	<posm:hasInput rdf:resource="http://metis.di.uoa.gr/Landslide.rdf#ExecuteInput_waterSaturationRatio"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://metis.di.uoa.gr/Landslide.rdf#ExecuteRequest">
+	<sawsdl:modelReference>
+		<rdfs:Class rdf:about="http://metis.di.uoa.gr/Landslide.rdf#ExecuteInput_DEM">
+			<dc:title>Process Input: DEM</dc:title>
+			<dc:identifier>DEM</dc:identifier>
+			<rdfs:subClassOf rdf:resource="http://purl.org/ifgi/wps#ExecuteInput"/>
+			<rdfs:isDefinedBy rdf:resource="http://metis.di.uoa.gr/Landslide.rdf#ExecuteInputDefinition"/>
+		</rdfs:Class>
+	</sawsdl:modelReference>
+</rdf:Description>
+<rdf:Description rdf:about="http://metis.di.uoa.gr/Landslide.rdf#ExecuteOperation">
+	<posm:hasInput rdf:resource="http://metis.di.uoa.gr/Landslide.rdf#ExecuteInput_DEM"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://metis.di.uoa.gr/Landslide.rdf#ExecuteRequest">
+	<sawsdl:modelReference>
+		<rdfs:Class rdf:about="http://metis.di.uoa.gr/Landslide.rdf#ExecuteInput_zone">
+			<dc:title>Process Input: zone</dc:title>
+			<dc:identifier>zone</dc:identifier>
+			<rdfs:subClassOf rdf:resource="http://purl.org/ifgi/wps#ExecuteInput"/>
+			<rdfs:isDefinedBy rdf:resource="http://metis.di.uoa.gr/Landslide.rdf#ExecuteInputDefinition"/>
+		</rdfs:Class>
+	</sawsdl:modelReference>
+</rdf:Description>
+<rdf:Description rdf:about="http://metis.di.uoa.gr/Landslide.rdf#ExecuteOperation">
+	<posm:hasInput rdf:resource="http://metis.di.uoa.gr/Landslide.rdf#ExecuteInput_zone"/>
+</rdf:Description>
+<wps:ExecuteResponse rdf:about="http://metis.di.uoa.gr/Landslide.rdf#ExecuteResponse">
+	<dc:title>Execute Response: Envision Landslide Probability map</dc:title>
+	<sawsdl:modelReference>
+		<rdfs:Class rdf:about="http://metis.di.uoa.gr/Landslide.rdf#ExecuteOutput_EnvisionResult">
+			<dc:title>Process Output: Probability Outcome</dc:title>
+			<dc:identifier>EnvisionResult</dc:identifier>
+			<rdfs:subClassOf rdf:resource="http://purl.org/ifgi/wps#ExecuteOutput"/>
+			<rdfs:isDefinedBy rdf:resource="http://metis.di.uoa.gr/Landslide.rdf#ExecuteOutputDefinition"/>
+		</rdfs:Class>
+	</sawsdl:modelReference>
+</wps:ExecuteResponse>
+<rdf:Description rdf:about="http://metis.di.uoa.gr/Landslide.rdf#ExecuteOperation">
+	<posm:hasOutput rdf:resource="http://metis.di.uoa.gr/Landslide.rdf#ExecuteOutput_EnvisionResult"/>
+	<rdfs:subClassOf rdf:resource="http://purl.org/ifgi/wps#Execute"/>
+</rdf:Description>
+<wsl:Condition rdf:about="http://metis.di.uoa.gr/Landslide.rdf#ExecuteInputDefinition">
+	<dc:title>Condition: ProbabilitiesLSComputation</dc:title>
+</wsl:Condition>
+<wsl:Effect rdf:about="http://metis.di.uoa.gr/Landslide.rdf#ExecuteOutputDefinition">
+	<dc:title>Effect: ProbabilitiesLSComputation</dc:title>
+	<rdf:value rdf:datatype="http://www.wsmo.org/wsml/wsml-syntax#AxiomLiteral">
+	?var1 memberOf _"http://metis.di.uoa.gr/Landslide.rdf#ExecuteInput_iterations" and
+		?var2 memberOf _"http://metis.di.uoa.gr/Landslide.rdf#ExecuteInput_format" and
+		?var3 memberOf _"http://purl.org/ifgi/geoqualities#elevation" and
+		?var4 memberOf _"http://purl.org/ifgi/oilspill#depth" and
+		?var5 memberOf _"http://purl.org/ifgi/landslide#water_saturation" and
+		?var6 memberOf _"http://purl.org/ifgi/landslide#landslide_probability" and
+		?var13[_"http://purl.org/ifgi/posm#hasInput" hasValue ?var7, _"http://purl.org/ifgi/posm#hasInput" hasValue ?var1, _"http://purl.org/ifgi/posm#hasInput" hasValue ?var8, _"http://purl.org/ifgi/posm#hasInput" hasValue ?var9, _"http://purl.org/ifgi/posm#hasInput" hasValue ?var10, _"http://purl.org/ifgi/posm#hasInput" hasValue ?var11, _"http://purl.org/ifgi/posm#hasInput" hasValue ?var2, _"http://purl.org/ifgi/posm#hasOutput" hasValue ?var12] memberOf _"http://metis.di.uoa.gr/Landslide.rdf#ExecuteOperation" and
+		?var7[_"http://swing.uni-muenster.de/core/Swing/annotates" hasValue ?var5] memberOf _"http://metis.di.uoa.gr/Landslide.rdf#ExecuteInput_waterSaturationRatio" and
+		?var8[_"http://swing.uni-muenster.de/core/Swing/annotates" hasValue ?var14] memberOf _"http://metis.di.uoa.gr/Landslide.rdf#ExecuteInput_zone" and
+		?var9[_"http://swing.uni-muenster.de/core/Swing/annotates" hasValue ?var4] memberOf _"http://metis.di.uoa.gr/Landslide.rdf#ExecuteInput_minDepth" and
+		?var10[_"http://swing.uni-muenster.de/core/Swing/annotates" hasValue ?var3] memberOf _"http://metis.di.uoa.gr/Landslide.rdf#ExecuteInput_DEM" and
+		?var11[_"http://swing.uni-muenster.de/core/Swing/annotates" hasValue ?var4] memberOf _"http://metis.di.uoa.gr/Landslide.rdf#ExecuteInput_maxDepth" and
+		?var12[_"http://swing.uni-muenster.de/core/Swing/annotates" hasValue ?var6] memberOf _"http://metis.di.uoa.gr/Landslide.rdf#ExecuteOutput_EnvisionResult" and
+		?var15[_"http://purl.org/ifgi/dul#hasQuality" hasValue ?var4, _"http://purl.org/ifgi/dul#hasLocation" hasValue ?var14] memberOf _"http://purl.org/ifgi/geounits#waterbody" and
+		?var16[_"http://purl.org/ifgi/dul#hasQuality" hasValue ?var5, _"http://purl.org/ifgi/dul#hasLocation" hasValue ?var14] memberOf _"http://purl.org/ifgi/landslide#soil" and
+		?var17[_"http://purl.org/ifgi/dul#hasQuality" hasValue ?var6, _"http://purl.org/ifgi/dul#hasLocation" hasValue ?var14] memberOf _"http://purl.org/ifgi/landslide#landslide" and
+		?var14[_"http://purl.org/ifgi/dul#hasQuality" hasValue ?var3] memberOf _"http://purl.org/ifgi/landslide#landslide_runout_zone".	
+	
+ 	 	</rdf:value>
+</wsl:Effect>
+</rdf:RDF>

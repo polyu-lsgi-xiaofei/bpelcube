@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://www.opengis.net/wps_ProbabilitiesLSComputation.wsdl" 
+	xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" 
+	xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" 
+	xmlns:ows="http://www.opengis.net/ows/1.1" 
+	xmlns:sawsdl="http://www.w3.org/ns/sawsdl" 
+	xmlns:tns="http://www.opengis.net/wps_ProbabilitiesLSComputation.wsdl" 
+	xmlns:wps="http://www.opengis.net/wps/1.0.0" 
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:odex="http://www.apache.org/ode/type/extension/http">
+	<wsdl:types>
+		<xsd:schema elementFormDefault="qualified" targetNamespace="http://www.opengis.net/wps_ProbabilitiesLSComputation.wsdl" xmlns="http://www.w3.org/2001/XMLSchema">
+			<!-- <xsd:import namespace="http://www.opengis.net/ows/1.1" schemaLocation="http://giv-wfs.uni-muenster.de/xsd/ows/1.1.0/owsExceptionReport.xsd"/>
+			       <xsd:import namespace="http://www.opengis.net/wps/1.0.0" schemaLocation="http://giv-wfs.uni-muenster.de/xsd/wps/1.0.0/wpsAll.xsd"/>  -->
+			<xsd:import namespace="http://www.opengis.net/ows/1.1" schemaLocation="http://schemas.opengis.net/ows/1.1.0/owsExceptionReport.xsd"/>
+			<xsd:import namespace="http://www.opengis.net/wps/1.0.0" schemaLocation="http://schemas.opengis.net/wps/1.0.0/wpsAll.xsd"/>			       
+			<xsd:element fixed="GetCapabilities" name="request_parameter_GetCapabilities" type="xsd:string"/>
+			<xsd:element fixed="DescribeProcess" name="request_parameter_DescribeProcess" type="xsd:string"/>
+			<xsd:element fixed="WPS" name="service_parameter" type="xsd:string"/>
+			<xsd:element fixed="1.0.0" name="version_parameter" type="xsd:string"/>
+			<xsd:element fixed="ProbabilitiesLSComputation" name="identifier_parameter" type="xsd:string"/>
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="GetCapabilitiesRequest">
+		<wsdl:part element="tns:request_parameter_GetCapabilities" name="request"/>
+		<wsdl:part element="tns:service_parameter" name="service"/>
+		<wsdl:part element="tns:version_parameter" name="version"/>
+	</wsdl:message>
+	<wsdl:message name="GetCapabilitiesResponse">
+		<wsdl:part element="wps:Capabilities" name="response"/>
+	</wsdl:message>
+	<wsdl:message name="DescribeProcessRequest">
+		<wsdl:part element="tns:request_parameter_DescribeProcess" name="request"/>
+		<wsdl:part element="tns:service_parameter" name="service"/>
+		<wsdl:part element="tns:version_parameter" name="version"/>
+		<wsdl:part element="tns:identifier_parameter" name="identifier"/>
+	</wsdl:message>
+	<wsdl:message name="DescribeProcessResponse">
+		<wsdl:part element="wps:ProcessDescriptions" name="response"/>
+	</wsdl:message>
+	<wsdl:message name="ExecuteRequest">
+		<wsdl:part element="wps:Execute" name="request"/>
+	</wsdl:message>
+	<wsdl:message name="ExecuteResponse">
+		<wsdl:part element="wps:ExecuteResponse" name="response"/>
+	</wsdl:message>
+        
+	<wsdl:portType name="wpsPortType" sawsdl:modelReference="http://giv-wfs.uni-muenster.de/jcr/repository/y2review/WPS10_WpsnetTestServer/ProbabilitiesLSComputation.rdf#Process_ProbabilitiesLSCompu">
+		<wsdl:operation name="GetCapabilities">
+			<wsdl:input message="tns:GetCapabilitiesRequest" name="GetCapabilitiesRequest"/>
+			<wsdl:output message="tns:GetCapabilitiesResponse" name="GetCapabilitiesResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="DescribeProcess">
+			<wsdl:input message="tns:DescribeProcessRequest" name="DescribeProcessRequest"/>
+			<wsdl:output message="tns:DescribeProcessResponse" name="DescribeProcessResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="Execute">
+			<wsdl:input message="tns:ExecuteRequest" name="ExecuteRequest"/>
+			<wsdl:output message="tns:ExecuteResponse" name="ExecuteResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+        
+	<wsdl:binding name="WPS10_WpsnetTestServer_HttpPOST" type="tns:wpsPortType">
+		<http:binding verb="POST"/>
+		<wsdl:operation name="GetCapabilities">
+			<http:operation location="WPS.NET/WPService.asmx/WPS"/>
+			<odex:binding verb="POST"/>
+			<wsdl:input name="GetCapabilitiesRequest">
+				<http:urlEncoded/>
+			</wsdl:input>
+			<wsdl:output name="GetCapabilitiesResponse">
+				<mime:content part="response" type="text/xml"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="DescribeProcess">
+			<http:operation location="WPS.NET/WPService.asmx/WPS"/>
+			<odex:binding verb="POST"/>
+			<wsdl:input name="DescribeProcessRequest">
+				<http:urlEncoded/>
+			</wsdl:input>
+			<wsdl:output name="DescribeProcessResponse">
+				<mime:content part="response" type="text/xml"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="Execute">
+			<http:operation location="WPS.NET/WPService.asmx/WPS"/>
+			<odex:binding verb="POST"/>
+			<wsdl:input name="ExecuteRequest">
+				<http:urlEncoded/>
+			</wsdl:input>
+			<wsdl:output name="ExecuteResponse">
+				<mime:content part="response" type="text/xml"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+        
+	<wsdl:service name="WPS10_WpsnetTestServer">
+		<wsdl:port binding="tns:WPS10_WpsnetTestServer_HttpPOST" name="WPS10_WpsnetTestServer_HttpPOSTPort">
+			<http:address location="http://envision-wps.brgm-rec.fr/"/>
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

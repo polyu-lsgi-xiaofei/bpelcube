@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+
+<definitions name="landSlide" xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype" 
+xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+targetNamespace="http://www.brgm.fr/envision/landslide/wsdl" 
+xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+xmlns="http://schemas.xmlsoap.org/wsdl/" 
+xmlns:sawsdl="http://www.w3.org/ns/sawsdl"
+xmlns:tns="http://www.brgm.fr/envision/landslide/wsdl" 
+xmlns:wps="http://www.opengis.net/wps/1.0.0">
+    
+	<import location="Precipitation.wsdl" namespace="http://www.opengis.net/sos_precipitation.wsdl"/>
+	<import location="ProbabilitiesLSComputation.wsdl" namespace="http://www.opengis.net/wps_ProbabilitiesLSComputation.wsdl"/>
+	<import location="HydrologicalModelling.wsdl" namespace="http://www.opengis.net/wps_HydrologicalModelling.wsdl"/>
+	<!--import location="SRTM3.wsdl" namespace="http://www.opengis.net/wcs_SRTM3.wsdl"/-->
+	<types>
+		<xsd:schema targetNamespace="http://www.brgm.fr/envision/landslide/wsdl">
+			<xsd:import namespace="http://www.opengis.net/wps/1.0.0" schemaLocation="http://schemas.opengis.net/wps/1.0.0/wpsAll.xsd"/>			       
+			<xsd:element name="request_parameter_GetCapabilities" fixed="GetCapabilities" type="xsd:string"/>
+			<xsd:element name="request_parameter_DescribeProcess" fixed="DescribeProcess" type="xsd:string"/>
+			<xsd:element name="service_parameter" fixed="WPS" type="xsd:string"/>
+			<xsd:element name="version_parameter" fixed="1.0.0" type="xsd:string"/>
+			<xsd:element name="identifier_parameter" fixed="landSlide" type="xsd:string"/>
+		</xsd:schema>
+	</types>
+	<message name="GetCapabilitiesRequest">
+		<part name="request" element="tns:request_parameter_GetCapabilities"/>
+		<part name="service" element="tns:service_parameter"/>
+		<part name="version" element="tns:version_parameter"/>
+	</message>
+	<message name="GetCapabilitiesResponse">
+		<part name="response" element="wps:Capabilities"/>
+	</message>
+	<message name="DescribeProcessRequest">
+		<part name="request" element="tns:request_parameter_DescribeProcess"/>
+		<part name="service" element="tns:service_parameter"/>
+		<part name="version" element="tns:version_parameter"/>
+		<part name="identifier" element="tns:identifier_parameter"/>
+	</message>
+	<message name="DescribeProcessResponse">
+		<part name="response" element="wps:ProcessDescriptions"/>
+	</message>
+	<message name="ExecuteRequest">
+		<part name="request" element="wps:Execute"/>
+	</message>
+	<message name="ExecuteResponse">
+		<part name="response" element="wps:ExecuteResponse"/>
+	</message>
+        
+	<portType name="landSlide_Interface" sawsdl:modelReference="Landslide.rdf#Landslide">
+		<operation name="GetCapabilities">
+			<input name="GetCapabilitiesRequest" message="tns:GetCapabilitiesRequest"/>
+			<output name="GetCapabilitiesResponse" message="tns:GetCapabilitiesResponse"/>
+		</operation>
+		<operation name="DescribeProcess">
+			<input name="DescribeProcessRequest" message="tns:DescribeProcessRequest"/>
+			<output name="DescribeProcessResponse" message="tns:DescribeProcessResponse"/>
+		</operation>
+		<operation name="Execute">
+			<input name="ExecuteRequest" message="tns:ExecuteRequest"/>
+			<output name="ExecuteResponse" message="tns:ExecuteResponse"/>
+		</operation>
+	</portType>
+	<binding name="landSlide_Binding" type="tns:landSlide_Interface">
+		<soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+		<operation name="Execute">
+			<soap:operation/>
+			<input name="ExecuteRequest">
+				<soap:body namespace="http://www.brgm.fr/envision/landslide/wsdl" use="literal"/>
+			</input>
+			<output name="ExecuteResponse">
+				<soap:body namespace="http://www.brgm.fr/envision/landslide/wsdl" use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="Landslide">
+		<port name="landSlide_Port" binding="tns:landSlide_Binding">
+			<soap:address location="http://myservice.com"/>
+		</port>
+	</service>
+
+        <plnk:partnerLinkType name="landSlide_PLType">
+		<plnk:role portType="ptns:landSlide_Interface" name="landSlideRole" xmlns:ptns="http://www.brgm.fr/envision/landslide/wsdl"/>
+	</plnk:partnerLinkType>
+	<plnk:partnerLinkType name="Precipitation_PLType">
+		<plnk:role portType="ptns:Precipitation_PortType" name="PrecipitationRole" xmlns:ptns="http://www.opengis.net/sos_precipitation.wsdl"/>
+	</plnk:partnerLinkType>
+	<plnk:partnerLinkType name="ProbabilitiesLSComputation_PLType">
+		<plnk:role portType="ptns:wpsPortType" name="ProbabilitiesLSComputationRole" xmlns:ptns="http://www.opengis.net/wps_ProbabilitiesLSComputation.wsdl"/>
+	</plnk:partnerLinkType>
+	<plnk:partnerLinkType name="HydrologicalModelling_PLType">
+		<plnk:role portType="ptns:wpsPortType" name="HydrologicalModellingRole" xmlns:ptns="http://www.opengis.net/wps_HydrologicalModelling.wsdl"/>
+	</plnk:partnerLinkType>
+</definitions>

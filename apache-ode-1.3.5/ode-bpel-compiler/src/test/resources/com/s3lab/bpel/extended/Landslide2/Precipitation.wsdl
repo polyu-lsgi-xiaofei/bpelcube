@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+    targetNamespace="http://www.opengis.net/sos_precipitation.wsdl"
+    xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+    xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+    xmlns:om="http://www.opengis.net/om/1.0"
+    xmlns:ows="http://www.opengis.net/ows/1.1"
+    xmlns:sawsdl="http://www.w3.org/ns/sawsdl"
+    xmlns:sml="http://www.opengis.net/sensorML/1.0.1"
+    xmlns:sos="http://www.opengis.net/sos/1.0"
+    xmlns:tns="http://www.opengis.net/sos_precipitation.wsdl"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <wsdl:types>
+        <xsd:schema targetNamespace="http://www.opengis.net/sos_precipitation.wsdl">
+            <xsd:import namespace="http://www.opengis.net/sos/1.0" schemaLocation="http://sosades.brgm.fr:80/SOService?xsd=11"/>
+            <xsd:import namespace="http://www.opengis.net/om/1.0" schemaLocation="http://sosades.brgm.fr:80/SOService?xsd=3"/>
+            <xsd:import namespace="http://www.opengis.net/ows/1.1" schemaLocation="http://sosades.brgm.fr:80/SOService?xsd=2"/>
+            <xsd:import
+                namespace="http://www.opengis.net/sensorML/1.0.1" schemaLocation="http://sosades.brgm.fr:80/SOService?xsd=12"/>
+            <xsd:element fixed="GetCapabilities"
+                name="request_parameter_GetCapabilities" type="xsd:string"/>
+            <xsd:element fixed="DescribeSensor"
+                name="request_parameter_DescribeSensor" type="xsd:string"/>
+            <xsd:element fixed="GetObservation"
+                name="request_parameter_GetObservation" type="xsd:string"/>
+            <xsd:element fixed="SOS" name="service_parameter" type="xsd:string"/>
+            <xsd:element fixed="1.0.0" name="version_parameter" type="xsd:string"/>
+            <xsd:element fixed="precipitation"
+                name="observedProperty_parameter" type="xsd:anyURI"/>
+            <xsd:element name="procedure_parameter" type="xsd:anyURI"/>
+            <xsd:element name="outputFormat_parameter" type="xsd:string"/>
+            <xsd:element name="responseFormat_parameter" type="xsd:string"/>
+            <xsd:element name="offering_parameter" type="xsd:anyURI"/>
+        </xsd:schema>
+    </wsdl:types>
+    <wsdl:message name="GetCapabilitiesRequest">
+        <wsdl:part element="tns:request_parameter_GetCapabilities" name="request"/>
+        <wsdl:part element="tns:service_parameter" name="service"/>
+        <wsdl:part element="tns:version_parameter" name="version"/>
+    </wsdl:message>
+    <wsdl:message name="GetCapabilitiesResponse">
+        <wsdl:part element="sos:Capabilities" name="response"/>
+    </wsdl:message>
+    <wsdl:message name="DescribeSensorRequest">
+        <wsdl:part element="tns:request_parameter_GetCapabilities" name="request"/>
+        <wsdl:part element="tns:service_parameter" name="service"/>
+        <wsdl:part element="tns:version_parameter" name="version"/>
+        <wsdl:part element="tns:procedure_parameter" name="procedure"/>
+        <wsdl:part element="tns:outputFormat_parameter" name="outputFormat"/>
+    </wsdl:message>
+    <wsdl:message name="DescribeSensorResponse">
+        <wsdl:part element="sml:SensorML" name="response"/>
+    </wsdl:message>
+    <wsdl:message name="GetObservationRequest">
+        <wsdl:part element="tns:request_parameter_GetCapabilities" name="request"/>
+        <wsdl:part element="tns:service_parameter" name="service"/>
+        <wsdl:part element="tns:version_parameter" name="version"/>
+        <wsdl:part element="tns:responseFormat_parameter" name="responseFormat"/>
+        <wsdl:part element="tns:offering_parameter" name="offering"/>
+        <wsdl:part element="tns:observedProperty_parameter" name="observedProperty"/>
+    </wsdl:message>
+    <wsdl:message name="GetObservationResponse">
+        <wsdl:part element="om:Observation" name="response"/>
+    </wsdl:message>
+    <wsdl:message name="ServiceException">
+        <wsdl:part element="ows:ExceptionReport" name="exception"/>
+    </wsdl:message>
+    <wsdl:portType name="Precipitation_PortType" sawsdl:modelReference="http://giv-wfs.uni-muenster.de/jcr/repository/y2review/SOS10_BrgmSos/Precipitation.rdf#SOS10_BrgmSos:Precipitation">
+        <wsdl:operation name="GetCapabilities">
+            <wsdl:input message="tns:GetCapabilitiesRequest" name="GetCapabilitiesRequest"/>
+            <wsdl:output message="tns:GetCapabilitiesResponse" name="GetCapabilitiesResponse"/>
+            <wsdl:fault message="tns:ServiceException" name="ExceptionReport"/>
+        </wsdl:operation>
+        <wsdl:operation name="DescribeSensor">
+            <wsdl:input message="tns:DescribeSensorRequest" name="DescribeSensorRequest"/>
+            <wsdl:output message="tns:DescribeSensorResponse" name="DescribeSensorResponse"/>
+            <wsdl:fault message="tns:ServiceException" name="ExceptionReport"/>
+        </wsdl:operation>
+        <wsdl:operation name="GetObservation">
+            <wsdl:input message="tns:GetObservationRequest" name="GetObservationRequest"/>
+            <wsdl:output message="tns:GetObservationResponse" name="GetObservationResponse"/>
+            <wsdl:fault message="tns:ServiceException" name="ExceptionReport"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="SOS10_BrgmSos_HttpGET" type="tns:Precipitation_PortType">
+        <http:binding verb="GET"/>
+        <wsdl:operation name="GetCapabilities">
+            <http:operation location="constellation-envision/WS/sos-discovery?"/>
+            <wsdl:input name="GetCapabilitiesRequest">
+                <http:urlEncoded/>
+            </wsdl:input>
+            <wsdl:output name="GetCapabilitiesResponse">
+                <mime:content part="response" type="text/xml"/>
+            </wsdl:output>
+            <wsdl:fault name="ExceptionReport"/>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="SOS10_BrgmSos_HttpPOST" type="tns:Precipitation_PortType">
+        <http:binding verb="POST"/>
+        <wsdl:operation name="GetCapabilities">
+            <http:operation location="constellation-envision/WS/sos-discovery?"/>
+            <wsdl:input name="GetCapabilitiesRequest">
+                <http:urlEncoded/>
+            </wsdl:input>
+            <wsdl:output name="GetCapabilitiesResponse">
+                <mime:content part="response" type="text/xml"/>
+            </wsdl:output>
+            <wsdl:fault name="ExceptionReport"/>
+        </wsdl:operation>
+        <wsdl:operation name="GetObservation">
+            <http:operation location="constellation-envision/WS/sos-discovery?"/>
+            <wsdl:input name="GetObservationRequest">
+                <http:urlEncoded/>
+            </wsdl:input>
+            <wsdl:output name="GetObservationResponse">
+                <mime:content part="response" type="text/xml"/>
+            </wsdl:output>
+            <wsdl:fault name="ExceptionReport"/>
+        </wsdl:operation>
+        <wsdl:operation name="DescribeSensor">
+            <http:operation location="constellation-envision/WS/sos-discovery?"/>
+            <wsdl:input name="DescribeSensorRequest">
+                <http:urlEncoded/>
+            </wsdl:input>
+            <wsdl:output name="DescribeSensorResponse">
+                <mime:content part="response" type="text/xml"/>
+            </wsdl:output>
+            <wsdl:fault name="ExceptionReport"/>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="SOS10_BrgmSos">
+        <wsdl:port binding="tns:SOS10_BrgmSos_HttpGET" name="SOS10_BrgmSos_HttpGETPort">
+            <http:address location="http://swe.brgm.fr/"/>
+        </wsdl:port>
+        <wsdl:port binding="tns:SOS10_BrgmSos_HttpPOST" name="SOS10_BrgmSos_HttpPOSTPort">
+            <http:address location="http://swe.brgm.fr/"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>
