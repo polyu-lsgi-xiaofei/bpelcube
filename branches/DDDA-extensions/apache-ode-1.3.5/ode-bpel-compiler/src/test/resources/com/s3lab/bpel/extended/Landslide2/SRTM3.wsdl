@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions 
+targetNamespace="http://www.opengis.net/wcs_SRTM3.wsdl" 
+xmlns:tns="http://www.opengis.net/wcs_SRTM3.wsdl" xmlns:ows="http://www.opengis.net/ows" 
+xmlns:owcs="http://www.opengis.net/wcs/1.1/ows" 
+xmlns:gml="http://www.opengis.net/gml" 
+xmlns:wcs="http://www.opengis.net/wcs/1.1" 
+xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" 
+xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" 
+xmlns:sawsdl="http://www.w3.org/ns/sawsdl">
+    
+	<wsdl:types>
+		<xsd:schema targetNamespace="http://www.opengis.net/wcs_SRTM3.wsdl" 
+                xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+			<xsd:import namespace="http://www.opengis.net/wcs/1.1" schemaLocation="http://giv-wfs.uni-muenster.de/xsd/wcs/1.1/wcsAll.xsd"/>
+		</xsd:schema>
+	</wsdl:types>
+
+        <wsdl:message name="GetCapabilitiesRequest">
+		<wsdl:part name="request" element="wcs:GetCapabilities"/>
+	</wsdl:message>
+	<wsdl:message name="GetCapabilitiesResponse">
+		<wsdl:part name="response" element="wcs:Capabilities"/>
+	</wsdl:message>
+	<wsdl:message name="DescribeCoverageRequest">
+		<wsdl:part name="request" element="wcs:DescribeCoverage"/>
+	</wsdl:message>
+	<wsdl:message name="DescribeCoverageResponse">
+		<wsdl:part name="response" element="wcs:CoverageDescriptions"/>
+	</wsdl:message>
+	<wsdl:message name="GetCoverageRequest">
+		<wsdl:part name="request" element="wcs:GetCoverage"/>
+	</wsdl:message>
+	<wsdl:message name="GetCoverageResponse">
+		<wsdl:part name="response" element="wcs:CoverageSummary"/>
+	</wsdl:message>
+
+        <wsdl:portType name="wcsPortType" sawsdl:modelReference="http://giv-wfs.uni-muenster.de:8080/jcr/repository/y2review/WCS11_Mapsrefrecbrgmfr/SRTM3.rdf#WCS11_Mapsrefrecbrgmfr">
+		<wsdl:operation name="GetCapabilities">
+			<wsdl:input name="GetCapabilitiesRequest" message="tns:GetCapabilitiesRequest"/>
+			<wsdl:output name="GetCapabilitiesResponse" message="tns:GetCapabilitiesResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="DescribeCoverage">
+			<wsdl:input name="DescribeCoverageRequest" message="tns:DescribeCoverageRequest"/>
+			<wsdl:output name="DescribeCoverageResponse" message="tns:DescribeCoverageResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetCoverage">
+			<wsdl:input name="GetCoverageRequest" message="tns:GetCoverageRequest"/>
+			<wsdl:output name="GetCoverageResponse" message="tns:GetCoverageResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	
+        <wsdl:binding name="WCS11_Mapsrefrecbrgmfr_HttpPOST" type="tns:wcsPortType">
+		<http:binding verb="POST"/>
+		<wsdl:operation name="GetCapabilities">
+			<http:operation location=""/>
+			<wsdl:input name="GetCapabilitiesRequest">
+				<mime:content part="request" type="application/xml"/>
+			</wsdl:input>
+			<wsdl:output name="GetCapabilitiesResponse">
+				<mime:content part="response" type="application/xml"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="DescribeCoverage">
+			<http:operation location=""/>
+			<wsdl:input name="DescribeCoverageRequest">
+				<mime:content part="request" type="application/xml"/>
+			</wsdl:input>
+			<wsdl:output name="DescribeCoverageResponse">
+				<mime:content part="response" type="application/xml"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetCoverage">
+			<http:operation location=""/>
+			<wsdl:input name="GetCoverageRequest">
+				<mime:content part="request" type="application/xml"/>
+			</wsdl:input>
+			<wsdl:output name="GetCoverageResponse">
+				<mime:content part="response" type="application/xml"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="WCS11_Mapsrefrecbrgmfr">
+		<wsdl:port name="WCS11_Mapsrefrecbrgmfr_HttpPOSTPort" binding="tns:WCS11_Mapsrefrecbrgmfr_HttpPOST">
+			<http:address location="http://mapsrefrec.brgm.fr/WMS/mapserv6?map=/carto/Demo/grille/srtm_glp.map"/>
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>
