@@ -53,24 +53,29 @@ public class InvokeActivity extends ScopeLikeActivity implements Communication {
         _commHelper = new CommunicationHelper(el);
         
 //        @author George Athanasopoulos
-        Element outcomeElement = this.getExtensibilityElement(EnvisionExtensionQNames.ENVISION_OUTCOME_QNAME);
-        _envisionExtensions = new EnvOutcome(outcomeElement);
+        if (el.getElementsByTagNameNS(EnvisionExtensionQNames.ENVISION_OUTCOME_QNAME.getNamespaceURI(),
+                EnvisionExtensionQNames.ENVISION_OUTCOME_QNAME.getLocalPart()) != null && el.
+                getElementsByTagNameNS(EnvisionExtensionQNames.ENVISION_OUTCOME_QNAME.getNamespaceURI(),
+                EnvisionExtensionQNames.ENVISION_OUTCOME_QNAME.getLocalPart()).getLength() > 0) {
+            Element outcomeElement = this.getExtensibilityElement(EnvisionExtensionQNames.ENVISION_OUTCOME_QNAME);
+            _envisionExtensions = new EnvOutcome(outcomeElement);
+        }
     }
 
     public Collection<URI> getMetamodelReference(){
-        return _envisionExtensions.getModelReference();
+        return _envisionExtensions!=null?_envisionExtensions.getModelReference():null;
     }
     public URI getLiftingScheme(){
-        return _envisionExtensions.getLiftingScheme();
+        return _envisionExtensions!=null?_envisionExtensions.getLiftingScheme():null;
     }
     public URI getLoweringScheme(){
-        return _envisionExtensions.getLoweringScheme();
+        return _envisionExtensions!=null?_envisionExtensions.getLoweringScheme():null;
     }
     public Collection<EnvMPolygon> getMultiPolygons(){
-        return _envisionExtensions.getMultiPolygons();
+        return (Collection<EnvMPolygon>) (_envisionExtensions!=null?_envisionExtensions.getMultiPolygons():Collections.emptyList());
     }
     public Collection<EnvTimeInterval> getTimeIntervals(){
-        return _envisionExtensions.getTimeIntervals();
+        return (Collection<EnvTimeInterval>) (_envisionExtensions!=null?_envisionExtensions.getTimeIntervals():Collections.emptyList());
     }
     /**
      * Get the input variable.

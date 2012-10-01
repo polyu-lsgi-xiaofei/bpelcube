@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import org.LogConfigurator;
 import org.apache.ode.bpel.compiler.BpelCompiler;
 import org.apache.ode.bpel.compiler.BpelCompiler11;
 import org.apache.ode.bpel.compiler.BpelCompiler20;
@@ -35,6 +36,7 @@ public class EnvisionExtendedTest {
     private File _processFile;
     private ResourceFinder _resourceFinder;
     public EnvisionExtendedTest() {
+        new LogConfigurator(); 
     }
     
     @Before
