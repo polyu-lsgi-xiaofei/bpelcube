@@ -12,7 +12,7 @@ import org.w3c.dom.Element;
 
 /**
  *
- * @author gathanas
+ * @author george athanasopoulos
  */
 public class EnvOutcome extends BpelObject{
 
