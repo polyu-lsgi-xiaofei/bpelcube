@@ -21,8 +21,14 @@
 
 package org.apache.ode.bpel.compiler;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
 import org.apache.ode.bpel.compiler.api.CompilationException;
 import org.apache.ode.bpel.compiler.bom.Activity;
+import org.apache.ode.bpel.compiler.bom.EnvMPolygon;
+import org.apache.ode.bpel.compiler.bom.EnvTimeInterval;
 import org.apache.ode.bpel.compiler.bom.IfActivity;
 import org.apache.ode.bpel.o.OActivity;
 import org.apache.ode.bpel.o.OSwitch;
@@ -42,10 +48,10 @@ class IfGenerator extends DefaultActivityGenerator {
     public void compile(OActivity output, Activity src) {
         OSwitch oswitch = (OSwitch) output;
         IfActivity switchDef = (IfActivity)src;
-
+               
         if (switchDef.getCondition() == null)
             throw new CompilationException(__cmsgs.errIfWithNoCondition());
-
+             
         boolean first = true;
         if (switchDef.getActivity() != null) {
             OSwitch.OCase ocase = new OSwitch.OCase(_context.getOProcess());
@@ -63,5 +69,36 @@ class IfGenerator extends DefaultActivityGenerator {
             oswitch.addCase(ocase);
             first = false;
         }
+        
+        
+        /**
+         * @since 18-09-2012
+         * @author George Athanasopoulos transferring envision outcome related information to OInvoke activity
+         */
+        {
+            oswitch._varMetamodelReferences = switchDef.getMetamodelReference();
+            oswitch._varLiftingScheme = switchDef.getLiftingScheme();
+            oswitch._varLoweringScheme = switchDef.getLoweringScheme();
+//         setting mutli-polygons
+            if (oswitch._varMPolygons == null && switchDef.getMultiPolygons()!=null)
+                oswitch._varMPolygons = new HashMap();
+            for (String varKey : switchDef.getMultiPolygons().keySet()) {
+                Collection<String> mPolygons = new LinkedList();
+                for(EnvMPolygon mPoly:switchDef.getMultiPolygons().get(varKey))
+                    mPolygons.add(mPoly.serialize());
+                oswitch._varMPolygons.put(varKey,mPolygons);
+            }
+//       setting time intervals
+            if (oswitch._varTimeIntervals == null && switchDef.getTimeIntervals()!=null)
+                oswitch._varTimeIntervals = new HashMap();
+            for (String varKey : switchDef.getTimeIntervals().keySet()) {
+                Collection<String> mIntervals = new LinkedList();
+                for(EnvTimeInterval mPoly:switchDef.getTimeIntervals().get(varKey))
+                    mIntervals.add(mPoly.serialize());
+                oswitch._varTimeIntervals.put(varKey,mIntervals);
+            }
+        }// end of Envision extensions
+
+
     }
 }

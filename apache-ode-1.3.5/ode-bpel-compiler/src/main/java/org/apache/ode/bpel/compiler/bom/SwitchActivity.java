@@ -18,8 +18,11 @@
  */
 package org.apache.ode.bpel.compiler.bom;
 
+import java.net.URI;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.w3c.dom.Element;
 
@@ -51,6 +54,46 @@ public class SwitchActivity extends Activity {
         return getChildren(Case.class);
     }
 
+    
+    public Map<String, Collection<URI>> getMetamodelReference() {
+        Map<String, Collection<URI>> referencesMap = new HashMap<String, Collection<URI>>();
+        for (EnvOutcomeQuery query : _queries.getEnvQueries())
+            referencesMap.put(query.getVariable(), query.getModelReferences());
+
+        return referencesMap;
+    }
+
+    public Map<String, URI> getLiftingScheme() {
+        Map<String, URI> referencesMap = new HashMap<String, URI>();
+        for (EnvOutcomeQuery query : _queries.getEnvQueries())
+            referencesMap.put(query.getVariable(), query.getLiftingScheme());
+
+        return referencesMap;
+    }
+
+    public Map<String, URI> getLoweringScheme() {
+        Map<String, URI> referencesMap = new HashMap<String, URI>();
+        for (EnvOutcomeQuery query : _queries.getEnvQueries())
+            referencesMap.put(query.getVariable(), query.getLoweringScheme());
+
+        return referencesMap;
+    }
+
+    public Map<String, Collection<EnvMPolygon>> getMultiPolygons() {
+        Map<String, Collection<EnvMPolygon>> referencesMap = new HashMap<String, Collection<EnvMPolygon>>();
+        for (EnvOutcomeQuery query : _queries.getEnvQueries())
+            referencesMap.put(query.getVariable(), query.getMPolygons());
+
+        return referencesMap;
+    }
+
+    public Map<String, Collection<EnvTimeInterval>> getTimeIntervals() {
+        Map<String, Collection<EnvTimeInterval>> referencesMap = new HashMap<String, Collection<EnvTimeInterval>>();
+        for (EnvOutcomeQuery query : _queries.getEnvQueries())
+            referencesMap.put(query.getVariable(), query.getTimeIntervals());
+
+        return referencesMap;
+    }
     /**
      * BPEL object model representation of <code>&lt;case&gt;</code> and 
      * <code>&lt;otherwise&gt;</code> elements. Note that the 
