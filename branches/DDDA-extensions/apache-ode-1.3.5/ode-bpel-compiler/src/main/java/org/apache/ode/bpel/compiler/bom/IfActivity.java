@@ -18,10 +18,14 @@
  */
 package org.apache.ode.bpel.compiler.bom;
 
+import java.net.URI;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
 import org.w3c.dom.Element;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Representation of the BPEL
@@ -33,7 +37,15 @@ public class IfActivity extends Activity {
 
     public IfActivity(Element el) {
         super(el);
+        //        @author George Athanasopoulos
+        if (el.getElementsByTagNameNS(EnvisionExtensionQNames.ENVISION_OUTCOME_QUERIES_QNAME.getNamespaceURI(),
+                EnvisionExtensionQNames.ENVISION_OUTCOME_QUERIES_QNAME.getLocalPart()) != null && el.
+                getElementsByTagNameNS(EnvisionExtensionQNames.ENVISION_OUTCOME_QUERIES_QNAME.getNamespaceURI(),
+                EnvisionExtensionQNames.ENVISION_OUTCOME_QUERIES_QNAME.getLocalPart()).getLength() > 0) {
+            Element outcomeElement = this.getExtensibilityElement(EnvisionExtensionQNames.ENVISION_OUTCOME_QNAME);
+
         _queries = this.getFirstChild(EnvOutcomeQueries.class);
+        }
 
     }
 
@@ -62,6 +74,46 @@ public class IfActivity extends Activity {
      */
     public List<Case> getCases() {
         return getChildren(Case.class);
+    }
+
+    public Map<String, Collection<URI>> getMetamodelReference() {
+        Map<String, Collection<URI>> referencesMap = new HashMap<String, Collection<URI>>();
+        for (EnvOutcomeQuery query : _queries.getEnvQueries())
+            referencesMap.put(query.getVariable(), query.getModelReferences());
+
+        return referencesMap;
+    }
+
+    public Map<String, URI> getLiftingScheme() {
+        Map<String, URI> referencesMap = new HashMap<String, URI>();
+        for (EnvOutcomeQuery query : _queries.getEnvQueries())
+            referencesMap.put(query.getVariable(), query.getLiftingScheme());
+
+        return referencesMap;
+    }
+
+    public Map<String, URI> getLoweringScheme() {
+        Map<String, URI> referencesMap = new HashMap<String, URI>();
+        for (EnvOutcomeQuery query : _queries.getEnvQueries())
+            referencesMap.put(query.getVariable(), query.getLoweringScheme());
+
+        return referencesMap;
+    }
+
+    public Map<String, Collection<EnvMPolygon>> getMultiPolygons() {
+        Map<String, Collection<EnvMPolygon>> referencesMap = new HashMap<String, Collection<EnvMPolygon>>();
+        for (EnvOutcomeQuery query : _queries.getEnvQueries())
+            referencesMap.put(query.getVariable(), query.getMPolygons());
+
+        return referencesMap;
+    }
+
+    public Map<String, Collection<EnvTimeInterval>> getTimeIntervals() {
+        Map<String, Collection<EnvTimeInterval>> referencesMap = new HashMap<String, Collection<EnvTimeInterval>>();
+        for (EnvOutcomeQuery query : _queries.getEnvQueries())
+            referencesMap.put(query.getVariable(), query.getTimeIntervals());
+
+        return referencesMap;
     }
 
     /**
