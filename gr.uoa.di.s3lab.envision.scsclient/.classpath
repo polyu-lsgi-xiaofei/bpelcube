@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="lib" path="C:/Users/Pigi/Desktop/eclipses/my_local_libs/scs/hsqldb-1.8.0.7.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Pigi/Desktop/eclipses/my_local_libs/scs/jini-core.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Pigi/Desktop/eclipses/my_local_libs/scs/jini-ext.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Pigi/Desktop/eclipses/my_local_libs/scs/jsk-dl.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Pigi/Desktop/eclipses/my_local_libs/scs/outrigger-dl.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Pigi/Desktop/eclipses/my_local_libs/scs/pg-9.1-901.jdbc4.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Pigi/Desktop/eclipses/my_local_libs/scs/postgis-jdbc-1.3.3.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Pigi/Desktop/eclipses/my_local_libs/scs/reggie.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Pigi/Desktop/eclipses/my_local_libs/scs/SCSObserver-1.0-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Pigi/Desktop/eclipses/my_local_libs/scs/SemCntSpace-dl.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
