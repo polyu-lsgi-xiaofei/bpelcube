@@ -35,6 +35,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ode.bpel.common.FaultException;
+import org.apache.ode.bpel.engine.BpelProcess;
 import org.apache.ode.bpel.engine.BpelRuntimeContextImpl;
 import org.apache.ode.bpel.evar.ExternalVariableModuleException;
 import org.apache.ode.bpel.evt.ActivityEvent;
@@ -378,6 +379,24 @@ abstract class ACTIVITY extends BpelJacobRunnable implements IndexedObject {
 		}
     }
     
+    /**************************************************************************/
+    
+   
+    
+    /**************************************************************************/
+    // Pigi Kouki: Additions to support the execution of the read operation of the SCS  
+    // Engine in the SWITCH activity
+    /**************************************************************************/
+    /*
+     * Gets the BpelProcess that this activity is associated with.
+     * 
+     * @return the BpelProcess
+     */
+    protected BpelProcess getBpelProcess() {
+    	BpelRuntimeContextImpl runtimeContext = 
+    			(BpelRuntimeContextImpl) getBpelRuntimeContext();
+    	return runtimeContext.getBpelProcess();
+    }
     /**************************************************************************/
     
 }
