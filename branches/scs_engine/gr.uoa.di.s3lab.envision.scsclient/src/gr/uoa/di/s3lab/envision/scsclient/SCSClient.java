@@ -31,7 +31,8 @@ import net.jini.core.transaction.TransactionException;
 public class SCSClient {
 	
 	private static SCSClient sharedInstance = null;
-	private SemanticJavaSpace space;
+	private SemanticJavaSpace space = null;
+	private String hostname;
 	
 	private SCSClient(){
 		sharedInstance = this;
@@ -44,9 +45,18 @@ public class SCSClient {
         return sharedInstance;
 	}
 	
-	public void initSCCEngine() throws RemoteException, IOException, ClassNotFoundException{
-		LookupLocator locator = new LookupLocator("jini://pleiades.di.uoa.gr/");
-        //LookupLocator locator = new LookupLocator("jini://pigi");
+	public boolean spaceHasBeenInitialized(){
+		if(space!=null)
+			return true;
+		else
+			return false;
+	}
+	
+	public void initSCCEngine(String hostnameString) throws RemoteException, IOException, ClassNotFoundException{
+		hostname = "jini://" + hostnameString + "/";
+		LookupLocator locator = new LookupLocator(hostname);
+		//LookupLocator locator = new LookupLocator("jini://pleiades.di.uoa.gr/");
+		//LookupLocator locator = new LookupLocator("jini://pigi");
         System.out.println("Locator details:" + locator.getHost() + ": " + locator.getPort());
         
         System.out.println("locatorName= " + locator.toString());
@@ -62,12 +72,12 @@ public class SCSClient {
             System.out.println("JavaSpace discovery failed!!");
         }
         
-        space.initializeDBs();
+        space.initializeDBs();	//delete this line!!!!!!!!!!!!!!!!!!!!!!!!
 
 	}
 	
 	
-	public Lease write(Node node,  long desiredTTL, URI metaInformation, String syntacticType, String scopeName, String multipolygon, Timestamp startTime, Timestamp endTime, TimeZone tz) throws SQLException, RemoteException, TransactionException{
+	public Lease write(Node node,  long desiredTTL, URI metaInformation, String syntacticType, String processIdScope, String processInstanceScope, String multipolygon, Timestamp startTime, Timestamp endTime, TimeZone tz) throws SQLException, RemoteException, TransactionException{
 		
 		//initialize the real information stored in the node element
 		XMLEntryNode entryNode = new XMLEntryNode(node);
@@ -89,11 +99,13 @@ public class SCSClient {
 		
 		//call the write and return the TTL returned from the SCS Engine
 		//template of the write function: Lease writeMetaInfoScopeSpatioTemp(Entry entry, Transaction tnx, long ls, MetaInformation sinfo, String scopeName, MultiPolygon multiPol, TemporalFeature tmpFeature)
-		return space.writeMetaInfoScopeSpatioTemp(entryNode, null, desiredTTL, rdflInfo, scopeName, multipol, tmpFeature);
-		
+		if(processInstanceScope == null)
+			return space.writeMetaInfoScopeSpatioTemp(entryNode, null, desiredTTL, rdflInfo, processIdScope, multipol, tmpFeature);
+		else
+			return space.writeMetaInfoScopeSpatioTemp(entryNode, null, desiredTTL, rdflInfo, processIdScope + "_" + processInstanceScope, multipol, tmpFeature);	
 	}
 	
-public Lease write(DocTest node,  long desiredTTL, URI metaInformation, String syntacticType, String scopeName, String multipolygon, Timestamp startTime, Timestamp endTime, TimeZone tz) throws SQLException, RemoteException, TransactionException{
+public Lease write(DocTest node,  long desiredTTL, URI metaInformation, String syntacticType, String processIdScope, String processInstanceScope, String multipolygon, Timestamp startTime, Timestamp endTime, TimeZone tz) throws SQLException, RemoteException, TransactionException{
 		
 		//initialize the real information stored in the node element
 		//XMLEntryNode entryNode = new XMLEntryNode(node);
@@ -115,13 +127,15 @@ public Lease write(DocTest node,  long desiredTTL, URI metaInformation, String s
 		
 		//call the write and return the TTL returned from the SCS Engine
 		//template of the write function: Lease writeMetaInfoScopeSpatioTemp(Entry entry, Transaction tnx, long ls, MetaInformation sinfo, String scopeName, MultiPolygon multiPol, TemporalFeature tmpFeature)
-		return space.writeMetaInfoScopeSpatioTemp(node, null, desiredTTL, rdflInfo, scopeName, multipol, tmpFeature);
-		
+		if(processInstanceScope == null)
+			return space.writeMetaInfoScopeSpatioTemp(node, null, desiredTTL, rdflInfo, processIdScope, multipol, tmpFeature);
+		else
+			return space.writeMetaInfoScopeSpatioTemp(node, null, desiredTTL, rdflInfo, processIdScope + "_" + processInstanceScope, multipol, tmpFeature);		
 	}
 	
 	
 	
-	public ResultsList read(URI metaInformation, String syntacticType, String scopeName, String multipolygon, Timestamp startTime, Timestamp endTime, TimeZone tz) throws SQLException, RemoteException, TransactionException{
+	public ResultsList read(URI metaInformation, String syntacticType, String processIdScope, String processInstanceScope, String multipolygon, Timestamp startTime, Timestamp endTime, TimeZone tz) throws SQLException, RemoteException, TransactionException{
 		
 		//ResultsList readMetaInfoScopeSpatioTemp(Entry entry, Transaction tnx, com.s3lab.space.actions.SpaceQuery query, String scope, boolean propagateQuery, MultiPolygon multiPol, TemporalFeature tmpFeature)
         //readMetaInfoScopeSpatioTemp(null, null, query, scopeName, propagateQuery, multiPol, tmpFeature);
@@ -145,8 +159,10 @@ public Lease write(DocTest node,  long desiredTTL, URI metaInformation, String s
 			tmpFeature = null;
 		
 		//call the write and return the matching results
-		return space.readMetaInfoScopeSpatioTemp(null, null, query, scopeName, true, multipol, tmpFeature);
-		
+		if(processInstanceScope == null)
+			return space.readMetaInfoScopeSpatioTemp(null, null, query, processIdScope, true, multipol, tmpFeature);
+		else
+			return space.readMetaInfoScopeSpatioTemp(null, null, query, processIdScope + "_" + processInstanceScope, true, multipol, tmpFeature);
 	}
 	
 	
@@ -170,11 +186,11 @@ public Lease write(DocTest node,  long desiredTTL, URI metaInformation, String s
 														//initialization process of the SCS Engine
 		URI uri = new URI(concept);
         rdflInfo.setCategory(uri);
-		space.createScope(processIdScope + "+" + processInstanceScope, rdflInfo, Long.MAX_VALUE);
+		space.createScope(processIdScope + "_" + processInstanceScope, rdflInfo, Long.MAX_VALUE);
 		
 	}
 	
-	public void addAffiliation(String processIdScope, String processInstanceScope) throws URISyntaxException, RemoteException{
+	public void addAffiliation(String processInstanceScope, String processIdScope) throws URISyntaxException, RemoteException{
 		
 		Role[] roles = new Role[1];
         roles[0] = new Role("ProcessInstanceBond");
@@ -182,10 +198,10 @@ public Lease write(DocTest node,  long desiredTTL, URI metaInformation, String s
         AffiliationType affType = new AffiliationType("AffType");
 		affType.setRoles(roles);
 		
-        URI localURI1 = new URI ("jini://pleiades.di.uoa.gr/SemanticContextSpace" + "#" + processIdScope);
+        URI localURI1 = new URI ("jini://pleiades.di.uoa.gr/SemanticContextSpace" + "#" + processIdScope + "_" + processInstanceScope);
         Bond fromScope = new Bond(localURI1, new Role("BondProcessIdProcessInstance")); 
 		
-		URI localURI2 = new URI ("jini://localhost/SemanticContextSpace" + "#" + processIdScope + "+" + processInstanceScope);
+		URI localURI2 = new URI ("jini://pleiades.di.uoa.gr/SemanticContextSpace" + "#" + processIdScope);
 		Bond toScope = new Bond(localURI2, new Role("BondProcessIdProcessInstance"));
 		
 		Collection<Bond> toScopes = new ArrayList<Bond>();

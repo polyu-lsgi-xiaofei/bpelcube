@@ -20,19 +20,19 @@ public class testClientMain {
 		
 		SCSClient client = SCSClient.AccessSCSClient();
 		
-		client.initSCCEngine();
+		client.initSCCEngine("pleiades.di.uoa.gr");
 		
 		client.createProcessScope("processScope");
 		client.createProcessInstanceScope("processScope", "processInstanceScope");
-		client.addAffiliation("processScope", "processInstanceScope");
+		client.addAffiliation("processInstanceScope", "processScope");
 		
 		DocTest DocT = new DocTest("C:\\Users\\Pigi\\Desktop\\envision\\SVN\\Papers\\SCS_Engine_2012\\evaluation\\hydroExecuteWPS3KB.xml");     
 		String multiPol = "MULTIPOLYGON(((1 1, 1 -1, -1 -1, -1 1, 1 1)),((1 1, 3 1, 3 3, 1 3, 1 1)))";
-        client.write(DocT, Lease.FOREVER, new URI("http://purl.org/ifgi/dul#Entity"), "testSyntType", "processScope", multiPol, null, null, null);
-        client.write(DocT, Lease.FOREVER, new URI("http://purl.org/ifgi/dul#Entity"), "testSyntType", "processScope+processInstanceScope", multiPol, null, null, null);
+        client.write(DocT, Lease.FOREVER, new URI("http://purl.org/ifgi/dul#Entity"), "testSyntType", "processScope", null, multiPol, null, null, null);
+        client.write(DocT, Lease.FOREVER, new URI("http://purl.org/ifgi/dul#Entity"), "testSyntType", "processScope", "processInstanceScope", multiPol, null, null, null);
 		
-        client.read(new URI("http://purl.org/ifgi/dul#Entity"), "testSyntType", "processScope", multiPol, null, null, null);
-        client.read(new URI("http://purl.org/ifgi/dul#Entity"), "testSyntType", "processScope+processInstanceScope", multiPol, null, null, null);
+        client.read(new URI("http://purl.org/ifgi/dul#Entity"), "testSyntType", "processScope", null, multiPol, null, null, null);
+        client.read(new URI("http://purl.org/ifgi/dul#Entity"), "testSyntType", "processScope", "processInstanceScope", multiPol, null, null, null);
 		
 	
 	}
