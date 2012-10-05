@@ -20,6 +20,7 @@
 package org.apache.ode.axis2;
 
 import gr.uoa.di.s3lab.bpelcube.BPELCubeNode;
+import gr.uoa.di.s3lab.envision.scsclient.SCSClient;
 import gr.uoa.di.s3lab.p2p.Log.Level;
 
 import java.io.File;
@@ -29,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -187,6 +189,12 @@ public class ODEServer {
 			node.setBPELEnginePort(bpelEnginePort);
 			node.start();
 			
+			 /**********************************************************************/
+	        // Pigi Kouki: initialize SCSClient
+			String hostnameSCS = props.getProperty("node.scs.engine.host");	//get the hostname from the properties file
+			this.intiSCSClient(hostnameSCS);
+	        /**********************************************************************/
+			
 		} catch (FileNotFoundException e) {
 			__log.debug(null, e);
 		} catch (IOException e) {
@@ -197,6 +205,29 @@ public class ODEServer {
 			__log.debug(null, e);
 		}
     }
+    
+    /**************************************************************************/
+    // Pigi Kouki: The following method is used to start the SCSClient
+    
+    /**
+     * Initializes the SCSEngine
+     */
+    public void intiSCSClient(String localhost){
+    	SCSClient client = SCSClient.AccessSCSClient();
+		try {
+			client.initSCCEngine(localhost);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+
     
     // Michael Pantazoglou: The following method is used to stop the local p2p node
     
@@ -226,8 +257,10 @@ public class ODEServer {
         // Michael Pantazoglou: initialize the local p2p node
         this.initBPELCubeNode();
         /**********************************************************************/
+        
     }
-
+    
+    
     public void init(String contextPath, AxisConfiguration axisConf) throws ServletException {
         _axisConfig = axisConf;
         String rootDir = System.getProperty("org.apache.ode.rootDir");
