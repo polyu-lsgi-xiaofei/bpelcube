@@ -21,10 +21,20 @@ package org.apache.ode.bpel.runtime;
 import org.apache.ode.bpel.common.FaultException;
 import org.apache.ode.bpel.explang.EvaluationContext;
 import org.apache.ode.bpel.explang.EvaluationException;
+import org.apache.ode.bpel.o.OConstantVarType;
+import org.apache.ode.bpel.o.OElementVarType;
+import org.apache.ode.bpel.o.OMessageVarType;
+import org.apache.ode.bpel.o.OScope.Variable;
 import org.apache.ode.bpel.o.OSwitch;
+import org.apache.ode.bpel.o.OXsdTypeVarType;
 import org.apache.ode.bpel.runtime.channels.FaultData;
 
+import gr.uoa.di.s3lab.envision.scsclient.SCSClient;
+
+import java.util.HashMap;
 import java.util.Iterator;
+
+import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -45,6 +55,42 @@ class SWITCH extends ACTIVITY {
     OSwitch oswitch = (OSwitch)_self.o;
     OSwitch.OCase matchedOCase = null;
     FaultData faultData = null;
+    
+    /********************************************************************/
+    //Pigi Kouki: Somewhere in the above code we will put the read operation to 
+    //the SCS Engine - not exactly down here but where George indicates!
+    
+    SCSClient client = SCSClient.AccessSCSClient();
+    if(client.spaceHasBeenInitialized()){
+        //attributes metaInformation and multipolygon will be given from George
+        
+    	//for the syntacticType we should check the type of the oscope varibale
+    	QName syntType;
+    	HashMap<String,Variable> variablesMap = _scopeFrame.oscope.variables;
+    	for(Variable var : variablesMap.values()){	//is this right?? will we read FOR EACH variable in the variablesMap???
+    		if(var.type instanceof OConstantVarType){
+    			OConstantVarType oConstant = (OConstantVarType) var.type;
+    			syntType = new QName(oConstant.getValue().getNamespaceURI(), oConstant.getValue().getLocalName());
+    		}
+    		else if(var.type instanceof OElementVarType){
+    			OElementVarType oElement = (OElementVarType) var.type;
+    			syntType = oElement.elementType;
+    		}
+    		else if(var.type instanceof OMessageVarType){
+    			OMessageVarType oMessage = (OMessageVarType) var.type;
+    			syntType = oMessage.messageType;
+    		}
+    		else if(var.type instanceof OXsdTypeVarType){
+    			OXsdTypeVarType oXsd = (OXsdTypeVarType) var.type;
+    			syntType = oXsd.xsdType;
+    		}
+    		else {
+    			//error!!
+    		}
+    		client.read(metaInformation, syntType, getBpelProcess().getPID().getLocalPart(), getP2PSessionId(), multipolygon, startTime, endTime, tz);
+    	}
+    	
+    }
     
     EvaluationContext evalCtx = getEvaluationContext();
     for (Iterator i = oswitch.getCases().iterator(); i.hasNext();) {
