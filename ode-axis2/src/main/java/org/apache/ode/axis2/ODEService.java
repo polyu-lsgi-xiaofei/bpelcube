@@ -25,6 +25,7 @@ import gr.uoa.di.s3lab.bpelcube.BPELCubeNodeDB;
 import gr.uoa.di.s3lab.bpelcube.BPELCubeUtils;
 import gr.uoa.di.s3lab.bpelcube.BPELProcessExecutionListener;
 import gr.uoa.di.s3lab.bpelcube.services.RecruitRequest;
+import gr.uoa.di.s3lab.envision.scsclient.SCSClient;
 import gr.uoa.di.s3lab.p2p.P2PRequest;
 import gr.uoa.di.s3lab.p2p.hypercube.Neighbor;
 
@@ -249,6 +250,14 @@ public class ODEService {
             	String p2pSessionId = this.initP2PSession(msgContext, odeMex);
             	((MyRoleMessageExchangeImpl)odeMex).getBpelProcess().setP2PSessionId(p2pSessionId);
             	/**************************************************************/
+            	
+            	/**************************************************************/
+            	// Pigi Kouki: Create the process instance scope and affiliate it with the process scope
+            	SCSClient client = SCSClient.AccessSCSClient();
+            	if(client.spaceHasBeenInitialized()){
+	            	client.createProcessInstanceScope(((MyRoleMessageExchangeImpl)odeMex).getBpelProcess().getPID().getLocalPart(), p2pSessionId);
+	            	client.addAffiliation(p2pSessionId, ((MyRoleMessageExchangeImpl)odeMex).getBpelProcess().getPID().getLocalPart());
+            	}/**************************************************************/
             	
                 // Preparing message to send to ODE
                 Message odeRequest = odeMex.createMessage(odeMex.getOperation().getInput().getMessage().getQName());
