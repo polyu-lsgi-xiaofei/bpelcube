@@ -123,5 +123,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/gr.uoa.di.s3lab.bpelcube"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/gr.uoa.di.s3lab.p2p"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/gr.uoa.di.s3lab.p2p.hypercube"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/gr.uoa.di.s3lab.envision.scsclient"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

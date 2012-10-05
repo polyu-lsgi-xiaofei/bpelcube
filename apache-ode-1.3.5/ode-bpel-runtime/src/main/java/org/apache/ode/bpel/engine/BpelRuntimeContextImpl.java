@@ -23,6 +23,7 @@ import gr.uoa.di.s3lab.bpelcube.BPELCubeNodeDB;
 import gr.uoa.di.s3lab.bpelcube.services.ReadBPELVariableRequest;
 import gr.uoa.di.s3lab.bpelcube.services.ReadBPELVariableResponse;
 import gr.uoa.di.s3lab.bpelcube.services.WriteBPELVariableRequest;
+import gr.uoa.di.s3lab.envision.scsclient.SCSClient;
 import gr.uoa.di.s3lab.p2p.P2PEndpoint;
 
 import java.io.ByteArrayInputStream;
@@ -529,6 +530,16 @@ public class BpelRuntimeContextImpl implements BpelRuntimeContext {
         
         __log.info("Reading variable: " + variableId);
         
+        /**********************************************************************/
+        //Pigi Kouki read 
+        /*SCSClient client = SCSClient.AccessSCSClient();
+        if(client.spaceHasBeenInitialized()){
+	        //attributes metaInformation and multipolygon will be given from George
+	        //for the syntacticType we should ask George!!!!
+        	client.read(metaInformation, syntacticType, _bpelProcess._pid.getLocalPart(), p2pSessionId, multipolygon, startTime, endTime, tz);
+	    }*/
+        /*********************************************************************/
+        
         String variableHolder = db.getVariableHolder(p2pSessionId, variableId);
         if (variableHolder != null) {
         	if (variableHolder.equals(me.getEndpoint().toString())) {
@@ -633,8 +644,6 @@ public class BpelRuntimeContextImpl implements BpelRuntimeContext {
         	// p2p session.
         }
         
-        /**********************************************************************/
-        
         XmlDataDAO var = scopedao.getVariable(varname);
         return (var == null || var.isNull()) ? null : var.get();
     }
@@ -699,6 +708,15 @@ public class BpelRuntimeContextImpl implements BpelRuntimeContext {
         dataDAO.set(changes);
 
         writeProperties(variable, changes, dataDAO);
+        
+        /*********************************************************************/
+        //Pigi Kouki: write in the SCSEngine
+        QName syntType = new QName(changes.getNamespaceURI(), changes.getLocalName());
+        SCSClient client = SCSClient.AccessSCSClient();
+        if(client.spaceHasBeenInitialized()){
+	        //attributes metaInformation and multipolygon will be given from George
+	        client.write(changes, null, metaInformation, syntType.toString(), _bpelProcess._pid.getLocalPart(), p2pSessionId, multipolygon, null, null, null);
+        }
         return dataDAO.get();
     }
 
