@@ -124,5 +124,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/gr.uoa.di.s3lab.p2p"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/gr.uoa.di.s3lab.p2p.hypercube"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/gr.uoa.di.s3lab.envision.scsclient"/>
+	<classpathentry kind="lib" path="lib/SemCntSpace-dl.jar"/>
+	<classpathentry kind="lib" path="lib/jini-core.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

@@ -711,12 +711,12 @@ public class BpelRuntimeContextImpl implements BpelRuntimeContext {
         
         /*********************************************************************/
         //Pigi Kouki: write in the SCSEngine
-        QName syntType = new QName(changes.getNamespaceURI(), changes.getLocalName());
+        /*QName syntType = new QName(changes.getNamespaceURI(), changes.getLocalName());
         SCSClient client = SCSClient.AccessSCSClient();
         if(client.spaceHasBeenInitialized()){
 	        //attributes metaInformation and multipolygon will be given from George
 	        client.write(changes, null, metaInformation, syntType.toString(), _bpelProcess._pid.getLocalPart(), p2pSessionId, multipolygon, null, null, null);
-        }
+        }*/
         return dataDAO.get();
     }
 

@@ -20,9 +20,9 @@
 <project>
 
 	<property name="db.scripts.dir" value="${basedir}/target" />
-	<property name="sql.dir" value="${basedir}/src/main/sql"/>
-        <property name="dao-hibernate.classes" value="${basedir}/../dao-hibernate/target/classes" />
-	<property name="bpel-store.classes" value="${basedir}/../bpel-store/target/classes" />
+	<property name="sql.dir" value="${basedir}/sql"/>
+        <property name="dao-hibernate.classes" value="${basedir}/../ode-dao-hibernate/target/classes" />
+	<property name="bpel-store.classes" value="${basedir}/../ode-bpel-store/target/classes" />
 
 	<path id="classpath">
 	  <pathelement path="${maven.runtime.classpath}"/>

@@ -1,6 +1,7 @@
 package gr.uoa.di.s3lab.envision.scsclient;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.rmi.RemoteException;
@@ -52,19 +53,37 @@ public class SCSClient {
 			return false;
 	}
 	
-	public void initSCCEngine(String hostnameString) throws RemoteException, IOException, ClassNotFoundException{
+	public void initSCCEngine(String hostnameString) /*throws RemoteException, IOException, ClassNotFoundException*/{
+		
 		hostname = "jini://" + hostnameString + "/";
-		LookupLocator locator = new LookupLocator(hostname);
+		LookupLocator locator = null;
+		try {
+			locator = new LookupLocator(hostname);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		//LookupLocator locator = new LookupLocator("jini://pleiades.di.uoa.gr/");
 		//LookupLocator locator = new LookupLocator("jini://pigi");
         System.out.println("Locator details:" + locator.getHost() + ": " + locator.getPort());
         
         System.out.println("locatorName= " + locator.toString());
 
-        space = (SemanticJavaSpace) locator.getRegistrar().lookup(
-            new ServiceTemplate(null,
-            new Class[]{SemanticJavaSpace.class},
-            null));
+        try {
+			space = (SemanticJavaSpace) locator.getRegistrar().lookup(
+			    new ServiceTemplate(null,
+			    new Class[]{SemanticJavaSpace.class},
+			    null));
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
         if (space != null) {
             System.out.println("JavaSpace Service discovered !!");
@@ -72,12 +91,20 @@ public class SCSClient {
             System.out.println("JavaSpace discovery failed!!");
         }
         
-        space.initializeDBs();	//delete this line!!!!!!!!!!!!!!!!!!!!!!!!
+        //delete from here!!!!!!!!!!!!!!!!!!!!!!!!
+        try {
+			space.initializeDBs();
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+        //delete until here!!!!!!!!!!!!!!!!!!!!!!!!
+		
 
 	}
 	
 	
-	public Lease write(Node node,  long desiredTTL, URI metaInformation, String syntacticType, String processIdScope, String processInstanceScope, String multipolygon, Timestamp startTime, Timestamp endTime, TimeZone tz) throws SQLException, RemoteException, TransactionException{
+	public Lease write(Node node,  long desiredTTL, URI metaInformation, String syntacticType, String processIdScope, String processInstanceScope, String multipolygon, Timestamp startTime, Timestamp endTime, TimeZone tz) /*throws SQLException, RemoteException, TransactionException*/{
 		
 		//initialize the real information stored in the node element
 		XMLEntryNode entryNode = new XMLEntryNode(node);
@@ -86,9 +113,16 @@ public class SCSClient {
 		RDFS_WSMLMetaInformation rdflInfo = new RDFS_WSMLMetaInformation();
 		rdflInfo.setCategory(metaInformation);
         rdflInfo.setSyntType(syntacticType);
+        MultiPolygon multipol = null;
         
         //initialize the spatial characteristics
-        MultiPolygon multipol = new MultiPolygon(multipolygon);
+        if(!multipolygon.equals("EMPTY"))
+			try {
+				multipol = new MultiPolygon(multipolygon);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         
         //initialize the temporal characteristics
 		TemporalFeature tmpFeature;
@@ -97,15 +131,35 @@ public class SCSClient {
 		else
 			tmpFeature = null;
 		
+		if(desiredTTL==0)
+			desiredTTL = Lease.FOREVER;
+			
 		//call the write and return the TTL returned from the SCS Engine
 		//template of the write function: Lease writeMetaInfoScopeSpatioTemp(Entry entry, Transaction tnx, long ls, MetaInformation sinfo, String scopeName, MultiPolygon multiPol, TemporalFeature tmpFeature)
 		if(processInstanceScope == null)
-			return space.writeMetaInfoScopeSpatioTemp(entryNode, null, desiredTTL, rdflInfo, processIdScope, multipol, tmpFeature);
+			try {
+				return space.writeMetaInfoScopeSpatioTemp(entryNode, null, desiredTTL, rdflInfo, processIdScope, multipol, tmpFeature);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (TransactionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		else
-			return space.writeMetaInfoScopeSpatioTemp(entryNode, null, desiredTTL, rdflInfo, processIdScope + "_" + processInstanceScope, multipol, tmpFeature);	
+			try {
+				return space.writeMetaInfoScopeSpatioTemp(entryNode, null, desiredTTL, rdflInfo, processIdScope + "_" + processInstanceScope, multipol, tmpFeature);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (TransactionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}	
+		return null;
 	}
 	
-public Lease write(DocTest node,  long desiredTTL, URI metaInformation, String syntacticType, String processIdScope, String processInstanceScope, String multipolygon, Timestamp startTime, Timestamp endTime, TimeZone tz) throws SQLException, RemoteException, TransactionException{
+public Lease write(DocTest node,  long desiredTTL, URI metaInformation, String syntacticType, String processIdScope, String processInstanceScope, String multipolygon, Timestamp startTime, Timestamp endTime, TimeZone tz) /*throws SQLException, RemoteException, TransactionException*/{
 		
 		//initialize the real information stored in the node element
 		//XMLEntryNode entryNode = new XMLEntryNode(node);
@@ -116,7 +170,13 @@ public Lease write(DocTest node,  long desiredTTL, URI metaInformation, String s
         rdflInfo.setSyntType(syntacticType);
         
         //initialize the spatial characteristics
-        MultiPolygon multipol = new MultiPolygon(multipolygon);
+        MultiPolygon multipol = null;
+		try {
+			multipol = new MultiPolygon(multipolygon);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         
         //initialize the temporal characteristics
 		TemporalFeature tmpFeature;
@@ -125,17 +185,38 @@ public Lease write(DocTest node,  long desiredTTL, URI metaInformation, String s
 		else
 			tmpFeature = null;
 		
+		if(desiredTTL==0)
+			desiredTTL = Lease.FOREVER;
+		
 		//call the write and return the TTL returned from the SCS Engine
 		//template of the write function: Lease writeMetaInfoScopeSpatioTemp(Entry entry, Transaction tnx, long ls, MetaInformation sinfo, String scopeName, MultiPolygon multiPol, TemporalFeature tmpFeature)
 		if(processInstanceScope == null)
-			return space.writeMetaInfoScopeSpatioTemp(node, null, desiredTTL, rdflInfo, processIdScope, multipol, tmpFeature);
+			try {
+				return space.writeMetaInfoScopeSpatioTemp(node, null, desiredTTL, rdflInfo, processIdScope, multipol, tmpFeature);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (TransactionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		else
-			return space.writeMetaInfoScopeSpatioTemp(node, null, desiredTTL, rdflInfo, processIdScope + "_" + processInstanceScope, multipol, tmpFeature);		
+			try {
+				return space.writeMetaInfoScopeSpatioTemp(node, null, desiredTTL, rdflInfo, processIdScope + "_" + processInstanceScope, multipol, tmpFeature);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (TransactionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}	
+		return null;
 	}
 	
 	
 	
-	public ResultsList read(URI metaInformation, String syntacticType, String processIdScope, String processInstanceScope, String multipolygon, Timestamp startTime, Timestamp endTime, TimeZone tz) throws SQLException, RemoteException, TransactionException{
+	public ResultsList read(URI metaInformation, String syntacticType, String processIdScope, String processInstanceScope, String multipolygon, Timestamp startTime, Timestamp endTime, TimeZone tz) {
+	
 		
 		//ResultsList readMetaInfoScopeSpatioTemp(Entry entry, Transaction tnx, com.s3lab.space.actions.SpaceQuery query, String scope, boolean propagateQuery, MultiPolygon multiPol, TemporalFeature tmpFeature)
         //readMetaInfoScopeSpatioTemp(null, null, query, scopeName, propagateQuery, multiPol, tmpFeature);
@@ -149,7 +230,13 @@ public Lease write(DocTest node,  long desiredTTL, URI metaInformation, String s
         query.setSemMatchFloor(1.0f);
 		
 		//initialize the spatial characteristics
-        MultiPolygon multipol = new MultiPolygon(multipolygon);
+        MultiPolygon multipol = null;
+		try {
+			multipol = new MultiPolygon(multipolygon);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         
         //initialize the temporal characteristics
 		TemporalFeature tmpFeature;
@@ -160,37 +247,76 @@ public Lease write(DocTest node,  long desiredTTL, URI metaInformation, String s
 		
 		//call the write and return the matching results
 		if(processInstanceScope == null)
-			return space.readMetaInfoScopeSpatioTemp(null, null, query, processIdScope, true, multipol, tmpFeature);
+			try {
+				return space.readMetaInfoScopeSpatioTemp(null, null, query, processIdScope, true, multipol, tmpFeature);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (TransactionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		else
-			return space.readMetaInfoScopeSpatioTemp(null, null, query, processIdScope + "_" + processInstanceScope, true, multipol, tmpFeature);
-	}
+			try {
+				return space.readMetaInfoScopeSpatioTemp(null, null, query, processIdScope + "_" + processInstanceScope, true, multipol, tmpFeature);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (TransactionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		return null;
+}
 	
 	
-	public void createProcessScope (String processIdScope) throws URISyntaxException, RemoteException{
+	public void createProcessScope (String processIdScope) /*throws URISyntaxException, RemoteException*/{
 		
 		RDFS_WSMLMetaInformation rdflInfo = new RDFS_WSMLMetaInformation();
 		String concept = "http://purl.org/ifgi/dul";	//the value of this variable does not affect as - the only restriction
 														//is to be from a namespace belonging to an ontology that is parsed during the 
 														//initialization process of the SCS Engine
-		URI uri = new URI(concept);
+		URI uri = null;
+		try {
+			uri = new URI(concept);
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         rdflInfo.setCategory(uri);
-		space.createScope(processIdScope, rdflInfo, Long.MAX_VALUE);
+		try {
+			space.createScope(processIdScope, rdflInfo, Long.MAX_VALUE);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 	
-	public void createProcessInstanceScope (String processIdScope, String processInstanceScope) throws URISyntaxException, RemoteException{
+	public void createProcessInstanceScope (String processIdScope, String processInstanceScope) /*throws URISyntaxException, RemoteException*/{
 		
 		RDFS_WSMLMetaInformation rdflInfo = new RDFS_WSMLMetaInformation();
 		String concept = "http://purl.org/ifgi/dul";	//the value of this variable does not affect as - the only restriction
 														//is to be from a namespace belonging to an ontology that is parsed during the 
 														//initialization process of the SCS Engine
-		URI uri = new URI(concept);
+		URI uri = null;
+		try {
+			uri = new URI(concept);
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         rdflInfo.setCategory(uri);
-		space.createScope(processIdScope + "_" + processInstanceScope, rdflInfo, Long.MAX_VALUE);
+		try {
+			space.createScope(processIdScope + "_" + processInstanceScope, rdflInfo, Long.MAX_VALUE);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 	
-	public void addAffiliation(String processInstanceScope, String processIdScope) throws URISyntaxException, RemoteException{
+	public void addAffiliation(String processInstanceScope, String processIdScope) /*throws URISyntaxException, RemoteException*/{
 		
 		Role[] roles = new Role[1];
         roles[0] = new Role("ProcessInstanceBond");
@@ -198,16 +324,33 @@ public Lease write(DocTest node,  long desiredTTL, URI metaInformation, String s
         AffiliationType affType = new AffiliationType("AffType");
 		affType.setRoles(roles);
 		
-        URI localURI1 = new URI ("jini://pleiades.di.uoa.gr/SemanticContextSpace" + "#" + processIdScope + "_" + processInstanceScope);
+        URI localURI1 = null;
+		try {
+			localURI1 = new URI ("jini://pleiades.di.uoa.gr/SemanticContextSpace" + "#" + processIdScope + "_" + processInstanceScope);
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         Bond fromScope = new Bond(localURI1, new Role("BondProcessIdProcessInstance")); 
 		
-		URI localURI2 = new URI ("jini://pleiades.di.uoa.gr/SemanticContextSpace" + "#" + processIdScope);
+		URI localURI2 = null;
+		try {
+			localURI2 = new URI ("jini://pleiades.di.uoa.gr/SemanticContextSpace" + "#" + processIdScope);
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		Bond toScope = new Bond(localURI2, new Role("BondProcessIdProcessInstance"));
 		
 		Collection<Bond> toScopes = new ArrayList<Bond>();
         toScopes.add(toScope);
         
-        space.addAffiliation(fromScope, toScopes, affType);
+        try {
+			space.addAffiliation(fromScope, toScopes, affType);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         
 	}
 	

@@ -476,10 +476,10 @@
               <outputDirectory>target/test/smx/ode</outputDirectory>
               <resources>          
                 <resource>
-                  <directory>${basedir}/../dao-jpa-ojpa-derby/target/derby</directory>
+                  <directory>${basedir}/../ode-dao-jpa-ojpa-derby/target/derby</directory>
                 </resource>
                 <resource>
-                  <directory>${basedir}/../dao-hibernate-db/target/derby</directory>
+                  <directory>${basedir}/../ode-dao-hibernate-db/target/derby</directory>
                 </resource>
               </resources>              
             </configuration>            

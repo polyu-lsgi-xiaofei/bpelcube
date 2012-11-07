@@ -18,8 +18,15 @@
  */
 package org.apache.ode.bpel.runtime;
 
+import gr.uoa.di.s3lab.envision.scsclient.SCSClient;
+
+import java.net.URI;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
+import java.util.TimeZone;
 
 import javax.xml.namespace.QName;
 
@@ -31,6 +38,7 @@ import org.apache.ode.bpel.evt.ActivityRecoveryEvent;
 import org.apache.ode.bpel.evt.VariableModificationEvent;
 import org.apache.ode.bpel.o.OFailureHandling;
 import org.apache.ode.bpel.o.OInvoke;
+import org.apache.ode.bpel.o.OProcess;
 import org.apache.ode.bpel.o.OScope;
 import org.apache.ode.bpel.runtime.channels.ActivityRecoveryChannel;
 import org.apache.ode.bpel.runtime.channels.ActivityRecoveryChannelListener;
@@ -42,6 +50,7 @@ import org.apache.ode.utils.DOMUtils;
 import org.apache.ode.bpel.evar.ExternalVariableModuleException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
 
 /**
  * JacobRunnable that performs the work of the <code>invoke</code> activity.
@@ -235,6 +244,51 @@ public class INVOKE extends ACTIVITY {
     					}
                         
                         /******************************************************************/
+                        
+                        
+                        /*********************************************************************/
+                        //Pigi Kouki: write in the SCSEngine
+                        SCSClient client = SCSClient.AccessSCSClient();
+                        if(client.spaceHasBeenInitialized()){
+                            //retrieve the real data (the entry) to be written in the SCS Engine
+                        	Node varData = null;
+							try {
+								varData = getBpelRuntimeContext().readVariable(outputVar.scopeInstance, outputVar.declaration.name, false);
+							} catch (FaultException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+                            QName syntType = new QName(varData.getNamespaceURI(), varData.getLocalName());
+                        	for(URI metaInformation : _oinvoke._metamodelReferences){
+                        		for(String multiPolygon : _oinvoke._mPolygons){
+                        			for(String time_Intervals : _oinvoke._timeIntervals){
+                        				String[] times = null;
+                        				time_Intervals.split(" ");
+                        				SimpleDateFormat simpleDataFormat1 = new SimpleDateFormat(times[0]);
+                        				Timestamp timestampStart = null;
+										try {
+											timestampStart = new Timestamp(simpleDataFormat1.parse(times[0]).getTime());
+										} catch (ParseException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										}
+                        				SimpleDateFormat simpleDataFormat2 = new SimpleDateFormat(times[0]);
+                        				Timestamp timestampEnd = null;
+										try {
+											timestampEnd = new Timestamp(simpleDataFormat2.parse(times[1]).getTime());
+										} catch (ParseException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										}
+                        				TimeZone tz = simpleDataFormat1.getTimeZone();
+                        				long desiredTTL = 0; //this value will be replaced with lease.FOREVER in the write method
+                        				//I have to declare somehow the Lease in here import net.jini.core.lease.Lease; does not work
+                        				client.write(varData, desiredTTL, metaInformation, syntType.toString(), getBpelProcess().getPID().getLocalPart(), getP2PSessionId(), multiPolygon, timestampStart, timestampEnd, tz);
+                        			}
+                        		}
+                        	}
+                        }
+                        
                     }
 
                     public void onFault() {

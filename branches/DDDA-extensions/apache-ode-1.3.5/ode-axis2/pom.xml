@@ -47,6 +47,11 @@
             <version>1.0</version>
         </dependency>
         <dependency>
+            <groupId>gr.uoa.di.s3lab.envision</groupId>
+            <artifactId>scsclient</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
             <groupId>gr.uoa.di.s3lab</groupId>
             <artifactId>bpelcube</artifactId>
             <version>1.0</version>
