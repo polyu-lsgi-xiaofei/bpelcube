@@ -40,7 +40,7 @@
         <receive name="ReceiveProcReq" createInstance="yes" partnerLink="ProcessService" operation="Execute" xmlns:tns="http://envision.eu/pro/service" portType="tns:landslidePortType" variable="ProcessInput"/>
         <if name="if_LandslideOb">
             <env:OutcomeQueries>
-                <env:Query variable="tns:LandslideOb" sawsdl:modelReference="http://purl.org/ifgi/landslide#landslide"></env:Query>
+                <env:Query env:variable="tns:LandslideOb" sawsdl:modelReference="http://purl.org/ifgi/landslide#landslide"></env:Query>
             </env:OutcomeQueries>
             <condition expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0">[CDATA[exists($landslideOb.response)]]</condition>
             <sequence name="empty_land_seq">
@@ -50,7 +50,7 @@
                 <sequence name="NoLandslideSequ">
                     <if name="If_PrecipitationOb">
                         <env:OutcomeQueries>
-                            <env:Query variable="tns:PrecipitationOb" sawsdl:modelReference="http://purl.org/ifgi/landslide#precipitation"></env:Query>
+                            <env:Query env:variable="tns:PrecipitationOb" sawsdl:modelReference="http://purl.org/ifgi/landslide#precipitation"></env:Query>
                         </env:OutcomeQueries>
                         <condition expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0">[CDATA[exists($PrecipitationOb.response)]]</condition>
                             <sequence name="empty_prec_seq">

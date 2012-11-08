@@ -32,8 +32,9 @@ import org.xml.sax.SAXException;
 
 public class EnvisionExtendedTest {
     
-    private static final String EXTENDED_RESOURCE_BPEL="F:/My_Projects/Envision/GoogleCode/apache-ode-1.3.5/ode-bpel-compiler/target/test-classes/com/s3lab/bpel/extended/Landslide_Ex/LandSlideProbCalc_Ex.bpel";
+    private static final String EXTENDED_RESOURCE_BPEL="D:/My_Projects/Envision/Shared-at-Google/DDDA-extensions/apache-ode-1.3.5/ode-bpel-compiler/target/test-classes/com/s3lab/bpel/extended/Landslide_Ex/LandSlideProbCalc_Ex.bpel"; 
     private File _processFile;
+    private URL resourceURL;
     private ResourceFinder _resourceFinder;
     public EnvisionExtendedTest() {
         new LogConfigurator(); 
@@ -41,7 +42,7 @@ public class EnvisionExtendedTest {
     
     @Before
     public void setup() throws URISyntaxException{
-        URL resourceURL = this.getClass().getResource("/extended/Landslide_Ex/");
+        resourceURL = ClassLoader.getSystemResource("/extended/Landslide_Ex/");
         _processFile = new File(EXTENDED_RESOURCE_BPEL);
 //        setup the default resource finder
         _resourceFinder =  new DefaultResourceFinder(_processFile.getParentFile(), _processFile.getAbsoluteFile());
