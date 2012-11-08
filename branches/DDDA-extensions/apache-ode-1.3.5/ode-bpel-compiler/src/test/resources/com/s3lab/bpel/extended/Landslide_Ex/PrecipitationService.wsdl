@@ -1,0 +1,74 @@
+<?xml version='1.0' encoding='UTF-8'?><!-- Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is Metro/2.2.0-1 (tags/2.2.0u1-7139; 2012-06-02T10:55:19+0000) JAXWS-RI/2.2.6-2 JAXWS/2.2 svn-revision#unknown. --><definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:sawsdl="http://www.w3.org/ns/sawsdl" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://envision.eu/services/precip" name="Precipitation" targetNamespace="http://envision.eu/services/precip">
+    <types/>
+    <message name="GetObservationRequest">
+        <part name="request" type="xsd:string"/>
+    </message>
+    <message name="GetObservationResponse">
+        <part name="response" type="xsd:string"/>
+    </message>
+    <message name="DescribeSensorRequest">
+        <part name="request" type="xsd:string"/>
+        <part name="service" type="xsd:string"/>
+        <part name="version" type="xsd:string"/>
+        <part name="procedure" type="xsd:string"/>
+    </message>
+    <message name="DescribeSensorResponse">
+        <part name="response" type="xsd:string"/>
+    </message>
+    <message name="GetCapabilitiesRequest">
+        <part name="request" type="xsd:string"/>
+        <part name="service" type="xsd:string"/>
+        <part name="version" type="xsd:string"/>
+    </message>
+    <message name="GetCapabilitiesResponse">
+        <part name="response" type="xsd:string"/>
+    </message>
+
+    <portType name="sosPortType" sawsdl:modelReference="http://giv-wfs.uni-muenster.de/jcr/repository/y2review/SOS10_BrgmSos/Precipitation.rdf#SOS10_BrgmSos:Precipitation">
+        <operation name="GetObservation">
+            <input name="input1" message="tns:GetObservationRequest"/>
+            <output name="output1" message="tns:GetObservationResponse"/>
+        </operation>
+        <operation name="GetCapabilities">
+            <input name="input2" message="tns:GetCapabilitiesRequest"/>
+            <output name="output2" message="tns:GetCapabilitiesResponse"/>
+        </operation>
+        <operation name="DescribeSensor">
+            <input name="input2" message="tns:DescribeSensorRequest"/>
+            <output name="output2" message="tns:DescribeSensorResponse"/>
+        </operation>
+    </portType>
+    <binding name="SOAP_BINDING" type="tns:sosPortType">
+        <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="GetObservation">
+            <soap:operation/>
+            <input name="input1">
+                <soap:body use="literal" namespace="http://envision.eu/services" parts="request"/>
+            </input>
+            <output name="output1">
+                <soap:body use="literal" namespace="http://envision.eu/services" parts="response"/>
+            </output>
+        </operation>
+        <operation name="GetCapabilities">
+            <input name="input2">
+                <soap:body parts="request service version"/>
+            </input>
+            <output name="output2">
+                <soap:body parts="response"/>
+            </output>
+        </operation>
+        <operation name="DescribeSensor">
+            <input name="input2">
+                <soap:body parts="request service version procedure"/>
+            </input>
+            <output name="output2">
+                <soap:body parts="response"/>
+            </output>
+        </operation>
+    </binding>
+    <service name="PrecipitationService">
+        <port name="SOAP_PORT" binding="tns:SOAP_BINDING">
+            <soap:address location="http://ifaistos.di.uoa.gr:8080/LandslideDemo/PrecipitationService"/>
+        </port>
+    </service>
+</definitions>

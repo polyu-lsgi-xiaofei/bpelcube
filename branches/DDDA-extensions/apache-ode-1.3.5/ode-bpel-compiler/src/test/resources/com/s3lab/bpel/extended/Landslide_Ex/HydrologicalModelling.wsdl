@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='UTF-8'?><!-- Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is Metro/2.2.0-1 (tags/2.2.0u1-7139; 2012-06-02T10:55:19+0000) JAXWS-RI/2.2.6-2 JAXWS/2.2 svn-revision#unknown. --><definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:sawsdl="http://www.w3.org/ns/sawsdl" xmlns:tns="http://envision.eu/services/hydro" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" name="HydrologicalModell" targetNamespace="http://envision.eu/services/hydro">
+    <types/>
+    <message name="ExecuteRequest">
+        <part name="request" type="xsd:string"/>
+    </message>
+    <message name="ExecuteResponse">
+        <part name="response" type="xsd:string"/>
+    </message>
+    <message name="GetCapabilitiesRequest">
+        <part name="request" type="xsd:string"/>
+        <part name="service" type="xsd:string"/>
+        <part name="version" type="xsd:string"/>
+    </message>
+    <message name="GetCapabilitiesResponse">
+        <part name="response" type="xsd:string"/>
+    </message>
+    <message name="DescribeProcessRequest">
+        <part name="request" type="xsd:string"/>
+        <part name="service" type="xsd:string"/>
+        <part name="version" type="xsd:string"/>
+        <part name="identifier" type="xsd:string"/>
+    </message>
+    <message name="DescribeProcessResponse">
+        <part name="response" type="xsd:string"/>
+    </message>
+    <portType name="wpsPortType" sawsdl:modelReference="http://giv-wfs.uni-muenster.de/jcr/repository/y2review/WPS10_WpsnetTestServer/HydrologicalModelling.rdf#Process_HydrologicalModellin">
+        <operation name="Execute">
+            <input name="input1" message="tns:ExecuteRequest"/>
+            <output name="output1" message="tns:ExecuteResponse"/>
+        </operation>
+        <operation name="GetCapabilities">
+            <input name="input2" message="tns:GetCapabilitiesRequest"/>
+            <output name="output2" message="tns:GetCapabilitiesResponse"/>
+        </operation>
+        <operation name="DescribeProcess">
+            <input name="input3" message="tns:DescribeProcessRequest"/>
+            <output name="output3" message="tns:DescribeProcessResponse"/>
+        </operation>
+    </portType>
+    
+    <binding name="SOAPBinding" type="tns:wpsPortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="rpc"/>
+        <operation name="Execute">
+            <soap:operation style="rpc"/>
+            <input name="input1">
+                <soap:body parts="request" namespace="http://envision.eu/services"/>
+            </input>
+            <output name="output1">
+                <soap:body parts="response"/>
+            </output>
+        </operation>
+        <operation name="GetCapabilities">
+            <soap:operation style="rpc"/>
+            <input name="input2">
+                <soap:body parts="request service version"/>
+            </input>
+            <output name="output2">
+                <soap:body parts="response"/>
+            </output>
+        </operation>
+        <operation name="DescribeProcess">
+            <soap:operation style="rpc"/>
+            <input name="input3">
+                <soap:body parts="request service version identifier"/>
+            </input>
+            <output name="output3">
+                <soap:body parts="response"/>
+            </output>
+        </operation>
+    </binding>
+    
+    <service name="HydrologicalModelling">
+        <port name="HydroSOAPPort" binding="tns:SOAPBinding">
+            <soap:address location="http://ifaistos.di.uoa.gr:8080/LandslideDemo/HydrologicalModelling"/>
+        </port>
+    </service>
+</definitions>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process
+    name="LandslideEx"
+    targetNamespace="http://envision.eu/proc/bpel"
+    xmlns="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:env="http://purl.org/nkua/s3lab/ode/1.3.5/envision"
+    xmlns:sawsdl="http://www.w3.org/ns/sawsdl"
+    xmlns:sxt="http://www.sun.com/wsbpel/2.0/process/executable/SUNExtension/Trace" 
+    xmlns:sxed="http://www.sun.com/wsbpel/2.0/process/executable/SUNExtension/Editor"
+    xmlns:tns="http://envision.eu/proc/bpel" xmlns:ns0="http://envision.eu/pro/service"
+    xmlns:ns1="http://envision.eu/services/precip" xmlns:ns2="http://envision.eu/services/probc">
+
+    <import namespace="http://envision.eu/pro/service" location="LandslideProbCalc_Ex.wsdl" importType="http://schemas.xmlsoap.org/wsdl/"/>
+    <import namespace="http://envision.eu/services/probc" location="ProbabilitiesLSComputationService.wsdl" importType="http://schemas.xmlsoap.org/wsdl/"/>
+    <import namespace="http://envision.eu/services/hydro" location="HydrologicalModelling.wsdl" importType="http://schemas.xmlsoap.org/wsdl/"/>
+    <import namespace="http://envision.eu/services/precip" location="PrecipitationService.wsdl" importType="http://schemas.xmlsoap.org/wsdl/"/>
+
+    <partnerLinks>
+        <partnerLink name="HydroPartLink" partnerLinkType="ns0:hydroPLT" partnerRole="hydroRole"/>
+        <partnerLink name="Precipitation" partnerLinkType="ns0:precipitationPLT" partnerRole="precipRole"/>
+        <partnerLink name="PobLSComPL" partnerLinkType="ns0:landslidePLT" partnerRole="landslideRole"/>
+        <partnerLink name="ProcessService" xmlns:tns="http://envision.eu/pro/service" partnerLinkType="tns:LandslideProbCalc_Ex" myRole="landslidePortTypeRole"/>
+    </partnerLinks>
+
+    <variables>
+        <variable name="ProbLSCalcOut" messageType="ns2:ExecuteResponse"/>
+        <variable name="ProbLSCalcIn" messageType="ns2:ExecuteRequest"/>
+        <variable name="HydrologicalOut" xmlns:tns="http://envision.eu/services/hydro" messageType="tns:ExecuteResponse"/>
+        <variable name="HydrologicalIn" xmlns:tns="http://envision.eu/services/hydro" messageType="tns:ExecuteRequest"/>
+        <variable name="PrecipitationOut" messageType="ns1:GetObservationResponse"/>
+        <variable name="PrecipitationIn" messageType="ns1:GetObservationRequest"/>
+        <variable name="ProcessOut" xmlns:tns="http://envision.eu/pro/service" messageType="tns:ExecuteResponse"/>
+        <variable name="ProcessInput" xmlns:tns="http://envision.eu/pro/service" messageType="tns:ExecuteRequest"/>
+        <variable name="PrecipitationOb" messageType="ns1:GetObservationResponse"/>
+        <variable name="LandslideOb" messageType="ns0:ExecuteResponse"/>
+    </variables>
+
+    <sequence>
+        <receive name="ReceiveProcReq" createInstance="yes" partnerLink="ProcessService" operation="Execute" xmlns:tns="http://envision.eu/pro/service" portType="tns:landslidePortType" variable="ProcessInput"/>
+        <if name="if_LandslideOb">
+            <env:OutcomeQueries>
+                <env:Query variable="tns:LandslideOb" sawsdl:modelReference="http://purl.org/ifgi/landslide#landslide"></env:Query>
+            </env:OutcomeQueries>
+            <condition expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0">[CDATA[exists($landslideOb.response)]]</condition>
+            <sequence name="empty_land_seq">
+                <empty name="Empty_LandslideOb"/>
+            </sequence>
+            <else>
+                <sequence name="NoLandslideSequ">
+                    <if name="If_PrecipitationOb">
+                        <env:OutcomeQueries>
+                            <env:Query variable="tns:PrecipitationOb" sawsdl:modelReference="http://purl.org/ifgi/landslide#precipitation"></env:Query>
+                        </env:OutcomeQueries>
+                        <condition expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0">[CDATA[exists($PrecipitationOb.response)]]</condition>
+                            <sequence name="empty_prec_seq">
+                                <empty name="Empty_PrecipitationOb"/>
+                            </sequence>
+                            <else>
+                                <sequence name="NoPrecipSeq">
+                                        <assign name="AssignPrecipitationRequest">
+                                                <copy>
+                                                        <from variable="ProcessInput" part="request"/>
+                                                            <to variable="PrecipitationIn" part="request"/>
+                                                    </copy>
+                                            </assign>
+                                            <invoke name="GetPrecipitation" partnerLink="Precipitation" operation="GetObservation" portType="ns1:sosPortType" inputVariable="PrecipitationIn" outputVariable="PrecipitationOut"/>
+                                    </sequence>
+                            </else>
+                    </if>
+                    <assign name="AssignHydrologicalRequest">
+                        <copy>
+                            <from variable="PrecipitationOut" part="response"/>
+                            <to variable="HydrologicalIn" part="request"/>
+                        </copy>
+                    </assign>
+                    <invoke name="CalHydrological" partnerLink="HydroPartLink" operation="Execute" xmlns:tns="http://envision.eu/services/hydro" portType="tns:wpsPortType" inputVariable="HydrologicalIn" outputVariable="HydrologicalOut"/>
+                    <assign name="AssignProdLSCalcRequest">
+                        <copy>
+                            <from variable="HydrologicalOut" part="response"/>
+                            <to variable="ProbLSCalcIn" part="request"/>
+                        </copy>
+                    </assign>
+                    <invoke name="ProbLSCalculation" partnerLink="PobLSComPL" operation="Execute" portType="ns2:wpsPortType" inputVariable="ProbLSCalcIn" outputVariable="ProbLSCalcOut"/>
+                </sequence>
+            </else>
+        </if>
+        <assign name="AssignProcessOutcome">
+            <copy>
+                <from variable="ProbLSCalcOut" part="response"/>
+                <to variable="ProcessOut" part="part1"/>
+            </copy>
+        </assign>
+        <reply name="ReturnProcResponse" partnerLink="ProcessService" operation="Execute" xmlns:tns="http://envision.eu/pro/service" portType="tns:landslidePortType" variable="ProcessOut"/>
+    </sequence>
+</process>
+
+
