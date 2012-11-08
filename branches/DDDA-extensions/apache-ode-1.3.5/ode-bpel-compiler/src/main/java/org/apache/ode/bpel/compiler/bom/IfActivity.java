@@ -42,9 +42,11 @@ public class IfActivity extends Activity {
                 EnvisionExtensionQNames.ENVISION_OUTCOME_QUERIES_QNAME.getLocalPart()) != null && el.
                 getElementsByTagNameNS(EnvisionExtensionQNames.ENVISION_OUTCOME_QUERIES_QNAME.getNamespaceURI(),
                 EnvisionExtensionQNames.ENVISION_OUTCOME_QUERIES_QNAME.getLocalPart()).getLength() > 0) {
-            Element outcomeElement = this.getExtensibilityElement(EnvisionExtensionQNames.ENVISION_OUTCOME_QNAME);
+            Element outcomesElement = (Element) el.getElementsByTagNameNS(EnvisionExtensionQNames.ENVISION_OUTCOME_QUERIES_QNAME.getNamespaceURI(),
+                EnvisionExtensionQNames.ENVISION_OUTCOME_QUERIES_QNAME.getLocalPart()).item(0);
 
-        _queries = this.getFirstChild(EnvOutcomeQueries.class);
+            
+        _queries =  new EnvOutcomeQueries(outcomesElement);
         }
 
     }
@@ -78,6 +80,7 @@ public class IfActivity extends Activity {
 
     public Map<String, Collection<URI>> getMetamodelReference() {
         Map<String, Collection<URI>> referencesMap = new HashMap<String, Collection<URI>>();
+        if(_queries!=null)
         for (EnvOutcomeQuery query : _queries.getEnvQueries())
             referencesMap.put(query.getVariable(), query.getModelReferences());
 
@@ -86,6 +89,7 @@ public class IfActivity extends Activity {
 
     public Map<String, URI> getLiftingScheme() {
         Map<String, URI> referencesMap = new HashMap<String, URI>();
+        if(_queries!=null)
         for (EnvOutcomeQuery query : _queries.getEnvQueries())
             referencesMap.put(query.getVariable(), query.getLiftingScheme());
 
@@ -94,6 +98,7 @@ public class IfActivity extends Activity {
 
     public Map<String, URI> getLoweringScheme() {
         Map<String, URI> referencesMap = new HashMap<String, URI>();
+        if(_queries!=null)
         for (EnvOutcomeQuery query : _queries.getEnvQueries())
             referencesMap.put(query.getVariable(), query.getLoweringScheme());
 
@@ -102,6 +107,7 @@ public class IfActivity extends Activity {
 
     public Map<String, Collection<EnvMPolygon>> getMultiPolygons() {
         Map<String, Collection<EnvMPolygon>> referencesMap = new HashMap<String, Collection<EnvMPolygon>>();
+        if(_queries!=null)
         for (EnvOutcomeQuery query : _queries.getEnvQueries())
             referencesMap.put(query.getVariable(), query.getMPolygons());
 
@@ -110,6 +116,7 @@ public class IfActivity extends Activity {
 
     public Map<String, Collection<EnvTimeInterval>> getTimeIntervals() {
         Map<String, Collection<EnvTimeInterval>> referencesMap = new HashMap<String, Collection<EnvTimeInterval>>();
+        if(_queries!=null)
         for (EnvOutcomeQuery query : _queries.getEnvQueries())
             referencesMap.put(query.getVariable(), query.getTimeIntervals());
 

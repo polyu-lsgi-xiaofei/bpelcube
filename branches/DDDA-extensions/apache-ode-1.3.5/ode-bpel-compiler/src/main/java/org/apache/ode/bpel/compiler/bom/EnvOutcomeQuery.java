@@ -20,11 +20,17 @@ public class EnvOutcomeQuery extends BpelObject{
     }
 
     public Collection<EnvMPolygon> getMPolygons(){
-        return this.getChildren(EnvMPolygon.class);
+        Collection<EnvMPolygon> results= new LinkedList(); 
+        for(BpelObject obj: this.getChildren(EnvisionExtensionQNames.ENVISION_MULTIPOLY_QNAME))
+            results.add(new EnvMPolygon(obj.getElement()));
+        return results;
     }
     
     public Collection<EnvTimeInterval> getTimeIntervals() {
-        return this.getChildren(EnvTimeInterval.class);
+        Collection<EnvTimeInterval> results= new LinkedList(); 
+        for(BpelObject obj: this.getChildren(EnvisionExtensionQNames.ENVISION_TIMEINTERVAL_QNAME))
+            results.add(new EnvTimeInterval(obj.getElement()));
+        return results;
     }
 
     public Collection<URI> getModelReferences(){

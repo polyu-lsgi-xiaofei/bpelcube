@@ -5,6 +5,7 @@
 package org.apache.ode.bpel.compiler.bom;
 
 import java.util.Collection;
+import java.util.LinkedList;
 import org.w3c.dom.Element;
 
 /**
@@ -19,7 +20,10 @@ public class EnvPolygon extends BpelObject {
     }
     
     public Collection<EnvNode> getNodes(){
-        return this.getChildren(EnvNode.class);
+        Collection<EnvNode> results= new LinkedList(); 
+        for(BpelObject obj: this.getChildren(EnvisionExtensionQNames.ENVISION_NODE_QNAME))
+            results.add(new EnvNode(obj.getElement()));
+        return results;
     }
     
     public String serialize(){

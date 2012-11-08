@@ -58,7 +58,7 @@
     <xs:complexType name="queryT">
         <xs:complexContent>
             <xs:extension base="tns:outcomeExtensionT">
-                <xs:attribute name="variable" type="xs:string"/>
+                <xs:attribute name="variable" type="xs:string" form="qualified"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
