@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions name="LandslideProbCalc_Ex" targetNamespace="http://envision.eu/pro/service"
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:sawsdl="http://www.w3.org/ns/sawsdl"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://envision.eu/pro/service" 
+    xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:lsd="http://envision.eu/services/probc" xmlns:hdr="http://envision.eu/services/hydro" xmlns:prc="http://envision.eu/services/precip">
+    <import location="ProbabilitiesLSComputationService.wsdl" namespace="http://envision.eu/services/probc"/>
+    <import location="HydrologicalModelling.wsdl" namespace="http://envision.eu/services/hydro"/>
+    <import location="PrecipitationService.wsdl" namespace="http://envision.eu/services/precip"/>
+    <types/>
+    <message name="ExecuteRequest">
+        <part name="request" type="xsd:string"/>
+    </message>
+    <message name="ExecuteResponse">
+        <part name="part1" type="xsd:string"/>
+    </message>
+    <portType name="landslidePortType" sawsdl:modelRereference="Landslide.rdf#Landslide">
+        <operation name="Execute">
+            <input name="input1" message="tns:ExecuteRequest"/>
+            <output name="output1" message="tns:ExecuteResponse"/>
+        </operation>
+    </portType>
+    <binding name="SOAP_Binding" type="tns:landslidePortType">
+        <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="Execute">
+            <soap:operation/>
+            <input name="input1">
+                <soap:body use="literal" namespace="http://envision.eu/pro/service"/>
+            </input>
+            <output name="output1">
+                <soap:body use="literal" namespace="http://envision.eu/pro/service"/>
+            </output>
+        </operation>
+    </binding>
+
+    <service name="LandslideProbCalculator">
+        <port name="SOAP_Port" binding="tns:SOAP_Binding">
+            <soap:address location="http://localhost:8082/LandslideProbCalculator/SOAP_Port"/>
+        </port>
+    </service>
+
+    <plnk:partnerLinkType name="LandslideProbCalc_Ex">
+        <!-- A partner link type is automatically generated when a new port type is added. Partner link types are used by BPEL processes.
+In a BPEL process, a partner link represents the interaction between the BPEL process and a partner service. Each partner link is associated with a partner link type.
+A partner link type characterizes the conversational relationship between two services. The partner link type can have one or two roles.-->
+        <plnk:role name="landslidePortTypeRole" portType="tns:landslidePortType"/>
+    </plnk:partnerLinkType>
+    <plnk:partnerLinkType name="hydroPLT">
+        <plnk:role name="hydroRole" portType="hdr:wpsPortType"/>
+    </plnk:partnerLinkType>
+    <plnk:partnerLinkType name="precipitationPLT">
+        <plnk:role name="precipRole" portType="prc:sosPortType"/>
+    </plnk:partnerLinkType>
+    <plnk:partnerLinkType name="landslidePLT">
+        <plnk:role name="landslideRole" portType="lsd:wpsPortType"/>
+    </plnk:partnerLinkType>
+</definitions>
+
+
+
+
