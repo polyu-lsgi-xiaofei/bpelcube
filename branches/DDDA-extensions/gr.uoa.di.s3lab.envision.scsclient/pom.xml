@@ -32,16 +32,6 @@
           <version>1.8.0.7</version>
    </dependency>
    <dependency>
-            <groupId>net.jini</groupId>
-            <artifactId>jini-core</artifactId>
-            <version>2.1</version>
-   </dependency>
-   <dependency>
-            <groupId>net.jini</groupId>
-            <artifactId>jini-ext</artifactId>
-            <version>2.1</version>
-        </dependency>
-   <dependency>
             <groupId>postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>9.0-801.jdbc4</version>
@@ -62,7 +52,12 @@
 	<artifactId>jini-core</artifactId>
 	<version>2.2-SNAPSHOT</version>
   </dependency>
-   
+
+  <dependency>
+  	<groupId>org.apache.river</groupId>
+  	<artifactId>jini-ext</artifactId>
+  	<version>2.2-SNAPSHOT</version>
+  </dependency>
    </dependencies>
    <build>
    <outputDirectory>bin/</outputDirectory>
