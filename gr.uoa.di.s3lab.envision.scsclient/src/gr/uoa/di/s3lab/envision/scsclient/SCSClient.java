@@ -269,7 +269,24 @@ public Lease write(DocTest node,  long desiredTTL, URI metaInformation, String s
 		return null;
 }
 	
+	/*	
+	 *  @since 15-11-2012	 
+	 *  @todo Pigi should update code at removeProcessScope function so as to check if the scope is already removed and 
+	 *  to remove all related process instance scopes
+	 * */
+	public void removeProcessScope(String processScopeId){
+		try{
+		space.removeScope(processScopeId);
+	}
+	catch(RemoteException rex){
+		rex.printStackTrace();
+		}	
+	}
 	
+	/*		 
+	 *  @since 15-11-2012	 
+	 *  @todo Pigi should update code at createProcessScope function so as to check if the scope already exists 
+	 * */
 	public void createProcessScope (String processIdScope) /*throws URISyntaxException, RemoteException*/{
 		
 		RDFS_WSMLMetaInformation rdflInfo = new RDFS_WSMLMetaInformation();
