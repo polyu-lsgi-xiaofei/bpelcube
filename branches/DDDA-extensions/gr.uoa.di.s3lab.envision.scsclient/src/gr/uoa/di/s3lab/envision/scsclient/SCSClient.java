@@ -92,12 +92,12 @@ public class SCSClient {
         }
         
         //delete from here!!!!!!!!!!!!!!!!!!!!!!!!
-        try {
+        /*try {
 			space.initializeDBs();
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}	
+		}	*/
         //delete until here!!!!!!!!!!!!!!!!!!!!!!!!
 		
 
@@ -273,39 +273,58 @@ public Lease write(DocTest node,  long desiredTTL, URI metaInformation, String s
 	 *  @since 15-11-2012	 
 	 *  @todo Pigi should update code at removeProcessScope function so as to check if the scope is already removed and 
 	 *  to remove all related process instance scopes
+	 *  DONE!
 	 * */
-	public void removeProcessScope(String processScopeId){
-		try{
-		space.removeScope(processScopeId);
-	}
-	catch(RemoteException rex){
-		rex.printStackTrace();
-		}	
+	public void removeProcessScope(String processIdScope){
+		Collection<String> matchingScopes = null;
+		try {
+			matchingScopes = space.findScope(processIdScope);
+		} catch (RemoteException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		if(!matchingScopes.isEmpty()){
+			try{
+				space.removeAffiliatedScopes(processIdScope);
+				space.removeScope(processIdScope);
+			}
+			catch(RemoteException rex){
+				rex.printStackTrace();
+			}	
+		}
 	}
 	
-	/*		 
-	 *  @since 15-11-2012	 
-	 *  @todo Pigi should update code at createProcessScope function so as to check if the scope already exists 
-	 * */
+	
+	
 	public void createProcessScope (String processIdScope) /*throws URISyntaxException, RemoteException*/{
 		
-		RDFS_WSMLMetaInformation rdflInfo = new RDFS_WSMLMetaInformation();
-		String concept = "http://purl.org/ifgi/dul";	//the value of this variable does not affect as - the only restriction
-														//is to be from a namespace belonging to an ontology that is parsed during the 
-														//initialization process of the SCS Engine
-		URI uri = null;
+		Collection<String> matchingScopes = null;
 		try {
-			uri = new URI(concept);
-		} catch (URISyntaxException e) {
+			matchingScopes = space.findScope(processIdScope);
+		} catch (RemoteException e1) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			e1.printStackTrace();
 		}
-        rdflInfo.setCategory(uri);
-		try {
-			space.createScope(processIdScope, rdflInfo, Long.MAX_VALUE);
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		
+		if(!matchingScopes.isEmpty()){
+			RDFS_WSMLMetaInformation rdflInfo = new RDFS_WSMLMetaInformation();
+			String concept = "http://purl.org/ifgi/dul";	//the value of this variable does not affect as - the only restriction
+															//is to be from a namespace belonging to an ontology that is parsed during the 
+															//initialization process of the SCS Engine
+			URI uri = null;
+			try {
+				uri = new URI(concept);
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	        rdflInfo.setCategory(uri);
+			try {
+				space.createScope(processIdScope, rdflInfo, Long.MAX_VALUE);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 	}
@@ -364,6 +383,41 @@ public Lease write(DocTest node,  long desiredTTL, URI metaInformation, String s
         
         try {
 			space.addAffiliation(fromScope, toScopes, affType);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+	}
+	
+public void removeAffiliation(String processInstanceScope, String processIdScope) /*throws URISyntaxException, RemoteException*/{
+		
+		Role[] roles = new Role[1];
+        roles[0] = new Role("ProcessInstanceBond");
+        
+        AffiliationType affType = new AffiliationType("AffType");
+		affType.setRoles(roles);
+		
+        URI localURI1 = null;
+		try {
+			localURI1 = new URI ("jini://pleiades.di.uoa.gr/SemanticContextSpace" + "#" + processIdScope + "_" + processInstanceScope);
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        Bond fromScope = new Bond(localURI1, new Role("BondProcessIdProcessInstance")); 
+		
+		URI localURI2 = null;
+		try {
+			localURI2 = new URI ("jini://pleiades.di.uoa.gr/SemanticContextSpace" + "#" + processIdScope);
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Bond toScope = new Bond(localURI2, new Role("BondProcessIdProcessInstance"));
+        
+        try {
+			space.removeAffiliation(fromScope, toScope, affType);
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
