@@ -19,11 +19,8 @@
 package org.apache.ode.bpel.o;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import org.apache.ode.bpel.o.OScope.Variable;
 
 
 /**
@@ -47,6 +44,35 @@ public class OSwitch extends OActivity {
     public Map<String, Collection<String>> _varTimeIntervals;
     public Map<String, Collection<String>> _varMPolygons;
 
+    public Map<String, Variable> getVarMaps(){
+        if(_varMetamodelReferences.isEmpty())
+            return Collections.emptyMap();
+
+        Map<String, Variable> _result = new HashMap<String, Variable>();
+        OScope _scope = getParentScope(this.getParent());
+        for(String _varName:_varMetamodelReferences.keySet())            
+           _result.put(_varName, _scope.getVisibleVariable(name));
+                
+        return _result;
+    }
+
+    private OScope getParentScope(OActivity _parent){
+        if (_parent == null)
+            return this.getOwner().procesScope;
+        
+        if(_parent instanceof OScope)
+            return (OScope)_parent;
+        else 
+            if(_parent.getParent()==null)
+                return _parent.getOwner().procesScope;
+            else
+                return getParentScope(_parent.getParent());
+    }
+    
+    public Variable getColateralVar(String name){
+        return getParentScope(this).getVisibleVariable(name+"Obs_bl");
+    }
+    
     /**
      * The cases declared within the <code>&lt;switch&gt;</code> actvity.
      */
