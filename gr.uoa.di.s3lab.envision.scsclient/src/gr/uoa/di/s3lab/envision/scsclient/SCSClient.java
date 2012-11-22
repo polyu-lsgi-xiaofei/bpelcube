@@ -55,6 +55,7 @@ public class SCSClient {
 	
 	public void initSCCEngine(String hostnameString) /*throws RemoteException, IOException, ClassNotFoundException*/{
 		
+		System.out.println("initSCCEngine start");
 		hostname = "jini://" + hostnameString + "/";
 		LookupLocator locator = null;
 		try {
