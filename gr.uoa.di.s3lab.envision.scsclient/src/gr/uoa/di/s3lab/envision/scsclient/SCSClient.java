@@ -232,12 +232,13 @@ public Lease write(DocTest node,  long desiredTTL, URI metaInformation, String s
 		
 		//initialize the spatial characteristics
         MultiPolygon multipol = null;
-		try {
-			multipol = new MultiPolygon(multipolygon);
-		} catch (SQLException e) {
+        if(multipolygon!=null)
+        	try {
+        		multipol = new MultiPolygon(multipolygon);
+        	} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+        	}
         
         //initialize the temporal characteristics
 		TemporalFeature tmpFeature;
