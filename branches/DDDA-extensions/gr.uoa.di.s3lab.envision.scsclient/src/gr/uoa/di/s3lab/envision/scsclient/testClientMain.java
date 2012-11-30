@@ -10,14 +10,19 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
+import com.s3lab.space.common.ResultEntry;
+import com.s3lab.space.common.ResultsList;
+
 import net.jini.core.lease.Lease;
 import net.jini.core.transaction.TransactionException;
 
-public class testClientMain {
+public class TestClientMain {
 	
-	
-	public static void main(String[] args) throws RemoteException, IOException, ClassNotFoundException, URISyntaxException, ParserConfigurationException, SAXException, SQLException, TransactionException {
+	TestClientMain(){
 		
+	}
+	
+	public void docTest() throws ParserConfigurationException, SAXException, IOException, URISyntaxException{
 		SCSClient client = SCSClient.AccessSCSClient();
 		
 		client.initSCCEngine("pleiades.di.uoa.gr");
@@ -34,7 +39,22 @@ public class testClientMain {
         client.read(new URI("http://purl.org/ifgi/dul#Entity"), "testSyntType", "processScope", null, multiPol, null, null, null);
         client.read(new URI("http://purl.org/ifgi/dul#Entity"), "testSyntType", "processScope", "processInstanceScope", multiPol, null, null, null);
 		
+	}
 	
+	public void findElements() throws URISyntaxException{
+		SCSClient client = SCSClient.AccessSCSClient();	
+		client.initSCCEngine("pleiades.di.uoa.gr");
+		
+		ResultsList list = client.read(new URI("http://purl.org/ifgi/geoevents#precipitation"), null, "LandslideEx-13", null, null, null, null, null);
+		System.out.println("Result list size is :"+list.getCollection().size());
+		for(ResultEntry entry: list.getCollection()){
+			System.out.println("Reading entry class name :"+entry.getEntry().getClass().getSimpleName());
+		}
+	}
+	
+	public static void main(String[] args) throws RemoteException, IOException, ClassNotFoundException, URISyntaxException, ParserConfigurationException, SAXException, SQLException, TransactionException {
+		TestClientMain client = new TestClientMain();
+		client.findElements();
 	}
 
 	
