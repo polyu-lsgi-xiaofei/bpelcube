@@ -34,7 +34,12 @@ import org.apache.ode.bpel.o.OScope.Variable;
 import org.apache.ode.bpel.o.OSwitch;
 import org.apache.ode.bpel.o.OXsdTypeVarType;
 import org.apache.ode.bpel.runtime.channels.FaultData;
+import org.apache.ode.utils.DOMUtils;
 
+import org.w3c.dom.CDATASection;
+import org.w3c.dom.CharacterData;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import gr.uoa.di.s3lab.envision.scsclient.SCSClient;
@@ -45,6 +50,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.TimeZone;
 
 import javax.xml.namespace.QName;
@@ -54,6 +60,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.s3lab.space.common.ResultEntry;
 import com.s3lab.space.common.ResultsList;
+import com.s3lab.space.common.XMLEntryNode;
 
 
 /**
@@ -92,8 +99,9 @@ class SWITCH extends ACTIVITY {
        //pigi: i need the matchedOCase variable, right??
        //so, where exactly to put the above code?? after the matchedOCase = ocase; ??
        //HashMap<String,Variable> variablesMap = _scopeFrame.oscope.variables;	//this variablesMap is temporary!i'll put what george will send me
-       HashMap<String,Variable> variablesMap = new HashMap<String,Variable>();
-       for(OSwitch.OCase oCase : oswitch.getCases()){
+    	
+    	/*HashMap<String,Variable> variablesMap = new HashMap<String,Variable>();
+        for(OSwitch.OCase oCase : oswitch.getCases()){
     	   OExpression expression = oCase.expression;
     	   OExpressionLanguage expLanguage = oCase.expression.expressionLanguage;
            if(expLanguage.expressionLanguageUri.equals(EXPRESSION_LANGS[0])){
@@ -110,11 +118,180 @@ class SWITCH extends ACTIVITY {
                OXPath20ExpressionBPEL20 xpath20Exp = (OXPath20ExpressionBPEL20) oCase.expression;
                variablesMap.putAll(xpath20Exp.vars);
            }
-       }
-       
+       }*/
+    	Map<String,Variable> variablesMap = oswitch.getVarMaps();
+    	System.out.println("*** Switch vars map contains :"+variablesMap.size());
 	       for(Variable var : variablesMap.values()){
+	    	   System.out.println("varname = " + var.name);
+	    	   if(var.type instanceof OConstantVarType){
+	    			OConstantVarType oConstant = (OConstantVarType) var.type;
+	    			syntType = new QName(oConstant.getValue().getNamespaceURI(), oConstant.getValue().getLocalName());
+	    		}
+	    		else if(var.type instanceof OElementVarType){
+	    			OElementVarType oElement = (OElementVarType) var.type;
+	    			syntType = oElement.elementType;
+	    		}
+	    		else if(var.type instanceof OMessageVarType){
+	    			OMessageVarType oMessage = (OMessageVarType) var.type;
+	    			syntType = oMessage.messageType;
+	    		}
+	    		else if(var.type instanceof OXsdTypeVarType){
+	    			OXsdTypeVarType oXsd = (OXsdTypeVarType) var.type;
+	    			syntType = oXsd.xsdType;
+	    		}
+	    		else {
+	    			System.out.println("[SWITCH] Error: var.type is not instance of any available type.");
+	    		}
+	    	    System.out.println("--> read information with syntType.toString()=" + syntType.toString());
 	    		for(URI metaInformation : oswitch._varMetamodelReferences.get(var.name)){
+	    			System.out.println("metaInformation = " + metaInformation.toString());
 	    			for(String multiPolygon : oswitch._varMPolygons.get(var.name)){
+	    				System.out.println("multiPolygon = " + multiPolygon.toString());
+	    				for(String time_Intervals : oswitch._varTimeIntervals.get(var.name)){
+	    					System.out.println("case where multipolygon!=null && temporalFeatures!=null");
+	    					String[] times = time_Intervals.split(" ");
+	        				SimpleDateFormat simpleDataFormat1 = new SimpleDateFormat(times[0]);
+	        				Timestamp timestampStart = null;
+							try {
+								timestampStart = new Timestamp(simpleDataFormat1.parse(times[0]).getTime());
+							} catch (ParseException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+	        				SimpleDateFormat simpleDataFormat2 = new SimpleDateFormat(times[0]);
+	        				Timestamp timestampEnd = null;
+							try {
+								timestampEnd = new Timestamp(simpleDataFormat2.parse(times[1]).getTime());
+							} catch (ParseException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+	        				TimeZone tz = simpleDataFormat1.getTimeZone();
+	        				
+	        				ResultsList results = client.read(metaInformation, syntType.toString(), getBpelProcess().getPID().getLocalPart(), getP2PSessionId(), multiPolygon, timestampStart, timestampEnd, tz);
+				    		
+				    		if(!results.getCollection().isEmpty())
+				    		for(ResultEntry currentResEntry : results.getCollection()){
+				    		     Node resultNode = (Node) currentResEntry.getEntry();
+				    		     VariableInstance varInstance = _scopeFrame.resolve(var);
+				    		     this.getBpelRuntimeContext().writeVariable(varInstance, resultNode);
+				    		     
+				    		     //make true the variable
+				    		     Variable trueVar = oswitch.getColateralVar(var.name);
+				    		     VariableInstance trueVarInstance = _scopeFrame.resolve(trueVar);
+				    		     
+				    		     Document doc = DOMUtils.newDocument();
+				    		     System.out.println("About to set value to "+trueVarInstance.declaration.name);
+				    		     //solution1
+				    		     CDATASection cdataNode = doc.createCDATASection("");
+				    		     CharacterData cdata = cdataNode;
+				    		     cdata.setData("true");
+				    		     
+				    		     //solution2
+				    		     //Element root = doc.createElement("Item");
+				    		     //root.setAttribute("VariableIsTrue", "true");
+				    		     
+				    		     this.getBpelRuntimeContext().writeVariable(trueVarInstance, doc.getFirstChild());
+				    		     
+					    		/*if(there are results){
+					    	       final VariableInstance varInstance = _scopeFrame.resolve(_oinvoke.outputVar);
+					    		   //changes is the entryType returned from the read operation
+					    	       this.getBpelRuntimeContext().writeVariable(varInstance, changes);
+					    		}*/
+				    		     break; //we need to store only the first returned result
+				    		}
+	    				}
+	    			}
+	    			//case where multipolygon==null && temporalFeatures==null
+	    			if(oswitch._varMPolygons.get(var.name).isEmpty() && oswitch._varTimeIntervals.get(var.name).isEmpty()){
+	    				System.out.println("case where multipolygon==null && temporalFeatures==null");
+	    				System.out.println("About to read in the SCS with metainfo = " + metaInformation.toString() + " and syntType=" + syntType.toString());
+	    				ResultsList results = client.read(metaInformation, syntType.toString(), getBpelProcess().getPID().getLocalPart(), getP2PSessionId(), null, null, null, null);
+	    				if(results==null)
+	    					System.out.println("0 results returned");
+	    				else
+	    					System.out.println(results.getCollection().size() + " results returned");
+			    		if(!results.getCollection().isEmpty()){
+			    			System.out.println("Results list size is " + results.getCollection().size());
+				    		for(ResultEntry currentResEntry : results.getCollection()){
+				    			 System.out.println("About to get the returned resultNode.");
+				    		     //Node resultNode = (Node) currentResEntry.getEntry();
+				    		     XMLEntryNode xmlNode = (XMLEntryNode) currentResEntry.getEntry();
+				    		     System.out.println("About to get the Node resultNode.");
+				    		     Node resultNode = xmlNode.getNode();
+				    		     if(xmlNode.getNode()==null) System.out.println("Null xml entry Node!!");
+				    		     System.out.println("Retrieved element value is :\n"+DOMUtils.domToString(resultNode)+"\n");
+				    		     VariableInstance varInstance = _scopeFrame.resolve(var);
+				    		     System.out.println("About to call the writeVariable function.");
+				    		     this.getBpelRuntimeContext().writeVariable(varInstance, resultNode);
+				    		     
+				    		     //make true the variable
+				    		     Variable trueVar = oswitch.getColateralVar(var.name);
+				    		     VariableInstance trueVarInstance = _scopeFrame.resolve(trueVar);
+				    		     
+				    		     Document doc = DOMUtils.newDocument();
+				    		     System.out.println("About to set value to "+trueVarInstance.declaration.name);
+				    		     //solution1
+				    		     CDATASection cdataNode = doc.createCDATASection("");
+				    		     CharacterData cdata = cdataNode;
+				    		     cdata.setData("true");
+				    		     
+				    		     //solution2
+				    		     //Element root = doc.createElement("Item");
+				    		     //root.setAttribute("VariableIsTrue", "true");
+				    		     
+				    		     this.getBpelRuntimeContext().writeVariable(trueVarInstance, doc.getFirstChild());
+				    		     
+					    		/*if(there are results){
+					    	       final VariableInstance varInstance = _scopeFrame.resolve(_oinvoke.outputVar);
+					    		   //changes is the entryType returned from the read operation
+					    	       this.getBpelRuntimeContext().writeVariable(varInstance, changes);
+					    		}*/
+				    		     break; //we need to store only the first returned result
+				    		}
+			    		}
+	    			}
+	    			//case where multipolygon!=null && temporalFeatures==null
+	    			if(!oswitch._varMPolygons.get(var.name).isEmpty() && oswitch._varTimeIntervals.get(var.name).isEmpty()){
+	    				for(String multiPolygon : oswitch._varMPolygons.get(var.name)){
+	    					System.out.println("case where multipolygon!=null && temporalFeatures==null");
+	    					ResultsList results = client.read(metaInformation, syntType.toString(), getBpelProcess().getPID().getLocalPart(), getP2PSessionId(), multiPolygon, null, null, null);
+				    		
+				    		if(!results.getCollection().isEmpty())
+				    		for(ResultEntry currentResEntry : results.getCollection()){
+				    		     Node resultNode = (Node) currentResEntry.getEntry();
+				    		     VariableInstance varInstance = _scopeFrame.resolve(var);
+				    		     this.getBpelRuntimeContext().writeVariable(varInstance, resultNode);
+				    		     
+				    		     //make true the variable
+				    		     Variable trueVar = oswitch.getColateralVar(var.name);
+				    		     VariableInstance trueVarInstance = _scopeFrame.resolve(trueVar);
+				    		     
+				    		     Document doc = DOMUtils.newDocument();
+				    		     System.out.println("About to set value to "+trueVarInstance.declaration.name);
+				    		     //solution1
+				    		     CDATASection cdataNode = doc.createCDATASection("");
+				    		     CharacterData cdata = cdataNode;
+				    		     cdata.setData("true");
+				    		     
+				    		     //solution2
+				    		     //Element root = doc.createElement("Item");
+				    		     //root.setAttribute("VariableIsTrue", "true");
+				    		     
+				    		     this.getBpelRuntimeContext().writeVariable(trueVarInstance, doc.getFirstChild());
+				    		     
+					    		/*if(there are results){
+					    	       final VariableInstance varInstance = _scopeFrame.resolve(_oinvoke.outputVar);
+					    		   //changes is the entryType returned from the read operation
+					    	       this.getBpelRuntimeContext().writeVariable(varInstance, changes);
+					    		}*/
+				    		     break; //we need to store only the first returned result
+				    		}
+	    				}
+	    			}
+	    			//case where multipolygon==null && temporalFeatures!=null
+	    			if(oswitch._varMPolygons.get(var.name).isEmpty() && !oswitch._varTimeIntervals.get(var.name).isEmpty()){
+	    				System.out.println("case where multipolygon==null && temporalFeatures!=null");
 	    				for(String time_Intervals : oswitch._varTimeIntervals.get(var.name)){
 	    					String[] times = time_Intervals.split(" ");
 	        				SimpleDateFormat simpleDataFormat1 = new SimpleDateFormat(times[0]);
@@ -134,32 +311,32 @@ class SWITCH extends ACTIVITY {
 								e.printStackTrace();
 							}
 	        				TimeZone tz = simpleDataFormat1.getTimeZone();
-	    		
-				    		if(var.type instanceof OConstantVarType){
-				    			OConstantVarType oConstant = (OConstantVarType) var.type;
-				    			syntType = new QName(oConstant.getValue().getNamespaceURI(), oConstant.getValue().getLocalName());
-				    		}
-				    		else if(var.type instanceof OElementVarType){
-				    			OElementVarType oElement = (OElementVarType) var.type;
-				    			syntType = oElement.elementType;
-				    		}
-				    		else if(var.type instanceof OMessageVarType){
-				    			OMessageVarType oMessage = (OMessageVarType) var.type;
-				    			syntType = oMessage.messageType;
-				    		}
-				    		else if(var.type instanceof OXsdTypeVarType){
-				    			OXsdTypeVarType oXsd = (OXsdTypeVarType) var.type;
-				    			syntType = oXsd.xsdType;
-				    		}
-				    		else {
-				    			;//error!!
-				    		}
-				    		ResultsList results = client.read(metaInformation, syntType.toString(), getBpelProcess().getPID().getLocalPart(), getP2PSessionId(), multiPolygon, timestampStart, timestampEnd, tz);
+	        				
+				    		ResultsList results = client.read(metaInformation, syntType.toString(), getBpelProcess().getPID().getLocalPart(), getP2PSessionId(), null, timestampStart, timestampEnd, tz);
+				    		
 				    		if(!results.getCollection().isEmpty())
 				    		for(ResultEntry currentResEntry : results.getCollection()){
 				    		     Node resultNode = (Node) currentResEntry.getEntry();
 				    		     VariableInstance varInstance = _scopeFrame.resolve(var);
 				    		     this.getBpelRuntimeContext().writeVariable(varInstance, resultNode);
+				    		     
+				    		     //make true the variable
+				    		     Variable trueVar = oswitch.getColateralVar(var.name);
+				    		     VariableInstance trueVarInstance = _scopeFrame.resolve(trueVar);
+				    		     
+				    		     Document doc = DOMUtils.newDocument();
+				    		     System.out.println("About to set value to "+trueVarInstance.declaration.name);
+				    		     //solution1
+				    		     CDATASection cdataNode = doc.createCDATASection("");
+				    		     CharacterData cdata = cdataNode;
+				    		     cdata.setData("true");
+				    		     
+				    		     //solution2
+				    		     //Element root = doc.createElement("Item");
+				    		     //root.setAttribute("VariableIsTrue", "true");
+				    		     
+				    		     this.getBpelRuntimeContext().writeVariable(trueVarInstance, doc.getFirstChild());
+				    		     
 					    		/*if(there are results){
 					    	       final VariableInstance varInstance = _scopeFrame.resolve(_oinvoke.outputVar);
 					    		   //changes is the entryType returned from the read operation
