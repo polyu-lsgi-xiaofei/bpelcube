@@ -1,3 +1,4 @@
+
 package gr.uoa.di.s3lab.envision.scsclient;
 
 import java.io.IOException;
@@ -114,16 +115,18 @@ public class SCSClient {
 		RDFS_WSMLMetaInformation rdflInfo = new RDFS_WSMLMetaInformation();
 		rdflInfo.setCategory(metaInformation);
         rdflInfo.setSyntType(syntacticType);
-        MultiPolygon multipol = null;
         
+        MultiPolygon multipol = null;
         //initialize the spatial characteristics
-        if(!multipolygon.equals("EMPTY"))
+        //if(!multipolygon.equals("EMPTY"))
+        if(multipolygon!=null){
 			try {
 				multipol = new MultiPolygon(multipolygon);
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+        }
         
         //initialize the temporal characteristics
 		TemporalFeature tmpFeature;
@@ -139,7 +142,14 @@ public class SCSClient {
 		//template of the write function: Lease writeMetaInfoScopeSpatioTemp(Entry entry, Transaction tnx, long ls, MetaInformation sinfo, String scopeName, MultiPolygon multiPol, TemporalFeature tmpFeature)
 		if(processInstanceScope == null)
 			try {
-				return space.writeMetaInfoScopeSpatioTemp(entryNode, null, desiredTTL, rdflInfo, processIdScope, multipol, tmpFeature);
+				if(multipol==null && tmpFeature==null){
+					System.out.println("[SCSClient] writeMetaInfoScope");
+					return space.writeMetaInfoScope(entryNode, null, desiredTTL, rdflInfo, processIdScope);
+				}
+				else{
+					System.out.println("[SCSClient] writeMetaInfoScopeSpatioTemp");
+					return space.writeMetaInfoScopeSpatioTemp(entryNode, null, desiredTTL, rdflInfo, processIdScope, multipol, tmpFeature);
+				}
 			} catch (RemoteException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -149,7 +159,14 @@ public class SCSClient {
 			}
 		else
 			try {
-				return space.writeMetaInfoScopeSpatioTemp(entryNode, null, desiredTTL, rdflInfo, processIdScope + "_" + processInstanceScope, multipol, tmpFeature);
+				if(multipol==null && tmpFeature==null){
+					System.out.println("[SCSClient] writeMetaInfoScope");
+					return space.writeMetaInfoScope(entryNode, null, desiredTTL, rdflInfo, processIdScope + "_" + processInstanceScope);
+				}
+				else{
+					System.out.println("[SCSClient] writeMetaInfoScopeSpatioTemp");
+					return space.writeMetaInfoScopeSpatioTemp(entryNode, null, desiredTTL, rdflInfo, processIdScope + "_" + processInstanceScope, multipol, tmpFeature);		
+				}
 			} catch (RemoteException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -172,11 +189,13 @@ public Lease write(DocTest node,  long desiredTTL, URI metaInformation, String s
         
         //initialize the spatial characteristics
         MultiPolygon multipol = null;
-		try {
-			multipol = new MultiPolygon(multipolygon);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if(multipolygon!=null){
+	        try {
+				multipol = new MultiPolygon(multipolygon);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
         
         //initialize the temporal characteristics
@@ -232,25 +251,40 @@ public Lease write(DocTest node,  long desiredTTL, URI metaInformation, String s
 		
 		//initialize the spatial characteristics
         MultiPolygon multipol = null;
-        if(multipolygon!=null)
-        	try {
-        		multipol = new MultiPolygon(multipolygon);
-        	} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-        	}
-        
+		if(multipolygon!=null){
+	        try {
+				multipol = new MultiPolygon(multipolygon);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+        }
         //initialize the temporal characteristics
 		TemporalFeature tmpFeature;
 		if(startTime!=null && endTime!=null && tz!=null)
 			tmpFeature = new TemporalFeature(startTime, endTime, tz);
 		else
 			tmpFeature = null;
-		
-		//call the write and return the matching results
+		ResultsList results = null;
+		//call the read and return the matching results
 		if(processInstanceScope == null)
 			try {
-				return space.readMetaInfoScopeSpatioTemp(null, null, query, processIdScope, true, multipol, tmpFeature);
+				System.out.println("processInstanceScope == null and call the readMetaInfoScopeSpatioTemp");
+				if(multipol==null && tmpFeature==null){
+					System.out.println("[SCSClient] readMetaInfoScope");
+					results = space.readMetaInfoScope(null, null, query, processIdScope, true);
+				}
+				else{
+					System.out.println("[SCSClient] readMetaInfoScopeSpatioTemp");
+					results = space.readMetaInfoScopeSpatioTemp(null, null, query, processIdScope, true, multipol, tmpFeature);
+				}
+				if(results==null)
+					System.out.println("0 results returned [SCSClient]");
+				else
+					System.out.println(results.getCollection().size() + " results returned[SCSClient]");
+				return results;
+						
 			} catch (RemoteException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -260,14 +294,29 @@ public Lease write(DocTest node,  long desiredTTL, URI metaInformation, String s
 			}
 		else
 			try {
-				return space.readMetaInfoScopeSpatioTemp(null, null, query, processIdScope + "_" + processInstanceScope, true, multipol, tmpFeature);
-			} catch (RemoteException e) {
+				System.out.println("processInstanceScope != null and call the readMetaInfoScopeSpatioTemp");
+				
+				if(multipol==null && tmpFeature==null){
+					System.out.println("[SCSClient] readMetaInfoScope");
+					results = space.readMetaInfoScope(null, null, query, processIdScope + "_" + processInstanceScope, true);
+				}
+				else{
+					System.out.println("[SCSClient] readMetaInfoScopeSpatioTemp");
+					results = space.readMetaInfoScopeSpatioTemp(null, null, query, processIdScope + "_" + processInstanceScope, true, multipol, tmpFeature);
+				}
+				if(results==null)
+					System.out.println("0 results returned [SCSClient]");
+				else
+					System.out.println(results.getCollection().size() + " results returned[SCSClient]");
+				return results;
+			    } catch (RemoteException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (TransactionException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		System.out.println("[SCSClient] return null!");
 		return null;
 }
 	
