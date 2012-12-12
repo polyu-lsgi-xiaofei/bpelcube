@@ -259,9 +259,48 @@ public class INVOKE extends ACTIVITY {
 								e.printStackTrace();
 							}
                             QName syntType = new QName(varData.getNamespaceURI(), varData.getLocalName());
-                        	for(URI metaInformation : _oinvoke._metamodelReferences){
-                        		for(String multiPolygon : _oinvoke._mPolygons){
-                        			for(String time_Intervals : _oinvoke._timeIntervals){
+                            if(_oinvoke._metamodelReferences!=null){
+	                        	for(URI metaInformation : _oinvoke._metamodelReferences){
+	                        		if(!_oinvoke._mPolygons.isEmpty() && !_oinvoke._timeIntervals.isEmpty()){
+		                        	    System.out.println("[INVOKE] case where multipolygon==null && temporalFeatures==null");
+		                        		for(String multiPolygon : _oinvoke._mPolygons){
+		                        			for(String time_Intervals : _oinvoke._timeIntervals){
+		                        				String[] times = null;
+		                        				time_Intervals.split(" ");
+		                        				SimpleDateFormat simpleDataFormat1 = new SimpleDateFormat(times[0]);
+		                        				Timestamp timestampStart = null;
+												try {
+													timestampStart = new Timestamp(simpleDataFormat1.parse(times[0]).getTime());
+												} catch (ParseException e) {
+													// TODO Auto-generated catch block
+													e.printStackTrace();
+												}
+		                        				SimpleDateFormat simpleDataFormat2 = new SimpleDateFormat(times[0]);
+		                        				Timestamp timestampEnd = null;
+												try {
+													timestampEnd = new Timestamp(simpleDataFormat2.parse(times[1]).getTime());
+												} catch (ParseException e) {
+													// TODO Auto-generated catch block
+													e.printStackTrace();
+												}
+		                        				TimeZone tz = simpleDataFormat1.getTimeZone();
+		                        				long desiredTTL = 0; //this value will be replaced with lease.FOREVER in the write method
+		                        				//I have to declare somehow the Lease in here import net.jini.core.lease.Lease; does not work
+		                        				client.write(varData, desiredTTL, metaInformation, syntType.toString(), getBpelProcess().getPID().getLocalPart(), getP2PSessionId(), multiPolygon, timestampStart, timestampEnd, tz);
+		                        			}
+		                        		}
+	                        	}
+	                            if(!_oinvoke._mPolygons.isEmpty() && _oinvoke._timeIntervals.isEmpty()){
+	                            	System.out.println("[INVOKE] case where multipolygon!=null && temporalFeatures==null");
+	                            	for(String multiPolygon : _oinvoke._mPolygons){
+	                            		long desiredTTL = 0; //this value will be replaced with lease.FOREVER in the write method
+                        				//I have to declare somehow the Lease in here import net.jini.core.lease.Lease; does not work
+                        				client.write(varData, desiredTTL, metaInformation, syntType.toString(), getBpelProcess().getPID().getLocalPart(), getP2PSessionId(), multiPolygon, null, null, null);
+	                            	}
+	                            }
+	                            if(_oinvoke._mPolygons.isEmpty() && !_oinvoke._timeIntervals.isEmpty()){
+	                            	System.out.println("[INVOKE] case where multipolygon==null && temporalFeatures!=null");
+	                            	for(String time_Intervals : _oinvoke._timeIntervals){
                         				String[] times = null;
                         				time_Intervals.split(" ");
                         				SimpleDateFormat simpleDataFormat1 = new SimpleDateFormat(times[0]);
@@ -283,10 +322,18 @@ public class INVOKE extends ACTIVITY {
                         				TimeZone tz = simpleDataFormat1.getTimeZone();
                         				long desiredTTL = 0; //this value will be replaced with lease.FOREVER in the write method
                         				//I have to declare somehow the Lease in here import net.jini.core.lease.Lease; does not work
-                        				client.write(varData, desiredTTL, metaInformation, syntType.toString(), getBpelProcess().getPID().getLocalPart(), getP2PSessionId(), multiPolygon, timestampStart, timestampEnd, tz);
+                        				client.write(varData, desiredTTL, metaInformation, syntType.toString(), getBpelProcess().getPID().getLocalPart(), getP2PSessionId(), null, timestampStart, timestampEnd, tz);
                         			}
-                        		}
+	                            }
+	                            if(_oinvoke._mPolygons.isEmpty() && _oinvoke._timeIntervals.isEmpty()){
+	                            	System.out.println("[INVOKE] case where multipolygon==null && temporalFeatures==null");
+	                            	long desiredTTL = 0; //this value will be replaced with lease.FOREVER in the write method
+                    				//I have to declare somehow the Lease in here import net.jini.core.lease.Lease; does not work
+                    				client.write(varData, desiredTTL, metaInformation, syntType.toString(), getBpelProcess().getPID().getLocalPart(), getP2PSessionId(), null, null, null, null);
+	                            }
+	                            
                         	}
+                        }
                         }
                         
                     }
