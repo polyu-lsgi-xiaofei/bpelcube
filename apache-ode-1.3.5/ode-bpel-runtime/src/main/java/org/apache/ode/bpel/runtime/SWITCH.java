@@ -41,9 +41,11 @@ import org.w3c.dom.CharacterData;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 import gr.uoa.di.s3lab.envision.scsclient.SCSClient;
 
+import java.io.IOException;
 import java.net.URI;
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -84,6 +86,19 @@ class SWITCH extends ACTIVITY {
     /********************************************************************/
     //Pigi Kouki: Somewhere in the above code we will put the read operation to 
     //the SCS Engine - not exactly down here but where George indicates!
+    
+    //set the boolean variable to true
+    String trueVarContent = "<temporary-simple-type-wrapper>true</temporary-simple-type-wrapper>";
+    Node trueVarElement = null;
+	try {
+		trueVarElement = DOMUtils.stringToDOM(trueVarContent);
+	} catch (SAXException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	} catch (IOException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	}
     
     SCSClient client = SCSClient.AccessSCSClient();
     if(client.spaceHasBeenInitialized()){
@@ -180,18 +195,21 @@ class SWITCH extends ACTIVITY {
 				    		     Variable trueVar = oswitch.getColateralVar(var.name);
 				    		     VariableInstance trueVarInstance = _scopeFrame.resolve(trueVar);
 				    		     
-				    		     Document doc = DOMUtils.newDocument();
-				    		     System.out.println("About to set value to "+trueVarInstance.declaration.name);
+				    		     //Document doc = DOMUtils.newDocument();
+				    		     //System.out.println("About to set value to "+trueVarInstance.declaration.name);
 				    		     //solution1
-				    		     CDATASection cdataNode = doc.createCDATASection("");
-				    		     CharacterData cdata = cdataNode;
-				    		     cdata.setData("true");
+				    		     //CDATASection cdataNode = doc.createCDATASection("");
+				    		     //CharacterData cdata = cdataNode;
+				    		     //cdata.setData("true");
 				    		     
 				    		     //solution2
 				    		     //Element root = doc.createElement("Item");
 				    		     //root.setAttribute("VariableIsTrue", "true");
 				    		     
-				    		     this.getBpelRuntimeContext().writeVariable(trueVarInstance, doc.getFirstChild());
+				    		     System.out.println("About to write true variable");
+				    		     if(trueVarElement!=null)
+				    		    	 this.getBpelRuntimeContext().writeVariable(trueVarInstance, trueVarElement);
+				    		     //this.getBpelRuntimeContext().writeVariable(trueVarInstance, doc.getFirstChild());
 				    		     
 					    		/*if(there are results){
 					    	       final VariableInstance varInstance = _scopeFrame.resolve(_oinvoke.outputVar);
@@ -212,35 +230,34 @@ class SWITCH extends ACTIVITY {
 	    				else
 	    					System.out.println(results.getCollection().size() + " results returned");
 			    		if(!results.getCollection().isEmpty()){
-			    			System.out.println("Results list size is " + results.getCollection().size());
 				    		for(ResultEntry currentResEntry : results.getCollection()){
-				    			 System.out.println("About to get the returned resultNode.");
 				    		     //Node resultNode = (Node) currentResEntry.getEntry();
 				    		     XMLEntryNode xmlNode = (XMLEntryNode) currentResEntry.getEntry();
-				    		     System.out.println("About to get the Node resultNode.");
 				    		     Node resultNode = xmlNode.getNode();
 				    		     if(xmlNode.getNode()==null) System.out.println("Null xml entry Node!!");
 				    		     System.out.println("Retrieved element value is :\n"+DOMUtils.domToString(resultNode)+"\n");
 				    		     VariableInstance varInstance = _scopeFrame.resolve(var);
-				    		     System.out.println("About to call the writeVariable function.");
 				    		     this.getBpelRuntimeContext().writeVariable(varInstance, resultNode);
 				    		     
 				    		     //make true the variable
 				    		     Variable trueVar = oswitch.getColateralVar(var.name);
 				    		     VariableInstance trueVarInstance = _scopeFrame.resolve(trueVar);
 				    		     
-				    		     Document doc = DOMUtils.newDocument();
-				    		     System.out.println("About to set value to "+trueVarInstance.declaration.name);
+				    		     //Document doc = DOMUtils.newDocument();
+				    		     //System.out.println("About to set value to "+trueVarInstance.declaration.name);
 				    		     //solution1
-				    		     CDATASection cdataNode = doc.createCDATASection("");
-				    		     CharacterData cdata = cdataNode;
-				    		     cdata.setData("true");
+				    		     //CDATASection cdataNode = doc.createCDATASection("");
+				    		     //CharacterData cdata = cdataNode;
+				    		     //cdata.setData("true");
 				    		     
 				    		     //solution2
 				    		     //Element root = doc.createElement("Item");
 				    		     //root.setAttribute("VariableIsTrue", "true");
 				    		     
-				    		     this.getBpelRuntimeContext().writeVariable(trueVarInstance, doc.getFirstChild());
+				    		     //this.getBpelRuntimeContext().writeVariable(trueVarInstance, doc.getFirstChild());
+				    		     
+				    		     if(trueVarElement!=null)
+				    		    	 this.getBpelRuntimeContext().writeVariable(trueVarInstance, trueVarElement);
 				    		     
 					    		/*if(there are results){
 					    	       final VariableInstance varInstance = _scopeFrame.resolve(_oinvoke.outputVar);
@@ -267,18 +284,19 @@ class SWITCH extends ACTIVITY {
 				    		     Variable trueVar = oswitch.getColateralVar(var.name);
 				    		     VariableInstance trueVarInstance = _scopeFrame.resolve(trueVar);
 				    		     
-				    		     Document doc = DOMUtils.newDocument();
-				    		     System.out.println("About to set value to "+trueVarInstance.declaration.name);
+				    		     //Document doc = DOMUtils.newDocument();
+				    		     //System.out.println("About to set value to "+trueVarInstance.declaration.name);
 				    		     //solution1
-				    		     CDATASection cdataNode = doc.createCDATASection("");
-				    		     CharacterData cdata = cdataNode;
-				    		     cdata.setData("true");
+				    		     //CDATASection cdataNode = doc.createCDATASection("");
+				    		     //CharacterData cdata = cdataNode;
+				    		     //cdata.setData("true");
 				    		     
 				    		     //solution2
 				    		     //Element root = doc.createElement("Item");
 				    		     //root.setAttribute("VariableIsTrue", "true");
 				    		     
-				    		     this.getBpelRuntimeContext().writeVariable(trueVarInstance, doc.getFirstChild());
+				    		     if(trueVarElement!=null)
+				    		    	 this.getBpelRuntimeContext().writeVariable(trueVarInstance, trueVarElement);
 				    		     
 					    		/*if(there are results){
 					    	       final VariableInstance varInstance = _scopeFrame.resolve(_oinvoke.outputVar);
@@ -324,18 +342,19 @@ class SWITCH extends ACTIVITY {
 				    		     Variable trueVar = oswitch.getColateralVar(var.name);
 				    		     VariableInstance trueVarInstance = _scopeFrame.resolve(trueVar);
 				    		     
-				    		     Document doc = DOMUtils.newDocument();
-				    		     System.out.println("About to set value to "+trueVarInstance.declaration.name);
+				    		     
+				    		     //System.out.println("About to set value to "+trueVarInstance.declaration.name);
 				    		     //solution1
-				    		     CDATASection cdataNode = doc.createCDATASection("");
-				    		     CharacterData cdata = cdataNode;
-				    		     cdata.setData("true");
+				    		     //CDATASection cdataNode = doc.createCDATASection("");
+				    		     //CharacterData cdata = cdataNode;
+				    		     //cdata.setData("true");
 				    		     
 				    		     //solution2
 				    		     //Element root = doc.createElement("Item");
 				    		     //root.setAttribute("VariableIsTrue", "true");
-				    		     
-				    		     this.getBpelRuntimeContext().writeVariable(trueVarInstance, doc.getFirstChild());
+				    		     System.out.println("About to write true variable");
+				    		     if(trueVarElement!=null)
+				    		    	 this.getBpelRuntimeContext().writeVariable(trueVarInstance, trueVarElement);
 				    		     
 					    		/*if(there are results){
 					    	       final VariableInstance varInstance = _scopeFrame.resolve(_oinvoke.outputVar);
