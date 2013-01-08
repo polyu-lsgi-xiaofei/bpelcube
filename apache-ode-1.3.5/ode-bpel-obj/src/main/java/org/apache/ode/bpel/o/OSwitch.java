@@ -50,8 +50,11 @@ public class OSwitch extends OActivity {
 
         Map<String, Variable> _result = new HashMap<String, Variable>();
         OScope _scope = getParentScope(this.getParent());
-        for(String _varName:_varMetamodelReferences.keySet())            
-           _result.put(_varName, _scope.getVisibleVariable(name));
+      
+        for(String _varName:_varMetamodelReferences.keySet()){
+        	Variable _var = _scope.getVisibleVariable(_varName);
+           _result.put(_varName, _var);
+           }
                 
         return _result;
     }
@@ -78,6 +81,7 @@ public class OSwitch extends OActivity {
      */
     private final List<OCase> _cases = new ArrayList<OCase> ();
 
+    
     public OSwitch(OProcess owner, OActivity parent) {
         super(owner, parent);
     }
