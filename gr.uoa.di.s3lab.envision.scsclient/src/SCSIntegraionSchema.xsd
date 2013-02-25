@@ -8,6 +8,27 @@ and open the template in the editor.
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
                       targetNamespace="http://purl.org/nkua/s3lab/ode/1.3.5/scs" 
            xmlns:tns="http://purl.org/nkua/s3lab/ode/1.3.5/scs">
-    
 
+    <xs:element name="SCSEngine">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="scope">
+                    <xs:complexType>
+                        <xs:simpleContent>
+                            <xs:extension base="xs:anyURI">
+                                <xs:attribute name="conType" type="tns:conTypeClass" use="optional" default="Synchronous"/>
+                            </xs:extension>
+                        </xs:simpleContent>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:simpleType name="conTypeClass">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Asynchronous"/>
+            <xs:enumeration value="Synchronous"/>
+        </xs:restriction>
+    </xs:simpleType>
 </xs:schema>
