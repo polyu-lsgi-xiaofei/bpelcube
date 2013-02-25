@@ -28,8 +28,10 @@ import gr.uoa.di.s3lab.bpelcube.services.RecruitRequest;
 import gr.uoa.di.s3lab.envision.scsclient.SCSClient;
 import gr.uoa.di.s3lab.p2p.P2PRequest;
 import gr.uoa.di.s3lab.p2p.hypercube.Neighbor;
+import java.io.StringWriter;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.SynchronousQueue;
@@ -43,6 +45,7 @@ import javax.wsdl.extensions.UnknownExtensibilityElement;
 import javax.wsdl.extensions.http.HTTPAddress;
 import javax.wsdl.extensions.soap.SOAPAddress;
 import javax.xml.namespace.QName;
+import org.apache.axiom.om.OMElement;
 
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
@@ -244,10 +247,15 @@ public class ODEService {
             __log.debug("ODE routed to operation " + odeMex.getOperation() + " from service " + _serviceName);
             odeMex.setProperty("isTwoWay", Boolean.toString(msgContext.getAxisOperation() instanceof TwoChannelAxisOperation));
 
-            int i=0;
-            for(String part:odeMex.getRequest().getParts())
-                __log.info("Request message part "+(i++)+part);
-            
+            Iterator scsEngineItr = msgContext.getEnvelope().getHeader().getChildrenWithName(new QName(
+                    "http://purl.org/nkua/s3lab/ode/1.3.5/scs", "SCSEngine"));
+            if (scsEngineItr != null)
+                while (scsEngineItr.hasNext()){
+                 OMElement _omElem=   (OMElement) scsEngineItr.next();
+                 StringWriter strWriter = new StringWriter();
+                 _omElem.serialize(strWriter);
+                 SCSEngineDocument scsHeaderDoc = SCSEngineDocument.Factory.parse(strWriter.toString());
+                }
             if (odeMex.getOperation() != null) {
             	
             	/**************************************************************/
