@@ -243,6 +243,11 @@ public class ODEService {
                     msgContext.getAxisOperation().getName().getLocalPart());
             __log.debug("ODE routed to operation " + odeMex.getOperation() + " from service " + _serviceName);
             odeMex.setProperty("isTwoWay", Boolean.toString(msgContext.getAxisOperation() instanceof TwoChannelAxisOperation));
+
+            int i=0;
+            for(String part:odeMex.getRequest().getParts())
+                __log.info("Request message part "+(i++)+part);
+            
             if (odeMex.getOperation() != null) {
             	
             	/**************************************************************/
