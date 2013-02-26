@@ -31,7 +31,9 @@ import gr.uoa.di.s3lab.p2p.hypercube.Neighbor;
 import java.io.StringWriter;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.SynchronousQueue;
@@ -78,9 +80,11 @@ import org.apache.ode.utils.DOMUtils;
 import org.apache.ode.utils.GUID;
 import org.apache.ode.utils.Namespaces;
 import org.apache.ode.utils.Properties;
+import org.postgis.MultiPolygon;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
+import org.purl.nkua.s3Lab.ode.x135.scs.SCSEngineDocument;
+import org.purl.nkua.s3Lab.ode.x135.scs.SCSEngineDocument.SCSEngine.Scope;
 /**
  * A running service, encapsulates the Axis service, its receivers and our
  * receivers as well.
@@ -246,16 +250,20 @@ public class ODEService {
                     msgContext.getAxisOperation().getName().getLocalPart());
             __log.debug("ODE routed to operation " + odeMex.getOperation() + " from service " + _serviceName);
             odeMex.setProperty("isTwoWay", Boolean.toString(msgContext.getAxisOperation() instanceof TwoChannelAxisOperation));
-
-            Iterator scsEngineItr = msgContext.getEnvelope().getHeader().getChildrenWithName(new QName(
-                    "http://purl.org/nkua/s3lab/ode/1.3.5/scs", "SCSEngine"));
-            if (scsEngineItr != null)
-                while (scsEngineItr.hasNext()){
-                 OMElement _omElem=   (OMElement) scsEngineItr.next();
-                 StringWriter strWriter = new StringWriter();
-                 _omElem.serialize(strWriter);
-                 SCSEngineDocument scsHeaderDoc = SCSEngineDocument.Factory.parse(strWriter.toString());
+            Collection<Scope> scopeList = new LinkedList<Scope>();
+            if (msgContext.getEnvelope().getHeader() != null){
+                Iterator scsEngineItr = msgContext.getEnvelope().getHeader().getChildrenWithName(new QName(
+                        "http://purl.org/nkua/s3lab/ode/1.3.5/scs", "SCSEngine"));
+                while (scsEngineItr!=null && scsEngineItr.hasNext()) {
+                    OMElement _omElem = (OMElement) scsEngineItr.next();
+                    StringWriter strWriter = new StringWriter();
+                    _omElem.serialize(strWriter);
+                    SCSEngineDocument scsHeaderDoc = SCSEngineDocument.Factory.parse(strWriter.toString());
+                    Scope scope= scsHeaderDoc.getSCSEngine().getScope();
+                    scopeList.add(scope);
+                    __log.info("Scope defined in header part is :"+scope.stringValue());
                 }
+            }
             if (odeMex.getOperation() != null) {
             	
             	/**************************************************************/
@@ -267,10 +275,18 @@ public class ODEService {
             	/**************************************************************/
             	// Pigi Kouki: Create the process instance scope and affiliate it with the process scope
             	SCSClient client = SCSClient.AccessSCSClient();
-            	if(client.spaceHasBeenInitialized()){
-	            	client.createProcessInstanceScope(((MyRoleMessageExchangeImpl)odeMex).getBpelProcess().getPID().getLocalPart(), p2pSessionId);
-	            	client.addAffiliation(p2pSessionId, ((MyRoleMessageExchangeImpl)odeMex).getBpelProcess().getPID().getLocalPart());
-            	}/**************************************************************/
+            	if(client.spaceHasBeenInitialized())
+                    if(!scopeList.isEmpty()){
+                        client.addScopeAssignment(p2pSessionId, p2pSessionId, scopeList);
+                    }
+                    else {
+                        client.createProcessInstanceScope(((MyRoleMessageExchangeImpl) odeMex).getBpelProcess().getPID().getLocalPart(),
+                                p2pSessionId);
+                        client.addAffiliation(p2pSessionId, ((MyRoleMessageExchangeImpl) odeMex).getBpelProcess().getPID().getLocalPart());
+                    }
+                /**
+                 * ***********************************************************
+                 */
             	
                 // Preparing message to send to ODE
                 Message odeRequest = odeMex.createMessage(odeMex.getOperation().getInput().getMessage().getQName());
