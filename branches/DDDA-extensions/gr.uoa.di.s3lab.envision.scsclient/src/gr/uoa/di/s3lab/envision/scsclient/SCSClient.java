@@ -25,6 +25,8 @@ import com.s3lab.space.struct.core.Role;
 import com.s3lab.space.struct.wsml.RDFS_WSMLMetaInformation;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.jini.core.discovery.LookupLocator;
 import net.jini.core.lookup.ServiceTemplate;
@@ -33,7 +35,7 @@ import net.jini.core.transaction.TransactionException;
 import org.purl.nkua.s3Lab.ode.x135.scs.SCSEngineDocument.SCSEngine.Scope;
 
 public class SCSClient {
-    
+    private static final Logger _logger = Logger.getLogger(SCSClient.class.getCanonicalName());
     private static SCSClient sharedInstance = null;
     private SemanticJavaSpace space = null;
     private String hostname;
@@ -52,6 +54,7 @@ public class SCSClient {
 //	////////////////////////////////////////////////////////////////////
 //                      initialization/management operations
     public void addScopeAssignment(String processId, String processInstanceId, Collection<Scope> assignedScopes) {
+        _logger.log(Level.INFO,"Adding scopes for process "+processId+" & instance id "+processInstanceId);
         this.scopeProcessMappings.put(getScopeName(processId, processInstanceId), assignedScopes);
     }
     
@@ -88,21 +91,16 @@ public class SCSClient {
                     new ServiceTemplate(null,
                     new Class[]{SemanticJavaSpace.class},
                     null));
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
+            _logger.log(Level.SEVERE, "Exception while trying to connect to SCS Engine", e);
             e.printStackTrace();
         }
         
         if (space != null)
-            System.out.println("JavaSpace Service discovered !!");
+            _logger.log(Level.INFO,"JavaSpace Service discovered !!");
         else
-            System.out.println("JavaSpace discovery failed!!");
+            _logger.log(Level.INFO,"JavaSpace discovery failed!!");
 
         //delete from here!!!!!!!!!!!!!!!!!!!!!!!!
         /*try {
@@ -153,13 +151,14 @@ public class SCSClient {
 
         //call the write and return the TTL returned from the SCS Engine
         //template of the write function: Lease writeMetaInfoScopeSpatioTemp(Entry entry, Transaction tnx, long ls, MetaInformation sinfo, String scopeName, MultiPolygon multiPol, TemporalFeature tmpFeature)
+        Lease finalLease = null;
      if (scopeProcessMappings.containsKey(this.getScopeName(processIdScope, processInstanceScope)))
             for (Scope _scope : scopeProcessMappings.get(this.getScopeName(processIdScope, processInstanceScope)))
                 try {
                     if (multipol == null && tmpFeature == null)
-                        space.writeMetaInfoScope(entryNode, null, desiredTTL, rdflInfo, _scope.netValue().getFragment());
+                        finalLease= space.writeMetaInfoScope(entryNode, null, desiredTTL, rdflInfo, URI.create(_scope.getStringValue()).getFragment());
                     else
-                        space.writeMetaInfoScopeSpatioTemp(entryNode, null, desiredTTL, rdflInfo, _scope.netValue().getFragment(), multipol, tmpFeature);
+                        finalLease= space.writeMetaInfoScopeSpatioTemp(entryNode, null, desiredTTL, rdflInfo, URI.create(_scope.getStringValue()).getFragment(), multipol, tmpFeature);
                 } catch (Exception e) {
                     e.printStackTrace();
                     continue;
@@ -167,18 +166,19 @@ public class SCSClient {
         else            
             try {
                 if (multipol == null && tmpFeature == null)
-                    return space.writeMetaInfoScope(entryNode, null, desiredTTL, rdflInfo, getScopeName(processIdScope,
+                    finalLease= space.writeMetaInfoScope(entryNode, null, desiredTTL, rdflInfo, getScopeName(processIdScope,
                             processInstanceScope));
                 else
-                    return space.writeMetaInfoScopeSpatioTemp(entryNode, null, desiredTTL, rdflInfo, this.getScopeName(processIdScope,
+                    finalLease= space.writeMetaInfoScopeSpatioTemp(entryNode, null, desiredTTL, rdflInfo, this.getScopeName(processIdScope,
                             processInstanceScope), multipol, tmpFeature);
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-        return null;
+        return finalLease;
     }
     
+    @Deprecated
     public Lease write(DocTest node, long desiredTTL, URI metaInformation, String syntacticType, String processIdScope,
             String processInstanceScope, String multipolygon, Timestamp startTime, Timestamp endTime, TimeZone tz) /*throws SQLException, RemoteException, TransactionException*/ {
 
@@ -266,57 +266,50 @@ public class SCSClient {
             tmpFeature = new TemporalFeature(startTime, endTime, tz);
         else
             tmpFeature = null;
+        
         ResultsList results = null;
         //call the read and return the matching results
-        if (processInstanceScope == null)
-            try {
-                System.out.println("processInstanceScope == null and call the readMetaInfoScopeSpatioTemp");
-                if (multipol == null && tmpFeature == null) {
-                    System.out.println("[SCSClient] readMetaInfoScope");
-                    results = space.readMetaInfoScope(null, null, query, processIdScope, true);
-                } else {
-                    System.out.println("[SCSClient] readMetaInfoScopeSpatioTemp");
-                    results = space.readMetaInfoScopeSpatioTemp(null, null, query, processIdScope, true, multipol, tmpFeature);
+        if (this.scopeProcessMappings.containsKey(getScopeName(processIdScope, processInstanceScope)))
+            for(Scope _scope: scopeProcessMappings.get(getScopeName(processIdScope, processInstanceScope)))
+                try {
+                    if(results ==null)
+                        results = new ResultsList();
+                    
+                    if (multipol == null && tmpFeature == null) {
+                        _logger.log(Level.FINER, "[SCSClient] readMetaInfoScope");
+                        results.addResultList(space.readMetaInfoScope(null, null, query, URI.create(_scope.getStringValue()).getFragment(), true));
+                    } else {
+                        _logger.log(Level.FINER, "[SCSClient] readMetaInfoScopeSpatioTemp ["+multipolygon.toString()+", "+tmpFeature.toString()+"]");
+                        results.addResultList(space.readMetaInfoScopeSpatioTemp(null, null, query, URI.create(_scope.getStringValue()).getFragment(),
+                                true,
+                                multipol, tmpFeature));
+                    }
+                    if (results != null)
+                        _logger.log(Level.INFO, "[SCSClient]" + results.getCollection().size() + " results returned");
+
+                } catch (Exception e) {
+                    _logger.log(Level.SEVERE, "Exception while querying the SCS engine", e);
+                    continue;
                 }
-                if (results == null)
-                    System.out.println("0 results returned [SCSClient]");
-                else
-                    System.out.println(results.getCollection().size() + " results returned[SCSClient]");
-                return results;
-                
-            } catch (RemoteException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (TransactionException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
         else
             try {
-                System.out.println("processInstanceScope != null and call the readMetaInfoScopeSpatioTemp");
-                
                 if (multipol == null && tmpFeature == null) {
-                    System.out.println("[SCSClient] readMetaInfoScope");
-                    results = space.readMetaInfoScope(null, null, query, processIdScope + "_" + processInstanceScope, true);
+                    _logger.log(Level.FINER, "[SCSClient] readMetaInfoScope");
+                    results = space.readMetaInfoScope(null, null, query, this.getScopeName(processIdScope, processInstanceScope), true);
                 } else {
-                    System.out.println("[SCSClient] readMetaInfoScopeSpatioTemp");
-                    results = space.readMetaInfoScopeSpatioTemp(null, null, query, processIdScope + "_" + processInstanceScope, true,
+                    _logger.log(Level.FINER, "[SCSClient] readMetaInfoScopeSpatioTemp");
+                    results = space.readMetaInfoScopeSpatioTemp(null, null, query, this.getScopeName(processIdScope, processInstanceScope),
+                            true,
                             multipol, tmpFeature);
                 }
-                if (results == null)
-                    System.out.println("0 results returned [SCSClient]");
-                else
-                    System.out.println(results.getCollection().size() + " results returned[SCSClient]");
-                return results;
-            } catch (RemoteException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (TransactionException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                if (results != null)
+                    _logger.log(Level.INFO, "[SCSClient]" + results.getCollection().size() + " results returned");
+
+            } catch (Exception e) {
+                _logger.log(Level.SEVERE, "Exception while querying the SCS engine", e);
             }
-        System.out.println("[SCSClient] return null!");
-        return null;
+
+        return results;
     }
 
     /*	
