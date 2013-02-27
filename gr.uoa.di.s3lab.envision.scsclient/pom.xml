@@ -72,8 +72,9 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>xmlbeans-maven-plugin</artifactId>
                 <configuration>
-                    <schemaDirectory>src/</schemaDirectory>
-                    <!--sourceGenerationDirectory>build/generated-sources/xmlbeans</sourceGenerationDirectory-->
+                    <schemaDirectory>src</schemaDirectory>
+                    <classGenerationDirectory>${basedir}/bin/classes</classGenerationDirectory>
+                    <sourceGenerationDirectory>src/generated-sources/xmlbeans</sourceGenerationDirectory>
                     <javaSource>1.6</javaSource>
                 </configuration>
                 <executions>
