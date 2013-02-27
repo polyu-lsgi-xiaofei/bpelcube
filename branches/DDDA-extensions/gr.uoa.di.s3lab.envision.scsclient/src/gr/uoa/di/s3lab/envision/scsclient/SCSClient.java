@@ -56,7 +56,7 @@ public class SCSClient {
     }
     
     private String getScopeName(String processId, String processInstanceId) {
-        return (processId != null ? processId : "") + "_" + (processInstanceId != null ? processInstanceId : "");
+        return (processId != null ? processId : "") + (processInstanceId != null ? "_"+processInstanceId : "");
     }
 
     public boolean spaceHasBeenInitialized() {
@@ -80,7 +80,7 @@ public class SCSClient {
         //LookupLocator locator = new LookupLocator("jini://pleiades.di.uoa.gr/");
         //LookupLocator locator = new LookupLocator("jini://pigi");
         System.out.println("Locator details:" + locator.getHost() + ": " + locator.getPort());
-        
+
         System.out.println("locatorName= " + locator.toString());
         
         try {
@@ -153,40 +153,29 @@ public class SCSClient {
 
         //call the write and return the TTL returned from the SCS Engine
         //template of the write function: Lease writeMetaInfoScopeSpatioTemp(Entry entry, Transaction tnx, long ls, MetaInformation sinfo, String scopeName, MultiPolygon multiPol, TemporalFeature tmpFeature)
-        if (processInstanceScope == null)
-            try {
-                if (multipol == null && tmpFeature == null) {
-                    System.out.println("[SCSClient] writeMetaInfoScope");
-                    return space.writeMetaInfoScope(entryNode, null, desiredTTL, rdflInfo, processIdScope);
-                } 
-                else {
-                    System.out.println("[SCSClient] writeMetaInfoScopeSpatioTemp");
-                    return space.writeMetaInfoScopeSpatioTemp(entryNode, null, desiredTTL, rdflInfo, processIdScope, multipol, tmpFeature);
+     if (scopeProcessMappings.containsKey(this.getScopeName(processIdScope, processInstanceScope)))
+            for (Scope _scope : scopeProcessMappings.get(this.getScopeName(processIdScope, processInstanceScope)))
+                try {
+                    if (multipol == null && tmpFeature == null)
+                        space.writeMetaInfoScope(entryNode, null, desiredTTL, rdflInfo, _scope.netValue().getFragment());
+                    else
+                        space.writeMetaInfoScopeSpatioTemp(entryNode, null, desiredTTL, rdflInfo, _scope.netValue().getFragment(), multipol, tmpFeature);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    continue;
                 }
-            } catch (RemoteException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (TransactionException e) {
-                // TODO Auto-generated catch block
+        else            
+            try {
+                if (multipol == null && tmpFeature == null)
+                    return space.writeMetaInfoScope(entryNode, null, desiredTTL, rdflInfo, getScopeName(processIdScope,
+                            processInstanceScope));
+                else
+                    return space.writeMetaInfoScopeSpatioTemp(entryNode, null, desiredTTL, rdflInfo, this.getScopeName(processIdScope,
+                            processInstanceScope), multipol, tmpFeature);
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-        else
-            try {
-                if (multipol == null && tmpFeature == null) {
-                    System.out.println("[SCSClient] writeMetaInfoScope");
-                    return space.writeMetaInfoScope(entryNode, null, desiredTTL, rdflInfo, processIdScope + "_" + processInstanceScope);
-                } else {
-                    System.out.println("[SCSClient] writeMetaInfoScopeSpatioTemp");
-                    return space.writeMetaInfoScopeSpatioTemp(entryNode, null, desiredTTL, rdflInfo,
-                            processIdScope + "_" + processInstanceScope, multipol, tmpFeature);                    
-                }
-            } catch (RemoteException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (TransactionException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }        
+
         return null;
     }
     
