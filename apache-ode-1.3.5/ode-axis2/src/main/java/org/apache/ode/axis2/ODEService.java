@@ -274,15 +274,16 @@ public class ODEService {
             	
             	/**************************************************************/
             	// Pigi Kouki: Create the process instance scope and affiliate it with the process scope
+                //   George Athanasopoulos: changed SCS Engine scope and process instance association mechanism
             	SCSClient client = SCSClient.AccessSCSClient();
+                String processId = ((MyRoleMessageExchangeImpl) odeMex).getBpelProcess().getPID().getLocalPart();
             	if(client.spaceHasBeenInitialized())
                     if(!scopeList.isEmpty()){
-                        client.addScopeAssignment(p2pSessionId, p2pSessionId, scopeList);
+                        client.addScopeAssignment(processId, p2pSessionId, scopeList);
                     }
                     else {
-                        client.createProcessInstanceScope(((MyRoleMessageExchangeImpl) odeMex).getBpelProcess().getPID().getLocalPart(),
-                                p2pSessionId);
-                        client.addAffiliation(p2pSessionId, ((MyRoleMessageExchangeImpl) odeMex).getBpelProcess().getPID().getLocalPart());
+                        client.createProcessInstanceScope(processId,p2pSessionId);
+                        client.addAffiliation(p2pSessionId, processId);
                     }
                 /**
                  * ***********************************************************

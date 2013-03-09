@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="bpelcube">
+<project name="bpelcube" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+    <property environment="env"/>
+    <path id="maven-ant-tasks.classpath" path="${env.ANT_HOME}\lib\maven-ant-tasks-2.1.0.jar" />
+    <typedef resource="org/apache/maven/artifact/ant/antlib.xml"
+             uri="antlib:org.apache.maven.artifact.ant"
+             classpathref="maven-ant-tasks.classpath" />
+
 	<!--
 	<property name="eclipse.workspace" 
 		value="C:/Eclipse/Workspaces/bpelcube"/>
@@ -13,11 +19,11 @@
 	<property name="eclipse.workspace" 
 		value="/Users/michael/eclipses/workspaces/bpelcube"/>
 	<property name="tomcat.home" 
-		value="/Users/michael/Desktop/bpelcube/apache-tomcat-7.0.23"/>
+		value="E:\Apache\apache-tomcat-7.0.37"/>
 	<property name="maven.command" 
-		value="/usr/bin/mvn"/>
+		value="E:\Apache\apache-maven-2.2.1\bin\mvn.bat"/>
 	<property name="local.libs" 
-		value="/Users/michael/Java/Libraries"/>
+		value="F:\My_Projects\Envision\Local\my_local_libs"/>
 	
 	<property name="ode.webapp" 
 		value="${tomcat.home}/webapps/ode"/>
@@ -25,59 +31,67 @@
 		value="${ode.webapp}/WEB-INF/lib"/>
 	
 	<property name="gr.uoa.di.s3lab.p2p" 
-		value="${eclipse.workspace}/gr.uoa.di.s3lab.p2p"/>
+		value="../../gr.uoa.di.s3lab.p2p"/>
 	<property name="gr.uoa.di.s3lab.p2p.hypercube" 
-		value="${eclipse.workspace}/gr.uoa.di.s3lab.p2p.hypercube"/>
+		value="../../gr.uoa.di.s3lab.p2p.hypercube"/>
 	<property name="gr.uoa.di.s3lab.bpelcube" 
-		value="${eclipse.workspace}/gr.uoa.di.s3lab.bpelcube"/>
+		value="../"/>
 	
 	<property name="ode.axis2" 
-		value="${eclipse.workspace}/ode-axis2"/>
+		value="../../apache-ode-1.3.5/ode-axis2"/>
 	<property name="ode.bpel.runtime" 
-		value="${eclipse.workspace}/ode-bpel-runtime"/>
+		value="../../apache-ode-1.3.5/ode-bpel-runtime"/>
 	<property name="ode.bpel.compiler" 
-		value="${eclipse.workspace}/ode-bpel-compiler"/>
+		value="../../apache-ode-1.3.5/ode-bpel-compiler"/>
 	
-	<target name="install-p2p">
-		<jar destfile="${ode.webapp.lib}/gr.uoa.di.s3lab.p2p.jar" 
-			basedir="${gr.uoa.di.s3lab.p2p}/bin"/>
-		<exec executable="${maven.command}" dir="${ode.webapp.lib}">
-			<arg value="install:install-file"/>
-			<arg value="-DgroupId=gr.uoa.di.s3lab"/>
-			<arg value="-DartifactId=p2p"/>
-			<arg value="-Dversion=1.0"/>
-			<arg value="-Dpackaging=jar"/>
-			<arg value="-Dfile=gr.uoa.di.s3lab.p2p.jar"/>
-		</exec>
-		<copy file="${local.libs}/hsqldb/2.0/hsqldb.jar" 
-			todir="${ode.webapp.lib}"/>
-	</target>
+                <target name="install-p2p">
+                    <!--jar destfile="${ode.webapp.lib}/gr.uoa.di.s3lab.p2p.jar" 
+                    basedir="${gr.uoa.di.s3lab.p2p}/bin"/-->
+                    <property name="p2p.pom" value="${gr.uoa.di.s3lab.p2p}/pom/pom.xml"/>
+                    <artifact:pom id="p2ppom" file="${p2p.pom}"/>
+                    <artifact:install pomrefid="p2ppom" file="${gr.uoa.di.s3lab.p2p}/build/p2p-1.0.jar"/>
+                </target>
+
+                <target name="deploy-p2p">
+                    <!--jar destfile="${ode.webapp.lib}/gr.uoa.di.s3lab.p2p.jar" 
+                    basedir="${gr.uoa.di.s3lab.p2p}/bin"/-->
+                    <property name="p2p.pom" value="${gr.uoa.di.s3lab.p2p}/pom/pom.xml"/>
+                    <artifact:pom id="p2ppom" file="${p2p.pom}"/>
+                    <artifact:deploy pomrefid="p2ppom" file="${gr.uoa.di.s3lab.p2p}/build/p2p-1.0.jar">
+                        <remoteRepository url="http://metis.di.uoa.gr:808/archiva/repository/internal">
+                            <authentication username="george.athanasopoulos" password="4m@n@ger4"/>
+                        </remoteRepository>
+                    </artifact:deploy>
+                </target>
 	
-	<target name="install-p2p-hypercube">
-		<jar destfile="${ode.webapp.lib}/gr.uoa.di.s3lab.p2p.hypercube.jar" 
-			basedir="${gr.uoa.di.s3lab.p2p.hypercube}/bin"/>
-		<exec executable="${maven.command}" dir="${ode.webapp.lib}">
-			<arg value="install:install-file"/>
-			<arg value="-DgroupId=gr.uoa.di.s3lab"/>
-			<arg value="-DartifactId=p2p.hypercube"/>
-			<arg value="-Dversion=1.0"/>
-			<arg value="-Dpackaging=jar"/>
-			<arg value="-Dfile=gr.uoa.di.s3lab.p2p.hypercube.jar"/>
-		</exec>		
-	</target>
+        <target name="install-p2p-hypercube">
+            <!--jar destfile="${ode.webapp.lib}/gr.uoa.di.s3lab.p2p.hypercube.jar" 
+            basedir="${gr.uoa.di.s3lab.p2p.hypercube}/bin"/-->
+            <property name="p2p.hc.pom" value="${gr.uoa.di.s3lab.p2p.hypercube}/pom/pom.xml"/>
+            <artifact:pom id="p2phcpom" file="${p2p.hc.pom}"/>
+            <artifact:install pomrefid="p2phcpom" file="${gr.uoa.di.s3lab.p2p.hypercube}/build/p2p.hypercube-1.0.jar"/>
+        </target>
 	
-	<target name="install-bpelcube">
-		<jar destfile="${ode.webapp.lib}/gr.uoa.di.s3lab.bpelcube.jar" 
-			basedir="${gr.uoa.di.s3lab.bpelcube}/bin"/>
-		<exec executable="${maven.command}" dir="${ode.webapp.lib}">
-			<arg value="install:install-file"/>
-			<arg value="-DgroupId=gr.uoa.di.s3lab"/>
-			<arg value="-DartifactId=bpelcube"/>
-			<arg value="-Dversion=1.0"/>
-			<arg value="-Dpackaging=jar"/>
-			<arg value="-Dfile=gr.uoa.di.s3lab.bpelcube.jar"/>
-		</exec>
-	</target>
+        <target name="install-bpelcube">
+            <!--jar destfile="${ode.webapp.lib}/gr.uoa.di.s3lab.bpelcube.jar" 
+            basedir="${gr.uoa.di.s3lab.bpelcube}/bin"/-->
+            <property name="bpcube.pom" value="${gr.uoa.di.s3lab.bpelcube}/pom/pom.xml"/>
+            <artifact:pom id="bpcpom" file="${bpcube.pom}"/>
+            <artifact:install pomrefid="bpcpom" file="${gr.uoa.di.s3lab.bpelcube}/dist/gr.uoa.di.s3lab.bpelcube.jar"/>
+        </target>
+
+        <target name="deploy-bpelcube">
+            <!--jar destfile="${ode.webapp.lib}/gr.uoa.di.s3lab.bpelcube.jar" 
+            basedir="${gr.uoa.di.s3lab.bpelcube}/bin"/-->
+            <property name="bpcube.pom" value="${gr.uoa.di.s3lab.bpelcube}/pom/pom.xml"/>
+            <artifact:pom id="bpcpom" file="${bpcube.pom}"/>
+            <artifact:deploy pomrefid="bpcpom" file="${gr.uoa.di.s3lab.bpelcube}/dist/gr.uoa.di.s3lab.bpelcube.jar">
+                <remoteRepository url="http://metis.di.uoa.gr:808/archiva/repository/internal">
+                    <authentication username="george.athanasopoulos" password="4m@n@ger4"/>
+                </remoteRepository>
+            </artifact:deploy>
+
+        </target>
 	
 	<target name="install-ode-axis2">
 		<exec executable="${maven.command}" dir="${ode.axis2}">
@@ -89,7 +103,7 @@
 			<fileset dir="${ode.axis2}/target" includes="*.jar" />
 		</copy>		
 	</target>
-	
+        
 	<target name="install-ode-bpel-runtime">
 		<exec executable="${maven.command}" dir="${ode.bpel.runtime}">
 			<arg value="-o"/>

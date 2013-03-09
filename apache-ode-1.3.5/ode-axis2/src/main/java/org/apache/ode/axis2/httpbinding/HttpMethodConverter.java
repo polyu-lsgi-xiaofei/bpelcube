@@ -613,7 +613,7 @@ public class HttpMethodConverter {
      * @return
      * @throws IOException
      */
-    String downloadResponseBody(HttpMethod method) throws IOException {
+    protected String downloadResponseBody(HttpMethod method) throws IOException {
     	String body = null;
         byte[] responseBody = null;
 
