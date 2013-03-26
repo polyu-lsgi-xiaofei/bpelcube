@@ -274,16 +274,18 @@ public class SCSClient {
                 try {
                     if(results ==null)
                         results = new ResultsList();
-                    
+    
+                    String scopeUri=(URI.create(_scope.getStringValue()).getFragment()!=null)?URI.create(_scope.getStringValue()).getFragment():_scope.getStringValue();
+
                     if (multipol == null && tmpFeature == null) {
                         _logger.log(Level.FINER, "[SCSClient] readMetaInfoScope");
-                        results.addResultList(space.readMetaInfoScope(null, null, query, URI.create(_scope.getStringValue()).getFragment(), true));
-                    } else {
+                        results.addResultList(space.readMetaInfoScope(null, null, query, scopeUri, true));
+                    } 
+                    else {
                         _logger.log(Level.FINER, "[SCSClient] readMetaInfoScopeSpatioTemp ["+multipolygon.toString()+", "+tmpFeature.toString()+"]");
-                        results.addResultList(space.readMetaInfoScopeSpatioTemp(null, null, query, URI.create(_scope.getStringValue()).getFragment(),
-                                true,
-                                multipol, tmpFeature));
+                        results.addResultList(space.readMetaInfoScopeSpatioTemp(null, null, query, scopeUri,true, multipol, tmpFeature));
                     }
+                    
                     if (results != null)
                         _logger.log(Level.INFO, "[SCSClient]" + results.getCollection().size() + " results returned");
 
