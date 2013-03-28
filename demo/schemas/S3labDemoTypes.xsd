@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://purl.org/nkua/s3lab/envision/demo"
+            xmlns:tns="http://purl.org/nkua/s3lab/envision/demo"
+            elementFormDefault="qualified">
+    <xsd:complexType name="ExecuteResponseT">
+        <xsd:sequence>
+            <xsd:element name="name" type="xsd:string"></xsd:element>
+            <xsd:element name="data" type="xsd:string"></xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:element name="ExecuteResponse" type="tns:ExecuteResponseT"></xsd:element>
+
+    <xsd:complexType name="ObservationResponseT">
+        <xsd:sequence>
+            <xsd:element name="observation" type="xsd:string"></xsd:element>
+            <xsd:element name="sensor" type="xsd:string"></xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    
+    <xsd:element name="ObservationResponse" type="tns:ObservationResponseT"></xsd:element>
+</xsd:schema>
