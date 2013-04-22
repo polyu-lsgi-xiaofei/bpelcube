@@ -18,14 +18,14 @@
   ~ under the License.
   -->
   
-<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://ode.apache.org/activityRecovery" xmlns:ext="http://ode.apache.org/activityRecovery" elementFormDefault="qualified">
-  <element name="failureHandling">
-    <complexType>
-      <all>
-        <element name="retryFor" type="int" minOccurs="0"></element>
-        <element name="retryDelay" type="int" minOccurs="0"></element>
-        <element name="faultOnFailure" type="boolean" minOccurs="0"></element>
-      </all>
-    </complexType>
-  </element>
-</schema>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://ode.apache.org/activityRecovery" xmlns:ext="http://ode.apache.org/activityRecovery" elementFormDefault="qualified">
+  <xs:element name="failureHandling">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="retryFor" type="xs:int" minOccurs="0"></xs:element>
+        <xs:element name="retryDelay" type="xs:int" minOccurs="0"></xs:element>
+        <xs:element name="faultOnFailure" type="xs:boolean" minOccurs="0"></xs:element>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
